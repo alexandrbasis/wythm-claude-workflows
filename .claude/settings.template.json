@@ -1,0 +1,120 @@
+{
+  "env": {
+    "CLAUDE_HOOK_BOT_TOKEN": "YOUR_TELEGRAM_BOT_TOKEN_HERE",
+    "CLAUDE_HOOK_CHAT_ID": "YOUR_TELEGRAM_CHAT_ID_HERE",
+    "PUBLIC_REPO_PATH": "/path/to/your/public/claude-workflows-repo"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(mkdir:*)",
+      "Bash(git checkout:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(cd:*)",
+      "Bash(chmod:*)",
+      "Bash(make:*)",
+      "mcp__linear__list_teams",
+      "mcp__linear__list_issue_labels",
+      "mcp__linear__create_issue",
+      "mcp__linear__update_issue",
+      "mcp__linear__create_comment",
+      "mcp__linear__get_issue",
+      "mcp__linear__list_projects",
+      "mcp__linear__list_issue_statuses",
+      "mcp__linear__list_issues",
+      "Bash(gh pr list:*)",
+      "Bash(gh pr create:*)",
+      "Bash(gh pr view:*)",
+      "Bash(gh pr checks:*)",
+      "Bash(gh pr merge:*)",
+      "Bash(gh pr close:*)",
+      "WebFetch(domain:github.com)",
+      "WebSearch"
+    ],
+    "deny": [],
+    "ask": [],
+    "additionalDirectories": [
+      "/your/additional/working/directory"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/pre-commit-validation.py",
+            "timeout": 30,
+            "description": "Validates git commits before execution"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/lint-on-write.py",
+            "timeout": 30,
+            "description": "Auto-lint Python files on write/edit"
+          },
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/auto-sync-claude-agents.py",
+            "timeout": 30,
+            "description": "Sync agent configurations"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/auto-sync-public-repo.py",
+            "timeout": 60,
+            "description": "Auto-sync .claude/ to public repository on git commit"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/telegram-notify.sh\"",
+            "description": "Send Telegram notification when Claude stops"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/telegram-notify.sh\"",
+            "description": "Send Telegram notification when subagent stops"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/telegram-notify.sh\"",
+            "description": "Send Telegram notification on system notifications"
+          }
+        ]
+      }
+    ]
+  },
+  "outputStyle": "default"
+}
