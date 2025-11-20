@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "Railway": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "@railway/mcp-server"
+      ],
+      "env": {}
+    }
+  },
+  "enabledMcpjsonServers": [],
+  "disabledMcpjsonServers": []
+}
