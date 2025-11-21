@@ -71,7 +71,7 @@ Using changelog entries:
 4. **Testing** - MUST perform actual test execution, not just code inspection
 5. **Documentation** - all required updates completed
 
-**CRITICAL TESTING REQUIREMENT**: Do not just review test code or assume tests pass. You MUST actually run the test suite and verify results. Use appropriate test commands (pytest, npm test, etc.) to execute tests and report actual results, including any failures or issues discovered.
+**CRITICAL TESTING REQUIREMENT**: Do not just review test code or assume tests pass. You MUST actually run the test suite and verify results. Use appropriate test commands (pytest, npm test, etc.) to execute tests and report actual results, including any failures or issues discovered. For Wythm specifically, always run the project's `npm run test` script from the relevant package (e.g., backend root) and attach the real command output to the review notes—no skipping even if it takes time. Whenever you need deeper insight into coverage quality or missing scenarios, invoke the `@test-coverage-reviewer` agent and incorporate its findings into your review document. If the changes involve security-sensitive logic, consult the `@security-code-reviewer` agent for OWASP-focused verification, and for general maintainability or refactor reviews, run the `@code-quality-reviewer` agent to strengthen your assessment.
 
 #### **Solution Verification Checklist**
 

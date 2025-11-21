@@ -107,11 +107,12 @@ Note: Skip this step when continuing implementation or addressing Code Review Re
 ### **STEP 4: Completion**
 
 #### **Final Verification**
-1. **Run complete test suite** with coverage:
+1. **Run complete test suite** using the project's npm script and capture actual output:
    ```bash
-   pytest --cov=bot --cov-report=html --cov-report=term-missing
-   pytest --cov=bot --cov-fail-under=90
+   cd backend
+   npm run test -- --coverage
    ```
+   If other packages are affected, run their `npm run test` scripts as well and record the logs in the task document.
 2. **Verify success criteria**
 
 

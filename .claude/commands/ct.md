@@ -41,7 +41,7 @@ Look for existing documentation:
 
 Create technical implementation plan with **TEST PLAN FIRST** (TDD approach):
 - Fill in Primary Objective based on JTBD/PRD or user input
-- Define comprehensive Test Plan with Given/When/Then structure
+- Define comprehensive Test Plan with Given/When/Then structure and include explicit instructions on which existing project test commands (e.g., backend `npm run test`) must be executed
 - Detail Implementation Steps with specific files, directories, and changes
 - Reference relevant ADRs if architectural decisions were made
 
