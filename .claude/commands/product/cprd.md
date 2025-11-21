@@ -16,7 +16,7 @@ You are an experienced Product Manager. Create a Product Requirements Document (
 ## Required Context
 
 **Read before starting:**
-1. **Product Vision**: @product-docs/PRD/PRD_Wythm.md
+1. **Product Vision**: @docs/product-docs/PRD/PRD_Wythm.md
 2. **Project Structure**: @CLAUDE.md
 3. **Existing PRDs**: Check `product-docs/PRD/` for related documents
 

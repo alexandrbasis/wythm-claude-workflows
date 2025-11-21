@@ -20,12 +20,14 @@ Workspace: [your-workspace-name]
 
 ### Task States (in order)
 ```yaml
-- Backlog        # Initial state
-- Todo           # Ready to work
-- In Progress    # Active development
-- In Review      # Code review
-- Done           # Completed
-- Canceled       # Abandoned
+- Backlog              # Intake
+- Ready for Implementation
+- In Progress
+- In Review
+- Needs Fixes
+- Ready to Merge
+- Done
+- Canceled
 ```
 
 ### Priority Levels

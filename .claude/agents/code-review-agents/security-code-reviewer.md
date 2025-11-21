@@ -37,6 +37,14 @@ When reviewing code, you will:
 - Check for insecure direct object references (IDOR)
 - Verify proper implementation of role-based or attribute-based access control
 
+**Wythm-Specific Considerations**
+
+- Confirm Firebase-issued tokens are validated server-side and converted to backend JWTs exactly once per request (`AuthModule` services)
+- Ensure Prisma queries always use parameter binding—no dynamic SQL or string interpolation for Supabase/Postgres access
+- Check that secrets, access tokens, and Supabase credentials are never logged; `.env` variables must only flow through NestJS config providers
+- Validate request DTOs and class validators enforce constraints defined in the relevant `tech-decomposition-*.md` acceptance criteria
+- Review session persistence (context caches, Redis, etc.) for proper TTLs and revocation when Firebase tokens expire or users are disabled
+
 **Analysis Methodology**
 
 1. First, identify the security context and attack surface of the code

@@ -66,10 +66,10 @@ Note: Skip this step when continuing implementation or addressing Code Review Re
    - **Error Handling Tests**: As\If defined in approved test plan  
    - **Integration Tests**: As\If defined in approved test plan
    - **User Interaction Tests**: As\If defined in approved test plan
-1. **Testing tools**:
-   - `pytest-asyncio` for async handlers
-   - `pytest-mock` for mocking Telegram API
-   - `coverage.py` for coverage control
+4. **Testing tools**:
+   - `npm run test` / `npm run test -- --coverage` (Jest with ts-jest)
+   - `npm run test:ci` when the Postgres-backed integration suite is required
+   - `npm run test:db:start|migrate|stop` scripts to spin up and tear down the Supabase-compatible test DB
 5. **TDD Verification**: All tests from approved plan must pass before proceeding to next step
 
 #### **After Each Step:**

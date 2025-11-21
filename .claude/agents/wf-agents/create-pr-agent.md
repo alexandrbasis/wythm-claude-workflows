@@ -15,7 +15,7 @@ Create GitHub PRs for completed tasks while maintaining full traceability betwee
 ## WORKFLOW REQUIREMENTS
 
 ### 1. Task Document Analysis and Validation
-Thoroughly read and analyze task document (`tasks/*/Task Document.md` or similar) to extract:
+Thoroughly read and analyze the technical decomposition (`tasks/task-YYYY-MM-DD-[feature]/tech-decomposition-[feature].md`) to extract:
 - `# Task:` header with title
 - `## Description` section
 - `## Acceptance Criteria` with all items checked `[x]`
@@ -58,15 +58,14 @@ $description
 $(echo "$key_files" | sed 's/^[[:space:]]*- \*\*Files\*\*: /- /')
 
 ## Task Reference
-- **Task Document**: $task_file
+- **Tech Decomposition**: $task_file
 - **Linear Issue**: $linear_id
 - **Test Coverage**: $test_coverage
 
-## Test Plan
-- [x] All acceptance criteria validated and checked
-- [x] Comprehensive test suite implemented with $test_coverage
-- [x] Manual testing completed for all implemented features
-- [x] Integration testing verified
+## Test Evidence
+- `npm run test -- --coverage` (paste the final console output)
+- `npm run test:ci` (if the task requires the Postgres test DB)
+- Manual verification notes for user-facing flows
 
 ## Code Review Notes
 See task document for complete step-by-step implementation details and code review checklist.
@@ -80,7 +79,7 @@ EOF
 **PR Title Types:** `feat`, `fix`, `refactor`, `docs`, `test`, `chore`
 
 ### 3. Task Document Update
-Add comprehensive PR traceability and code review preparation section after successful creation:
+Add comprehensive PR traceability and code review preparation section after successful creation inside the same `tech-decomposition-*.md` file:
 ```markdown
 ## PR Traceability & Code Review Preparation
 - **PR Created**: [Date]
@@ -99,10 +98,7 @@ Add comprehensive PR traceability and code review preparation section after succ
 - **Dependencies Added**: [None/List if any]
 
 ### Step-by-Step Completion Status
-[Copy all step checkboxes with ✅ status and timestamps for reviewer reference]
-- [x] ✅ Step 1: [Description] - Completed [Timestamp]
-- [x] ✅ Step 2: [Description] - Completed [Timestamp]
-- [continue for all steps...]
+[Copy all step checkboxes with ✅ status and timestamps for reviewer reference from the tech decomposition]
 
 ### Code Review Checklist
 - [ ] **Functionality**: All acceptance criteria met
@@ -151,7 +147,7 @@ git ls-remote --heads origin "$branch" >/dev/null 2>&1 || git push -u origin "$b
 
 ```bash
 # Input: Task document path
-task="tasks/task-2025-01-15-authentication/Task Document.md"
+task="tasks/task-2025-01-15-authentication/tech-decomposition-authentication.md"
 
 # 1. Comprehensive task analysis and validation
 echo "📋 Analyzing task document..."

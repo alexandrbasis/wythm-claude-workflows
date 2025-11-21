@@ -10,12 +10,13 @@ model: sonnet
 **Purpose**: Generate changelog entries from completed task documents and update date-based changelog files
 
 ## PRIMARY OBJECTIVE
-Read task document, extract changes made, and add structured changelog entry to date-based changelog system under `docs/changelogs/`
+Read the completed task’s technical decomposition, extract the implemented changes, and add a structured changelog entry to the date-based files under `docs/changelogs/`.
 
 ## INPUT
-- **Task Document**: `docs/tasks/[latest].md` with implementation details
-- **Target Directory**: `docs/changelogs/YYYY-MM-DD/` with date-based organization
-- **Target File**: `docs/changelogs/YYYY-MM-DD/changelog.md` for current date
+- **Task Document**: `tasks/task-YYYY-MM-DD-[feature]/tech-decomposition-[feature].md`
+- **Source Sections**: `Primary Objective`, `Implementation Steps`, and especially `## Implementation Changelog`
+- **Target Directory**: `docs/changelogs/YYYY-MM-DD/` (create if missing)
+- **Target File**: `docs/changelogs/YYYY-MM-DD/changelog.md`
 
 ## CHANGELOG FORMAT
 Follow Keep a Changelog format for daily entries:
@@ -45,37 +46,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## WORKFLOW
 
 ### Step 1: Determine Current Date and Directory
-- Get current date in YYYY-MM-DD format using `date +%Y-%m-%d`
-- Check if `docs/changelogs/YYYY-MM-DD/` directory exists
-- Create directory if it doesn't exist: `mkdir -p docs/changelogs/YYYY-MM-DD/`
-- Determine target file path: `docs/changelogs/YYYY-MM-DD/changelog.md`
+- Get current date in `YYYY-MM-DD` format using `date +%Y-%m-%d` (or accept explicit date from the invoking command)
+- Create the directory if it doesn't exist: `mkdir -p docs/changelogs/YYYY-MM-DD/`
+- Set target file path to `docs/changelogs/YYYY-MM-DD/changelog.md`
 
 ### Step 2: Analyze Task Document
-- Read task file to understand what was implemented
-- Extract business requirements, technical changes, and user impact
-- Identify specific files, folders, and line numbers where changes were made
+- Read the `tech-decomposition-*.md` file to understand what was implemented
+- Focus on the `## Implementation Changelog` and completion summary for file paths, timestamps, and user impact
+- Gather references to acceptance criteria, database changes, and tests that were executed
 - Identify change type: Added, Changed, Fixed, or Removed
 
 ### Step 3: Categorize Changes
-Based on task content, categorize as:
-- **Added**: New features, commands, functionality
-- **Changed**: Modified existing behavior, improvements
-- **Fixed**: Bug fixes, issue resolutions
-- **Removed**: Deprecated features, cleanup
+Based on the task content, categorize as:
+- **Added**: New features, commands, entities, or migrations
+- **Changed**: Modified behavior, refactors, docs updates
+- **Fixed**: Bug fixes, regression patches
+- **Removed**: Deprecated features, cleanup, migration rollbacks
 
 ### Step 4: Handle Existing vs New Changelog
-- **If changelog.md exists for the date**: Add new entries to appropriate sections
-- **If changelog.md doesn't exist**: Create new file with full header structure and add entries
+- **If changelog.md exists**: Append to the existing “Added/Changed/Fixed/Removed” sections
+- **If changelog.md doesn't exist**: Create the file with the standard header before adding entries
 - Preserve existing entries when updating
 - Maintain proper markdown formatting and structure
 
 ### Step 5: Generate and Insert Changelog Entry
-- Write clear, user-focused description with code references
-- Include specific file paths and line numbers where applicable (e.g., `src/models/user.py:45`)
-- Include folder references for broader changes (e.g., `src/handlers/`, `tests/`)
-- Include version number if specified in task
-- Focus on user impact while providing technical context through code references
-- Add entry to appropriate section (Added, Changed, Fixed, Removed) in date-specific file
+- Write clear, user-focused descriptions with code references from the task’s changelog (e.g., ``backend/src/modules/sessions/services/create-session.service.ts``)
+- Include folder references for broader changes (e.g., ``backend/src/modules/sessions/``, ``backend/tests/integration/``)
+- Mention test coverage or migrations if the task highlighted them
+- Add entries to the appropriate section (Added, Changed, Fixed, Removed) in the date-specific file
 
 ## EXAMPLE OUTPUT
 For a task about adding user authentication completed on 2025-09-27:
@@ -90,16 +88,12 @@ For a task about adding user authentication completed on 2025-09-27:
 ```
 
 ## DIRECTORY STRUCTURE MANAGEMENT
-The agent should ensure the following structure is maintained:
+Create directories on demand; a minimal structure looks like:
 ```
 docs/changelogs/
-├── README.md                     # Documentation for the changelog system
-├── CHANGELOG_LEGACY.md          # Archived monolithic changelog
-├── 2025-09-28/                  # Latest date directories first
+├── 2025-11-20/
 │   └── changelog.md
-├── 2025-09-27/
-│   └── changelog.md
-└── 2025-09-26/
+└── 2025-11-21/
     └── changelog.md
 ```
 

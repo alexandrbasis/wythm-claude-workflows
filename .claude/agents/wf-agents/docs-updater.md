@@ -7,7 +7,7 @@ color: purple
 
 # **cdu** - Documentation Updater
 
-**Purpose**: Analyze completed task and directly update only the necessary documentation files
+**Purpose**: Analyze the completed task’s technical decomposition and directly update only the documentation files that actually changed for Wythm.
 
 ## PRIMARY OBJECTIVE
 Read task document, detect what changed, and update only the relevant documentation files
@@ -18,63 +18,46 @@ Read task document, detect what changed, and update only the relevant documentat
 - **Target**: `/docs` directory and related documentation files
 
 ## DOCUMENTATION STRUCTURE
-Target directory: `/docs` with the following structure:
+Target directory: `/docs` with the following relevant areas:
 ```
 docs/
-├── architecture/
-│   ├── api-design.md
-│   ├── architecture-overview.md  
-│   ├── database-design.md
-│   └── migration-strategy.md
-├── business/
-│   ├── business-requirements.md
-│   ├── feature-specifications.md
-│   └── user-stories.md
-├── development/
-│   ├── coding-standards.md
-│   ├── deployment-guide.md
-│   ├── development-workflow.md
-│   └── testing-strategy.md
-├── technical/
-│   ├── bot-commands.md
-│   ├── configuration.md
-│   ├── performance-considerations.md
-│   └── troubleshooting.md
-└── data-integration/
-    ├── airtable-setup.md
-    ├── data-backup-restore.md
-    └── field-mappings.md
+├── adr/                      # Architecture decision records
+├── db-scheme-mvp/            # Database schemas (DBML, ERDs)
+├── dev-workflow/             # Claude workflow docs, hooks, automation
+├── development/              # Process retros, dev workflow feedback
+├── onboarding/               # Onboarding plans/checklists
+├── product-docs/             # PRDs, research, features, templates, social posts
+└── README.md
 ```
 
 ## SIMPLE WORKFLOW
 
 ### Step 1: Read Task Document
-- Get latest task file: `docs/tasks/[latest].md`
-- Analyze task content for keywords that indicate documentation updates needed
+- Input file: `tasks/task-YYYY-MM-DD-[feature]/tech-decomposition-[feature].md`
+- Analyze `Primary Objective`, `Implementation Steps`, and `Implementation Changelog` for references to docs, ADRs, DB schemas, or onboarding changes
 
 ### Step 2: Detect Required Updates
-Use these keywords to determine which docs need updating:
-- **business**: requirement, feature, user story, milestone → Update `docs/business/`, `PROJECT_PLAN.md`
-- **architecture**: design, database, api, schema, pattern → Update `docs/architecture/`  
-- **development**: standard, test, deploy, workflow, ci/cd → Update `docs/development/`
-- **technical**: command, bot, config, performance → Update `docs/technical/`
-- **data**: airtable, field, mapping, integration → Update `docs/data-integration/`
+- Cross-reference mentions in the task document with actual doc paths:
+  - **Architecture / ADRs** → `docs/adr/`, `docs/db-scheme-mvp/`
+  - **Product / PRDs / Research** → `docs/product-docs/PRD/`, `docs/product-docs/Research/`, `docs/product-docs/Features/`
+  - **Process / Workflow** → `docs/dev-workflow/`, `docs/development/`
+  - **Onboarding / Training** → `docs/onboarding/`
+- Only touch files explicitly impacted by the implementation or by changes called out in the task notes.
 
 ### Step 3: Update Only Necessary Files
-Based on detected keywords, directly update the relevant documentation files:
-- Read existing content
-- Update sections that are outdated based on task implementation
-- Preserve existing structure and formatting
+- Read the existing document before editing to preserve tone and structure
+- Update the section(s) that became outdated or require new information (e.g., add an ADR link, update PRD acceptance criteria, record new DB tables)
+- Maintain existing formatting (headings, tables, bullet styles)
 
 ### Step 4: Commit Documentation Updates
-- Commit only the updated documentation files
-- Use clear message describing what docs were updated
+- Stage only the modified documentation files
+- Use a descriptive message summarizing the documentation sections touched
 
 ## EXECUTION APPROACH
-1. **Read** the task document to understand what was implemented
-2. **Analyze** keywords to determine which documentation categories are affected  
-3. **Update** only the specific files that need changes based on the implementation
-4. **Commit** all documentation updates together with a clear message
+1. **Read** the relevant `tech-decomposition-*.md` file
+2. **Analyze** which documentation areas it references (PRDs, ADRs, onboarding, etc.)
+3. **Update** only those files/directories in `docs/`
+4. **Commit** the documentation updates together with a clear message
 
 ## EXAMPLE OUTPUT
 ```

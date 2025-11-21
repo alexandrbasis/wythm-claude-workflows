@@ -25,6 +25,14 @@ Use only when:
 3. **Safety checks**:
    - Get explicit user confirmation
    - Verify branch up to date, CI passing, no conflicts
+   - Re-run the authoritative local checks and capture their console output for the merge notes:
+     ```bash
+     cd backend
+     npm install --legacy-peer-deps # if not already installed
+     npm run lint:check
+     npm run test -- --coverage
+     ```
+     If the task relies on the Postgres test DB, start it (`npm run test:db:start && npm run test:db:migrate`) and run `npm run test:ci` before shutting it down with `npm run test:db:stop`.
 
 ### **STEP 2: Pre-Merge Updates**
 

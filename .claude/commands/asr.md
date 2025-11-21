@@ -1,5 +1,4 @@
----
-allowed-tools: Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)
+allowed-tools: Bash,Read,Grep,Glob,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)
 description: Review a pull request using specialized agents and document findings
 ---
 
@@ -12,6 +11,16 @@ Perform a comprehensive code review using subagents for key areas:
 - security-code-reviewer
 
 Instruct each to only provide noteworthy feedback. Once they finish, review the feedback and post only the feedback that you also deem noteworthy.
+
+**Mandatory testing**: Always run the backend test suite to verify claims. From the repository root:
+```bash
+cd backend
+npm install --legacy-peer-deps # if dependencies are not installed
+npm run test -- --coverage
+```
+If the task set up dedicated `npm run test:ci` workflows (e.g., with the Postgres test DB), execute those as well and copy the full console output into your review notes.
+
+**Linear sync**: Use the `linear-task-manager` agent at review start (set issue to "In Review") and after finishing (set to "Ready to Merge"/"Needs Fixes" with summary) so the workflow mirrors `sr.md`.
 
 **After collecting all agent feedback**, create `Advanced Code Review - [Task Title].md` in task directory documenting findings from each agent:
 

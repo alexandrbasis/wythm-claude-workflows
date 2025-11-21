@@ -1,6 +1,6 @@
 When the user requests to sync the Claude Code configuration to the public repository:
 
-1. Execute the sync script:
+1. Ensure you're in the monorepo root (`/Users/.../wythm`) with a clean working tree, then execute the sync script:
    ```bash
    .claude/scripts/sync-to-public.sh
    ```

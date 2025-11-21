@@ -51,3 +51,10 @@ For each issue identified:
 - Prioritize recommendations by impact vs. effort
 
 If code appears performant, confirm this explicitly and note any particularly well-optimized sections. Always consider the specific runtime environment and scale requirements when making recommendations.
+
+**Wythm-Specific Focus Areas**:
+
+- Inspect Prisma queries for unbounded `findMany` calls, missing pagination, and lack of `select`/`include` filtering; recommend batching or `take/skip` usage
+- Flag N+1 issues inside NestJS services (loops issuing sequential Prisma queries) and suggest `include` or prefetch strategies
+- Ensure Supabase/Postgres connection pools (`npm run test:db:*`) are reused—no per-request instantiation of PrismaClient
+- Review long-running tasks for blocking awaits inside request handlers; prefer background jobs or streaming APIs where appropriate

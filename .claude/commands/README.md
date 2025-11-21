@@ -253,11 +253,10 @@ graph TD
 
 **Validation Requirements**:
 - Complete CI validation suite execution (matches GitHub Actions)
-- Format checking: black, isort compliance
-- Type checking: mypy validation with no errors
-- Linting: flake8 compliance across codebase
-- Security: pip-audit and bandit validation
-- Testing: pytest execution with coverage enforcement
+- Format/lint: `npm run lint:check` (after autofixing via `npm run lint` when needed)
+- Type rules: enforced through `npm run lint` (ESLint + TypeScript)
+- Security: dependency vulnerability scan (`npm audit`) when relevant
+- Testing: `npm run test -- --coverage` locally and `npm run test:ci` for CI parity
 
 ## Usage Instructions
 
@@ -423,8 +422,8 @@ These commands are designed to work with Claude Code's agent system:
 
 ### Project-Specific Configuration
 Commands are configured for the Wythm project:
-- Python-based vocabulary learning application with spaced repetition
-- Integration with existing testing and deployment workflows (pytest, mypy, flake8, black, isort)
+- NestJS/TypeScript backend for the vocabulary learning platform
+- Integration with existing testing and deployment workflows (`npm run lint`, `npm run test`, Prisma migrations, Dockerized CI)
 - Aligned with project architecture and coding standards
 - **TDD-first approach** with test plans created before implementation
 - **Single technical decomposition** as source of truth, with optional JTBD/PRD context

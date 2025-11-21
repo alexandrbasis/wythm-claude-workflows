@@ -39,6 +39,13 @@ When reviewing code, you will:
 - Avoid unnecessary use of underscores for unused variables
 - Ensure proper type safety and avoid `any` types when possible
 
+**Wythm-Specific Checks**:
+
+- Cross-check implementations with `backend/docs/project-structure.md` to ensure NestJS module boundaries, DDD aggregates, and adapter layers are respected
+- Ensure Prisma repositories encapsulate DB access (no direct Prisma client usage in controllers/use-cases)
+- Validate service classes keep orchestration only—pure domain logic belongs in use-cases/entities
+- Confirm DTOs map to API schemas consistently and that validation pipes enforce constraints defined in the task's `tech-decomposition-*.md`
+
 **Best Practices:**
 
 - Evaluate adherence to SOLID principles

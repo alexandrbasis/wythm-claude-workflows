@@ -60,7 +60,7 @@ Acknowledge that you're reviewing a technical decomposition document before impl
 - Confirm edge cases and error handling scenarios are identified and testable
 - Validate 90% coverage expectation is realistic and meaningful (not just line coverage)
 - **Functional Test Requirements**: Validate that tests prove the feature actually works for users
-- Check test implementation feasibility: specified paths, proper tools (pytest-asyncio, pytest-mock, coverage.py)
+- Check test implementation feasibility: specified paths, proper tools (`npm run test`, `npm run test -- --coverage`, `npm run test:ci`, `npm run test:db:start|migrate|stop`)
 - Ensure tests verify real data flow, business logic execution, and user-facing functionality
 
 #### Quality Standards Assessment
