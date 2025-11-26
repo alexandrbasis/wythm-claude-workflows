@@ -3,10 +3,10 @@
 ## PRIMARY OBJECTIVE
 Create implementation-ready technical documentation for developer implementation. Thoroughly understand the user's idea, review the codebase with Explore sub-agent and all necessary related documents. Adopt a TDD-first workflow where the test plan is authored first and guides the technical decomposition. Exclude any time estimates. Ask if anything is unclear. Think hard.
 
-## CRITICAL CONTROL GATES
+## Control Gates
 
 ### GATE 0: Context Gathering & Requirements Understanding
-**Must complete BEFORE technical decomposition:**
+**Complete BEFORE technical decomposition:**
 
 **STEP 1: Check for pre-work documentation**
 
@@ -28,12 +28,12 @@ Look for existing documentation:
 - Use Explore sub-agent to understand affected codebase
 - Summarize understanding and confirm with user
 
-**IMPORTANT**: You must deeply understand requirements before proceeding. Use Explore sub-agent extensively.
+**Note**: Deeply understand requirements before proceeding. Use Explore sub-agent extensively.
 
 ---
 
 ### GATE 1: Technical Decomposition & Test Plan Creation
-**Must complete AFTER context gathering:**
+**Complete AFTER context gathering:**
 
 **FILE**: Create `tasks/task-YYYY-MM-DD-[kebab-case]/tech-decomposition-[feature-name].md`
 
@@ -58,7 +58,7 @@ Create technical implementation plan with **TEST PLAN FIRST** (TDD approach):
 ---
 
 ### GATE 2: Task Splitting Evaluation
-**Must complete AFTER plan review and BEFORE Linear creation:**
+**Complete AFTER plan review and BEFORE Linear creation:**
 
 **ACTION:** Invoke task-splitter agent with the following prompt:
 
@@ -73,7 +73,7 @@ Please analyze tech-decomposition-[feature-name].md and provide your decision an
 ---
 
 ### GATE 3: Linear Issue Creation
-**Must complete AFTER task splitting evaluation:**
+**Complete AFTER task splitting evaluation:**
 
 **ACTION:** Invoke linear-task-manager agent with the following prompt:
 

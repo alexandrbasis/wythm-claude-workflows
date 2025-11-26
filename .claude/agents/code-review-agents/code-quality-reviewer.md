@@ -53,6 +53,15 @@ When reviewing code, you will:
 - Assess performance implications of implementation choices
 - Verify security considerations (input sanitization, sensitive data handling)
 
+**Over-Engineering Prevention:**
+
+When reviewing, flag code that:
+- Adds features, refactoring, or "improvements" beyond what was requested
+- Creates helpers, utilities, or abstractions for one-time operations
+- Adds error handling or validation for scenarios that can't happen
+- Designs for hypothetical future requirements
+- Creates unnecessary complexity when simpler solutions exist
+
 **Review Structure:**
 Provide your analysis in this format:
 
