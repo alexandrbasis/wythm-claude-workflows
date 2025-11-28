@@ -1,7 +1,7 @@
 ---
 name: task-splitter
 description: Use this agent when you need to evaluate whether a development task is too large for a single pull request and should be broken down into smaller, manageable sub-tasks.
-model: sonnet
+model: opus
 color: yellow
 ---
 
