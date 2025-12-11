@@ -79,7 +79,7 @@ def extract_files_from_command(command: str) -> List[str]:
     files: List[str] = []
 
     # Ищем git add в команде
-    add_match = re.search(r'git\s+add\s+([^&|;]+)', command)
+    add_match = re.search(r"git\s+add\s+([^&|;]+)", command)
     if not add_match:
         return files
 
@@ -134,10 +134,7 @@ def extract_files_from_command(command: str) -> List[str]:
         files.append(current_file.strip())
 
     # Фильтруем только .py файлы и проверяем существование
-    python_files = [
-        f for f in files
-        if f.endswith(".py") and os.path.exists(f)
-    ]
+    python_files = [f for f in files if f.endswith(".py") and os.path.exists(f)]
 
     return python_files
 

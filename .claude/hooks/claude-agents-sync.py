@@ -10,12 +10,13 @@ File pairs to synchronize:
 2. Backend: backend/claude.md ↔ backend/AGENTS.md
 """
 
+import hashlib
+import json
 import os
 import sys
-import json
-import hashlib
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+
 
 def log_message(message, level="INFO"):
     """Log messages with timestamp"""
@@ -23,13 +24,15 @@ def log_message(message, level="INFO"):
     print(f"[{timestamp}] {level}: {message}")
     sys.stdout.flush()
 
+
 def calculate_file_hash(file_path):
     """Calculate MD5 hash of file content"""
     try:
-        with open(file_path, 'rb') as f:
+        with open(file_path, "rb") as f:
             return hashlib.md5(f.read()).hexdigest()
     except FileNotFoundError:
         return None
+
 
 def get_file_pairs(base_path):
     """Define the file pairs that should be synchronized"""
@@ -39,14 +42,15 @@ def get_file_pairs(base_path):
         {
             "source": project_root / "CLAUDE.md",
             "target": project_root / "AGENTS.md",
-            "name": "Root"
+            "name": "Root",
         },
         {
             "source": project_root / "backend" / "CLAUDE.md",
             "target": project_root / "backend" / "AGENTS.md",
-            "name": "Backend"
-        }
+            "name": "Backend",
+        },
     ]
+
 
 def should_sync_file(file_path):
     """Check if a file should trigger synchronization"""
@@ -55,6 +59,7 @@ def should_sync_file(file_path):
 
     # Check if this is CLAUDE.md or AGENTS.md file
     return filename in ["claude.md", "agents.md"]
+
 
 def find_pair_for_file(changed_file, file_pairs):
     """Find the corresponding pair for a changed file"""
@@ -68,6 +73,7 @@ def find_pair_for_file(changed_file, file_pairs):
             return pair
 
     return None
+
 
 def synchronize_files(pair, changed_file):
     """Synchronize a pair of files"""
@@ -94,7 +100,7 @@ def synchronize_files(pair, changed_file):
 
     # Read source content
     try:
-        with open(source, 'r', encoding='utf-8') as f:
+        with open(source, "r", encoding="utf-8") as f:
             content = f.read()
     except Exception as e:
         log_message(f"Error reading {source}: {e}", "ERROR")
@@ -102,12 +108,12 @@ def synchronize_files(pair, changed_file):
 
     # Check if content is essentially the same (ignoring whitespace)
     def normalize_content(text):
-        return '\n'.join(line.strip() for line in text.split('\n') if line.strip())
+        return "\n".join(line.strip() for line in text.split("\n") if line.strip())
 
     # If target exists, check if it actually needs updating
     if target.exists():
         try:
-            with open(target, 'r', encoding='utf-8') as f:
+            with open(target, "r", encoding="utf-8") as f:
                 target_content = f.read()
 
             if normalize_content(content) == normalize_content(target_content):
@@ -122,7 +128,7 @@ def synchronize_files(pair, changed_file):
         target.parent.mkdir(parents=True, exist_ok=True)
 
         # Write the synchronized content
-        with open(target, 'w', encoding='utf-8') as f:
+        with open(target, "w", encoding="utf-8") as f:
             f.write(content)
 
         log_message(f"Successfully synchronized {pair['name']} ({direction})")
@@ -134,13 +140,14 @@ def synchronize_files(pair, changed_file):
         log_message(f"Error updating {target}: {e}", "ERROR")
         return False
 
+
 def main():
     """Main hook function"""
     # Get the repository root directory
     repo_root = Path(__file__).parent.parent
 
     # Get the changed file from environment variable or command line argument
-    changed_file = os.environ.get('FILE_PATH', '')
+    changed_file = os.environ.get("FILE_PATH", "")
     if len(sys.argv) > 1:
         changed_file = sys.argv[1]
 
@@ -177,6 +184,7 @@ def main():
     else:
         log_message("Synchronization failed", "ERROR")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

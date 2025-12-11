@@ -29,7 +29,9 @@ class TweetAnalyzer:
         self.text = tweet_text
         self.is_premium = is_premium
         self.char_count = len(tweet_text)
-        self.char_limit = self.CHAR_LIMIT_PREMIUM if is_premium else self.CHAR_LIMIT_FREE
+        self.char_limit = (
+            self.CHAR_LIMIT_PREMIUM if is_premium else self.CHAR_LIMIT_FREE
+        )
 
     def analyze(self) -> Dict[str, any]:
         """
@@ -39,50 +41,52 @@ class TweetAnalyzer:
             Dictionary with analysis results
         """
         return {
-            'character_count': self.char_count,
-            'character_limit': self.char_limit,
-            'remaining_chars': self.char_limit - self.char_count,
-            'is_within_limit': self.char_count <= self.char_limit,
-            'is_optimal_length': self.OPTIMAL_RANGE[0] <= self.char_count <= self.OPTIMAL_RANGE[1],
-            'optimal_range': self.OPTIMAL_RANGE,
-            'word_count': len(self.text.split()),
-            'line_count': len(self.text.split('\n')),
-            'hashtag_count': len(self._find_hashtags()),
-            'hashtags': self._find_hashtags(),
-            'mention_count': len(self._find_mentions()),
-            'mentions': self._find_mentions(),
-            'url_count': len(self._find_urls()),
-            'urls': self._find_urls(),
-            'has_question': '?' in self.text,
-            'has_emoji': self._has_emoji(),
-            'suggestions': self._generate_suggestions(),
+            "character_count": self.char_count,
+            "character_limit": self.char_limit,
+            "remaining_chars": self.char_limit - self.char_count,
+            "is_within_limit": self.char_count <= self.char_limit,
+            "is_optimal_length": self.OPTIMAL_RANGE[0]
+            <= self.char_count
+            <= self.OPTIMAL_RANGE[1],
+            "optimal_range": self.OPTIMAL_RANGE,
+            "word_count": len(self.text.split()),
+            "line_count": len(self.text.split("\n")),
+            "hashtag_count": len(self._find_hashtags()),
+            "hashtags": self._find_hashtags(),
+            "mention_count": len(self._find_mentions()),
+            "mentions": self._find_mentions(),
+            "url_count": len(self._find_urls()),
+            "urls": self._find_urls(),
+            "has_question": "?" in self.text,
+            "has_emoji": self._has_emoji(),
+            "suggestions": self._generate_suggestions(),
         }
 
     def _find_hashtags(self) -> List[str]:
         """Extract hashtags from tweet."""
-        return re.findall(r'#\w+', self.text)
+        return re.findall(r"#\w+", self.text)
 
     def _find_mentions(self) -> List[str]:
         """Extract mentions from tweet."""
-        return re.findall(r'@\w+', self.text)
+        return re.findall(r"@\w+", self.text)
 
     def _find_urls(self) -> List[str]:
         """Extract URLs from tweet."""
-        url_pattern = r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
+        url_pattern = r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
         return re.findall(url_pattern, self.text)
 
     def _has_emoji(self) -> bool:
         """Check if tweet contains emojis."""
         emoji_pattern = re.compile(
             "["
-            "\U0001F600-\U0001F64F"  # emoticons
-            "\U0001F300-\U0001F5FF"  # symbols & pictographs
-            "\U0001F680-\U0001F6FF"  # transport & map symbols
-            "\U0001F1E0-\U0001F1FF"  # flags
-            "\U00002702-\U000027B0"
-            "\U000024C2-\U0001F251"
+            "\U0001f600-\U0001f64f"  # emoticons
+            "\U0001f300-\U0001f5ff"  # symbols & pictographs
+            "\U0001f680-\U0001f6ff"  # transport & map symbols
+            "\U0001f1e0-\U0001f1ff"  # flags
+            "\U00002702-\U000027b0"
+            "\U000024c2-\U0001f251"
             "]+",
-            flags=re.UNICODE
+            flags=re.UNICODE,
         )
         return bool(emoji_pattern.search(self.text))
 
@@ -108,7 +112,9 @@ class TweetAnalyzer:
                 f"or converting to a thread"
             )
         else:
-            suggestions.append("✅ Tweet length is in the optimal range for engagement!")
+            suggestions.append(
+                "✅ Tweet length is in the optimal range for engagement!"
+            )
 
         # Hashtag suggestions
         hashtag_count = len(self._find_hashtags())
@@ -117,7 +123,9 @@ class TweetAnalyzer:
                 f"⚠️ Using {hashtag_count} hashtags. Recommended: 2-3 max for clean appearance"
             )
         elif hashtag_count == 0:
-            suggestions.append("💡 Consider adding 1-2 relevant hashtags for discoverability")
+            suggestions.append(
+                "💡 Consider adding 1-2 relevant hashtags for discoverability"
+            )
 
         # Engagement suggestions
         if not self._has_question_mark() and not self._has_call_to_action():
@@ -136,15 +144,31 @@ class TweetAnalyzer:
 
     def _has_question_mark(self) -> bool:
         """Check if tweet contains a question."""
-        return '?' in self.text
+        return "?" in self.text
 
     def _has_call_to_action(self) -> bool:
         """Check if tweet contains common CTAs."""
         ctas = [
-            'bookmark', 'save', 'retweet', 'rt', 'share', 'follow',
-            'click', 'check out', 'learn more', 'read', 'watch',
-            'join', 'subscribe', 'sign up', 'download', 'try',
-            'comment', 'reply', 'tag', 'dm me'
+            "bookmark",
+            "save",
+            "retweet",
+            "rt",
+            "share",
+            "follow",
+            "click",
+            "check out",
+            "learn more",
+            "read",
+            "watch",
+            "join",
+            "subscribe",
+            "sign up",
+            "download",
+            "try",
+            "comment",
+            "reply",
+            "tag",
+            "dm me",
         ]
         text_lower = self.text.lower()
         return any(cta in text_lower for cta in ctas)
@@ -153,18 +177,22 @@ class TweetAnalyzer:
         """Print formatted analysis results."""
         analysis = self.analyze()
 
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("TWEET ANALYSIS")
-        print("="*60)
+        print("=" * 60)
 
         # Character metrics
         print(f"\n📊 Character Metrics:")
-        print(f"   Characters: {analysis['character_count']}/{analysis['character_limit']}")
+        print(
+            f"   Characters: {analysis['character_count']}/{analysis['character_limit']}"
+        )
         print(f"   Remaining: {analysis['remaining_chars']}")
-        print(f"   Optimal range: {analysis['optimal_range'][0]}-{analysis['optimal_range'][1]} "
-              f"(current: {analysis['character_count']})")
+        print(
+            f"   Optimal range: {analysis['optimal_range'][0]}-{analysis['optimal_range'][1]} "
+            f"(current: {analysis['character_count']})"
+        )
 
-        if analysis['is_optimal_length']:
+        if analysis["is_optimal_length"]:
             print(f"   ✅ In optimal range for engagement!")
 
         # Content metrics
@@ -182,10 +210,10 @@ class TweetAnalyzer:
 
         # Suggestions
         print(f"\n💡 Suggestions:")
-        for suggestion in analysis['suggestions']:
+        for suggestion in analysis["suggestions"]:
             print(f"   {suggestion}")
 
-        print("\n" + "="*60 + "\n")
+        print("\n" + "=" * 60 + "\n")
 
 
 def main():
@@ -193,12 +221,14 @@ def main():
     if len(sys.argv) < 2:
         print("Usage: python tweet_analyzer.py 'Your tweet text here' [--premium]")
         print("\nExample:")
-        print("  python tweet_analyzer.py 'This is my tweet about #AI and #MachineLearning'")
+        print(
+            "  python tweet_analyzer.py 'This is my tweet about #AI and #MachineLearning'"
+        )
         print("  python tweet_analyzer.py 'Premium account tweet' --premium")
         sys.exit(1)
 
     tweet_text = sys.argv[1]
-    is_premium = '--premium' in sys.argv
+    is_premium = "--premium" in sys.argv
 
     analyzer = TweetAnalyzer(tweet_text, is_premium)
     analyzer.print_analysis()
