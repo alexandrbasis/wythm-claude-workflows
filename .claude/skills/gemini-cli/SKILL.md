@@ -182,6 +182,54 @@ These tools are available only through Gemini:
 1. **google_web_search** - Real-time internet search via Google
 2. **codebase_investigator** - Deep architectural analysis
 3. **save_memory** - Cross-session persistent memory
+4. **generate_image** - AI image generation via nanobanana extension
+
+## Image Generation
+
+Gemini CLI supports image generation through the **nanobanana** extension.
+
+### Prerequisites
+
+The API key must be set in environment (already configured in `~/.zshrc`):
+```bash
+export NANOBANANA_GEMINI_API_KEY="your-key-here"
+```
+
+To get a key: [Google AI Studio](https://aistudio.google.com/app/apikey)
+
+### Generate Image Command
+
+```bash
+gemini "Generate an image of [description]. Save it to /tmp/image-name.png" --yolo -o text 2>&1
+```
+
+### Model Selection (Optional)
+
+```bash
+# Default: gemini-2.5-flash-image (faster)
+# For higher quality:
+export NANOBANANA_MODEL="gemini-3-pro-image-preview"
+```
+
+### Rate Limits for Image Generation
+
+**Important**: Image generation requires a paid tier or has very limited free quota.
+- Free tier: ~0 requests (quota resets periodically)
+- Paid Tier 1: 500 RPM for flash, 20 RPM for pro
+- If quota exceeded, wait ~50 seconds and retry
+
+### Example Prompts
+
+```bash
+# Product mockup
+gemini "Generate an image of a mobile app interface for vocabulary learning with dark mode. Save to /tmp/app-mockup.png" --yolo -o text
+
+# Illustration
+gemini "Generate a cute robot mascot reading books in a cozy library. Save to /tmp/mascot.png" --yolo -o text
+
+# Icon/Logo
+gemini "Generate a minimalist logo for a language learning app, blue and white colors. Save to /tmp/logo.png" --yolo -o text
+```
 
 ## Configuration
 

@@ -1,7 +1,7 @@
 # Create Task Command
 
 ## PRIMARY OBJECTIVE
-Create implementation-ready technical documentation for developer implementation. Thoroughly understand the user's idea, review the codebase with Explore sub-agent and all necessary related documents. Adopt a TDD-first workflow where the test plan is authored first and guides the technical decomposition. Exclude any time estimates. Ask if anything is unclear. Think hard.
+Create implementation-ready technical documentation for developer implementation. Thoroughly understand the user's idea, review the codebase with **Explore sub-agent in parallel** and all necessary related documents. Adopt a TDD-first workflow where the test plan is authored first and guides the technical decomposition. Exclude any time estimates. Ask if anything is unclear. Think hard.
 
 ## Control Gates
 
