@@ -26,9 +26,9 @@ def get_changed_files_in_last_commit() -> list[str]:
             ["git", "diff", "--name-only", "HEAD~1", "HEAD"],
             capture_output=True,
             text=True,
-            check=True,
+            check=True
         )
-        return result.stdout.strip().split("\n") if result.stdout.strip() else []
+        return result.stdout.strip().split('\n') if result.stdout.strip() else []
     except subprocess.CalledProcessError as e:
         # Might fail on initial commit or if HEAD~1 doesn't exist
         # Try alternative approach
@@ -37,16 +37,16 @@ def get_changed_files_in_last_commit() -> list[str]:
                 ["git", "diff", "--name-only", "--cached"],
                 capture_output=True,
                 text=True,
-                check=True,
+                check=True
             )
-            return result.stdout.strip().split("\n") if result.stdout.strip() else []
+            return result.stdout.strip().split('\n') if result.stdout.strip() else []
         except subprocess.CalledProcessError:
             return []
 
 
 def has_claude_changes(files: list[str]) -> bool:
     """Check if any .claude/ files were changed"""
-    return any(f.startswith(".claude/") for f in files if f)
+    return any(f.startswith('.claude/') for f in files if f)
 
 
 def trigger_sync(project_dir: Path, log_file: Path):
@@ -59,7 +59,8 @@ def trigger_sync(project_dir: Path, log_file: Path):
 
     # Get public repo path from environment
     public_repo_path = os.getenv(
-        "PUBLIC_REPO_PATH", str(project_dir / "wythm-claude-workflows")
+        "PUBLIC_REPO_PATH",
+        str(project_dir / "wythm-claude-workflows")
     )
 
     log(f"Triggering sync to {public_repo_path}", log_file)
@@ -74,14 +75,14 @@ def trigger_sync(project_dir: Path, log_file: Path):
             env=env,
             capture_output=True,
             text=True,
-            timeout=60,  # 60 second timeout
+            timeout=60  # 60 second timeout
         )
 
         if result.returncode == 0:
             log("Sync completed successfully", log_file)
             # Extract and log the GitHub URL from output
-            for line in result.stdout.split("\n"):
-                if "github.com" in line:
+            for line in result.stdout.split('\n'):
+                if 'github.com' in line:
                     log(f"Updated: {line.strip()}", log_file)
             return True
         else:
@@ -137,7 +138,7 @@ def main():
         log(f"Files changed: {len(changed_files)}", log_file)
 
         if has_claude_changes(changed_files):
-            claude_files = [f for f in changed_files if f.startswith(".claude/")]
+            claude_files = [f for f in changed_files if f.startswith('.claude/')]
             log(f"Claude files changed: {', '.join(claude_files[:5])}", log_file)
 
             # Trigger sync

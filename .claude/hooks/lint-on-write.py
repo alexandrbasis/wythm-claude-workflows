@@ -68,7 +68,11 @@ def run_command(cmd: List[str], cwd: str) -> Tuple[int, str, str]:
     """Execute a command and return exit code, stdout, stderr."""
     try:
         result = subprocess.run(
-            cmd, cwd=cwd, capture_output=True, text=True, timeout=30
+            cmd,
+            cwd=cwd,
+            capture_output=True,
+            text=True,
+            timeout=30
         )
         return result.returncode, result.stdout, result.stderr
     except subprocess.TimeoutExpired:
@@ -99,7 +103,8 @@ def format_file(file_path: str, project_dir: str) -> Tuple[bool, str]:
     # Run black
     black_cmd = get_venv_tool_path("black", project_dir)
     returncode, stdout, stderr = run_command(
-        [black_cmd, file_path], cwd=content_intelligence_dir
+        [black_cmd, file_path],
+        cwd=content_intelligence_dir
     )
 
     if returncode == 0:
@@ -114,7 +119,8 @@ def format_file(file_path: str, project_dir: str) -> Tuple[bool, str]:
     # Run isort
     isort_cmd = get_venv_tool_path("isort", project_dir)
     returncode, stdout, stderr = run_command(
-        [isort_cmd, file_path], cwd=content_intelligence_dir
+        [isort_cmd, file_path],
+        cwd=content_intelligence_dir
     )
 
     if returncode == 0:
@@ -140,7 +146,8 @@ def check_flake8(file_path: str, project_dir: str) -> Tuple[bool, str]:
 
     flake8_cmd = get_venv_tool_path("flake8", project_dir)
     returncode, stdout, stderr = run_command(
-        [flake8_cmd, file_path], cwd=content_intelligence_dir
+        [flake8_cmd, file_path],
+        cwd=content_intelligence_dir
     )
 
     if returncode == 0:
@@ -168,7 +175,7 @@ def check_mypy(file_path: str, project_dir: str) -> Tuple[bool, str]:
         mypy_cmd = get_venv_tool_path("mypy", project_dir)
         returncode, stdout, stderr = run_command(
             [mypy_cmd, str(rel_path), "--no-error-summary"],
-            cwd=content_intelligence_dir,
+            cwd=content_intelligence_dir
         )
 
         if returncode == 0:
@@ -196,9 +203,7 @@ def main() -> None:
     # Extract hook data
     tool_name = input_data.get("tool_name", "")
     tool_input = input_data.get("tool_input", {})
-    project_dir = os.environ.get(
-        "CLAUDE_PROJECT_DIR", input_data.get("cwd", os.getcwd())
-    )
+    project_dir = os.environ.get("CLAUDE_PROJECT_DIR", input_data.get("cwd", os.getcwd()))
 
     # Only process Write/Edit operations
     if tool_name not in ["Write", "Edit"]:
@@ -226,9 +231,7 @@ def main() -> None:
     print(format_msg, file=sys.stderr)
 
     if not format_success:
-        print(
-            "\n❌ Formatting failed. Please check the file manually.", file=sys.stderr
-        )
+        print("\n❌ Formatting failed. Please check the file manually.", file=sys.stderr)
         sys.exit(2)  # Blocking error - shows to Claude
 
     # Step 2: Check flake8

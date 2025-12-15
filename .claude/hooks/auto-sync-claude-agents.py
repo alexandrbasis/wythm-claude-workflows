@@ -16,16 +16,14 @@ Triggered when:
 
 import json
 import os
-import subprocess
 import sys
+import subprocess
 from pathlib import Path
 from typing import List, Optional
-
 
 def log_message(message: str, level: str = "INFO") -> None:
     """Log messages with timestamp"""
     import datetime
-
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     try:
         debug_log = Path(".claude/hooks/hook-debug.log")
@@ -35,16 +33,17 @@ def log_message(message: str, level: str = "INFO") -> None:
         pass
     print(f"[{timestamp}] {level}: {message}")
 
-
 def should_sync_file(file_path: str) -> bool:
     """Check if file should trigger synchronization"""
     file_path = Path(file_path).resolve()
 
     # Define files that should be synchronized
-    sync_files = ["CLAUDE.md", "AGENTS.md"]
+    sync_files = [
+        "CLAUDE.md",
+        "AGENTS.md"
+    ]
 
     return file_path.name in sync_files
-
 
 def run_sync_hook(file_path: str) -> bool:
     """Run the synchronization hook for a given file"""
@@ -56,7 +55,10 @@ def run_sync_hook(file_path: str) -> bool:
 
         # Run the sync script
         result = subprocess.run(
-            [script_path, file_path], capture_output=True, text=True, timeout=30
+            [script_path, file_path],
+            capture_output=True,
+            text=True,
+            timeout=30
         )
 
         if result.returncode == 0:
@@ -72,7 +74,6 @@ def run_sync_hook(file_path: str) -> bool:
     except Exception as e:
         log_message(f"Error running sync for {file_path}: {e}", "ERROR")
         return False
-
 
 def extract_files_from_tool_input(tool_name: str, tool_input: dict) -> List[str]:
     """Extract file paths from different tool inputs"""
@@ -95,7 +96,6 @@ def extract_files_from_tool_input(tool_name: str, tool_input: dict) -> List[str]
             log_message(f"Read operation on sync file: {file_path}", "DEBUG")
 
     return files
-
 
 def main() -> None:
     """Main hook function"""
@@ -125,9 +125,7 @@ def main() -> None:
                 success_count += 1
 
         if success_count > 0:
-            log_message(
-                f"Auto-sync completed: {success_count}/{len(files_to_sync)} files synchronized"
-            )
+            log_message(f"Auto-sync completed: {success_count}/{len(files_to_sync)} files synchronized")
         else:
             log_message("Auto-sync failed for all files", "ERROR")
 
@@ -139,7 +137,6 @@ def main() -> None:
     except Exception as e:
         log_message(f"Unexpected error: {e}", "ERROR")
         sys.exit(1)
-
 
 if __name__ == "__main__":
     main()
