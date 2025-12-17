@@ -1,0 +1,22 @@
+{
+  "extraKnownMarketplaces": {
+    "claude-code-plugins-plus": {
+      "source": {
+        "source": "github",
+        "repo": "jeremylongshore/claude-code-plugins"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "ai-ml-engineering-pack@claude-code-plugins-plus": true,
+    "api-security-scanner@claude-code-plugins-plus": true,
+    "ci-cd-pipeline-builder@claude-code-plugins-plus": true,
+    "database-migration-manager@claude-code-plugins-plus": true,
+    "dependency-checker@claude-code-plugins-plus": true,
+    "project-health-auditor@claude-code-plugins-plus": true,
+    "secret-scanner@claude-code-plugins-plus": true,
+    "test-coverage-analyzer@claude-code-plugins-plus": true,
+    "sql-query-optimizer@claude-code-plugins-plus": true,
+    "unit-test-generator@claude-code-plugins-plus": true
+  }
+}
