@@ -5,6 +5,12 @@
         "source": "github",
         "repo": "jeremylongshore/claude-code-plugins"
       }
+    },
+    "claude-code-plugins": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-code"
+      }
     }
   },
   "enabledPlugins": {
@@ -17,6 +23,9 @@
     "secret-scanner@claude-code-plugins-plus": true,
     "test-coverage-analyzer@claude-code-plugins-plus": true,
     "sql-query-optimizer@claude-code-plugins-plus": true,
-    "unit-test-generator@claude-code-plugins-plus": true
+    "unit-test-generator@claude-code-plugins-plus": true,
+    "code-review@claude-code-plugins": true,
+    "pr-review-toolkit@claude-code-plugins": true,
+    "security-guidance@claude-code-plugins": true
   }
 }
