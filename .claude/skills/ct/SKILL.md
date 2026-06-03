@@ -1,13 +1,12 @@
 ---
 name: ct
 description: >-
-  Use when a feature, enhancement, or scoped task is clear enough for technical
-  planning and the next step is an implementation-ready technical decomposition
-  before coding. Trigger on requests like 'create task', 'technical
-  decomposition', 'plan implementation', 'break this into implementation steps',
-  or after `/nf` or `/product` when the user is ready to plan the build. NOT
-  for feature discovery (use /nf), product docs (use /product), brainstorming
-  (use /brainstorm), or implementation itself (use /si).
+  Use when a feature/scoped task is clear enough for technical planning —
+  produces an implementation-ready technical decomposition before coding.
+  Trigger: 'create task', 'technical decomposition', 'plan implementation',
+  'break into implementation steps', or after /nf or /product when ready to
+  plan the build. NOT for feature discovery (/nf), product docs (/product),
+  brainstorming (/brainstorm), or implementation (/si).
 argument-hint: [feature-name | task-name]
 allowed-tools: Task, Skill, AskUserQuestion, Read, Glob, Grep, Edit, Write, Bash
 ---
@@ -16,297 +15,159 @@ allowed-tools: Task, Skill, AskUserQuestion, Read, Glob, Grep, Edit, Write, Bash
 
 > **Announcement**: Begin with: "I'm using the **ct** skill for technical task creation."
 
-## PRIMARY OBJECTIVE
-Create implementation-ready technical documentation that a developer can execute with confidence. Work backward from expected behavior: clarify scope, inspect existing patterns, write the test plan first, then derive implementation steps. Keep the plan concrete, traceable, and free of time estimates.
+## Quick start
+`/ct streak-freeze` → confirm scope (GATE 0) → discover inputs & explore the codebase (GATE 1–2) →
+resolve ambiguity (GATE 3) → write `tech-decomposition-streak-freeze.md` (GATE 4) →
+review + split evaluation (GATE 5–6) → next: `/si [task-dir]`.
 
-## CORE PRINCIPLES
-- **Test plan first** — define what proves the work is done before describing how to build it
-- **Clarify ambiguity before decomposition** — unresolved gray areas become bad plans
-- **Follow existing patterns** — extend proven structures before inventing new ones
-- **Protect scope** — new ideas become follow-ups, not stealth additions
-- **Discover repo conventions** — prefer searching the actual workspace over assuming fixed paths
-- **Stay executable** — name files, commands, dependencies, and completion signals explicitly
-- **Context is compacted automatically** — for long sessions, save the in-progress decomposition to disk as you go; do not stop early due to token concerns
+## Objective
+Create implementation-ready technical documentation that a developer can execute with confidence.
+Work backward from expected behavior: clarify scope, inspect existing patterns, write the test plan
+first, then derive implementation steps. Keep the plan concrete, traceable, and free of time estimates.
 
+## Core principles
+- **Test plan first** — define what proves the work is done before describing how to build it.
+- **Clarify ambiguity before decomposition** — unresolved gray areas become bad plans.
+- **Follow existing patterns** — extend proven structures before inventing new ones.
+- **Protect scope** — new ideas become follow-ups, not stealth additions.
+- **Discover repo conventions** — prefer searching the actual workspace over assuming fixed paths.
+- **Stay executable** — name files, commands, dependencies, and completion signals explicitly.
+- **Context is compacted automatically** — for long sessions, save the in-progress decomposition to
+  disk as you go; don't stop early over token concerns.
 
-## Control Gates
+## Workflow
+Seven sequential gates. Each has an exit criterion — don't advance until it's met.
 
-### GATE 0: Confirm the Task Is Ready for Technical Planning
-**Complete before writing the plan:**
+### GATE 0 — Confirm the task is ready for technical planning
+- If no argument is provided, ask what task or feature to plan.
+- Route away if not ready: still fuzzy/exploratory → `/nf` or `/brainstorm`; missing product framing
+  (goals, business rules, success metrics) → `/product`; ready to build → continue.
+- Ask enough to name: objective, primary actor/system touchpoint, success criteria,
+  boundaries/out-of-scope, dependencies/constraints/non-negotiables.
+- Exclude time estimates — this doc is a technical contract, not a schedule.
+- **Exit:** the task is one clear implementation objective with known boundaries.
 
-- If no argument is provided, ask what task or feature should be planned
-- Determine whether the request is actually ready for decomposition:
-  - **Still fuzzy / exploratory** → route to `/nf` or `/brainstorm`
-  - **Missing product framing** (goals, business rules, success metrics) → route to `/product`
-  - **Ready to build** → continue
-- Ask enough clarifying questions to name:
-  - objective
-  - primary actor or system touchpoint
-  - success criteria
-  - boundaries / out-of-scope items
-  - dependencies, constraints, or non-negotiables
-- Exclude time estimates from the plan — this doc is a technical contract, not a schedule; estimates expire fast and mislead consumers of the doc
-
-**Exit criteria:** The task can be stated as a single clear implementation objective with known boundaries.
-
----
-
-### GATE 1: Discover Source Material and Prior Art
-**Complete before codebase exploration:**
-
-Search for inputs instead of assuming one repository layout. Prefer the project's existing document conventions if they already exist.
-
-**Look for (run these Glob calls in a single turn — they are independent):**
-- Discovery docs: `**/discovery-*.md`
-- Product docs: `**/JTBD-*.md`, `**/PRD*.md`, `**/*requirements*.md`
-- Architecture notes: `**/ADR*.md`, `**/*architecture*.md`, `**/*decision*.md`
+### GATE 1 — Discover source material and prior art
+Search for inputs instead of assuming a repo layout; prefer existing doc conventions. Run these Glob
+calls in one turn (they're independent):
+- Discovery: `**/discovery-*.md`
+- Product: `**/JTBD-*.md`, `**/PRD*.md`, `**/*requirements*.md`
+- Architecture: `**/ADR*.md`, `**/*architecture*.md`, `**/*decision*.md`
 - Existing plans: `**/tech-decomposition-*.md`, `**/*implementation-plan*.md`
-- Optional supporting artifacts: prototypes, flow diagrams, issue links, design notes
 
-**Read the closest relevant artifacts and extract:**
-- Canonical task / feature name
-- Requirements and success criteria
-- Constraints, blockers, and non-negotiables
-- Open questions or unresolved markers such as `[NEEDS CLARIFICATION: ...]`
-- Prior plan patterns worth reusing for structure or level of detail
+Read the closest artifacts and extract: canonical task/feature name, requirements & success criteria,
+constraints/blockers, open questions (`[NEEDS CLARIFICATION: ...]`), reusable plan patterns.
+- **Glossary**: if `product-docs/UBIQUITOUS_LANGUAGE.md` exists, read it and use its canonical terms
+  verbatim (module names, behaviors, acceptance criteria). Flag conflicts rather than inheriting drift.
+- **Architecture vocab**: load `.claude/skills/architecture-language/LANGUAGE.md` before describing
+  module changes — use **module / interface / seam / adapter / depth** exactly; don't drift into
+  "component", "service", "API", or "boundary".
+- **Output location**: prefer the repo's task-doc convention; else default to
+  `tasks/task-YYYY-MM-DD-[feature-name]/tech-decomposition-[feature-name].md`.
+- **Exit:** you know which inputs are authoritative and where the output doc lives.
 
-**Load shared glossary**: If `product-docs/UBIQUITOUS_LANGUAGE.md` exists, read it. Use its canonical terms throughout the tech-decomposition — module names, behaviors, and acceptance criteria should match the glossary verbatim. If terms in the source PRD/discovery contradict the glossary, flag the conflict and propose canonical phrasing rather than silently inheriting drift.
+### GATE 1.5 — Requirements quality & scope check
+Review inputs like "unit tests for English" — validate the requirements themselves, not just their
+feasibility, across: **Completeness** (major scenarios covered?), **Clarity** (one interpretation
+only?), **Consistency** (docs/constraints don't contradict?), **Measurability** (success objectively
+verifiable?), **Coverage** (errors, boundaries, permissions, edge cases defined?), **Gap** (what
+behavior is still missing?).
 
-**Architectural vocabulary**: Load `.claude/skills/architecture-language/LANGUAGE.md` before describing module changes. Use **module / interface / seam / adapter / depth** exactly — don't drift into "component", "service", "API", or "boundary".
+If important gaps exist: summarize as 3–7 tagged checklist items and present with `AskUserQuestion` —
+**Fix requirements first** (return to source docs) or **Proceed with explicit decisions/blockers**
+(resolve what's resolvable, capture anything still blocking). Don't hide requirement gaps inside
+implementation steps.
+- **Exit:** gaps are resolved or explicitly captured as decisions/blockers.
 
-**Output location rule:**
-- Prefer the repo's current convention for task docs
-- If no convention exists, default to:
-  `tasks/task-YYYY-MM-DD-[feature-name]/tech-decomposition-[feature-name].md`
+### GATE 2 — Explore the codebase
+Launch **2–3 Explore agents in a single turn** (fan out in the same batch — don't sequence), each with
+a mandate:
+1. **Architecture & patterns** — closest similar feature/module/workflow, relevant data models or
+   persisted state, reusable shared abstractions/utilities/base patterns.
+2. **Change surface** — files/dirs to modify; nearby API surfaces, contracts, background jobs, events,
+   integrations; existing test files & patterns in the affected module.
+3. **Risks & constraints** — likely failure modes & edge cases, config touchpoints, integration
+   boundaries, dependencies that could break or need coordinated change.
 
-**Exit criteria:** You know which inputs are authoritative and where the output doc should live.
+If UI-heavy, also inspect: component composition patterns; state management & navigation conventions;
+loading/empty/error/success/accessibility states; existing visual/system constraints. Optional: `/vp`
+(or another design helper) when visual uncertainty blocks planning; include analytics coverage when the
+change touches a tracked user-facing flow.
 
----
+Return a short findings summary: existing patterns, likely files/dirs, integration points, constraints.
+- **Exit:** the plan can be grounded in real codebase evidence, not guesses.
 
-### GATE 1.5: Requirements Quality and Scope Check
-**Complete after reading source material, before decomposition:**
+### GATE 3 — Resolve ambiguity before decomposition
+Identify gray areas: multi-interpretation requirements, missing acceptance criteria/edge cases,
+technical choices with multiple valid approaches, unclear current-vs-future boundaries. For each:
+resolve from docs/code, ask the user when product/implementation judgment is needed, or mark as
+blocker/prerequisite.
+- **Glossary updates**: if a new domain term appears or needs sharpening, invoke `/ubiquitous-language`
+  to update `product-docs/UBIQUITOUS_LANGUAGE.md` inline so `/si` and reviewers inherit it.
+- Record non-trivial choices in the decomposition as a decision table (`# | Question | Decision |
+  Rationale`).
+- **Scope guardrail**: this gate clarifies HOW to implement what's already in scope — it does not
+  expand the task. A new capability becomes a follow-up, not a fold-in.
+- **Exit:** all meaningful ambiguities are resolved or marked as blockers. If an unresolved one would
+  materially change implementation, the task is not ready for decomposition.
 
-Review the inputs like "unit tests for English." Validate the quality of the requirements themselves, not just their technical feasibility.
+### GATE 4 — Write the technical decomposition
+1. Read `.claude/docs/templates/technical-decomposition-template.md` — treat it as the **output
+   contract** (defines structure & detail level; don't restate it inside the doc).
+2. Follow **`references/decomposition-guide.md`** for the required sections, planning rules
+   (Entity Lifecycle, Constraint-to-UI traceability, the `Must Haves` block) and the Given/When/Then
+   test-case format.
 
-| Dimension | What to check |
-|-----------|---------------|
-| `[Completeness]` | Are major user/system scenarios covered? |
-| `[Clarity]` | Can the requirement be interpreted more than one way? |
-| `[Consistency]` | Do docs or constraints contradict each other? |
-| `[Measurability]` | Can success be objectively verified? |
-| `[Coverage]` | Are error states, boundaries, permissions, and edge cases defined? |
-| `[Gap]` | What important behavior is still missing from the inputs? |
+Core rules to honor while writing:
+- Define the **Test Plan before implementation steps**.
+- Concrete files/dirs/modules per step, stating what it changes and what it proves.
+- Assign `REQ-XXX` IDs when source requirements exist; otherwise write explicit plain-language
+  requirements.
+- Leave tracking fields (`Issue ID`, `Branch / PR`, `Split status`, `Completion Summary`) blank unless
+  real — they're owned by `/si` and tracker integration.
+- Exclude time estimates.
+- **Exit:** a fresh developer could implement the task from the doc without a separate planning meeting.
 
-If important gaps exist:
-- Summarize them as 3-7 concrete checklist items tagged with the dimensions above
-- Present them to the user with `AskUserQuestion`
-- Options:
-  - **Fix requirements first** — return to the source docs before planning
-  - **Proceed with explicit decisions or blockers** — resolve what can be resolved and capture anything still stopping implementation
+### GATE 5 — Review and strengthen the plan
+Self-check: does every must-have map to tests and steps? any scope creep? are blockers/constraints
+explicit? does it follow repo patterns? is the test strategy sufficient for the change risk?
 
-Do not hide requirement gaps inside implementation steps.
+Required review by complexity:
 
-**Exit criteria:** Requirement gaps are either resolved or explicitly captured as implementation decisions or blockers.
+| Complexity | Signal | Required review |
+|------------|--------|-----------------|
+| Simple | 1–2 focused steps | `plan-reviewer` agent |
+| Medium | 3–5 steps, multiple touchpoints | `plan-reviewer` + `senior-architecture-reviewer` |
+| Complex | 6+ steps, architecture/cross-system risk | `plan-reviewer` + `senior-architecture-reviewer` + cross-AI validation |
 
----
+> Reviewer agents follow a coverage-then-filter pattern — surface every issue (severity + confidence),
+> then filter in a separate pass. Don't instruct them to report "only important" findings; 4.7 obeys
+> that literally and recall drops.
 
-### GATE 2: Explore the Codebase
-**Complete before writing implementation steps:**
+For **Complex** plans, cross-AI validation is part of the required path — follow
+`.claude/docs/templates/cross-ai-protocol.md` if present. Optional adjuncts: `/analyze` when source
+specs exist and traceability matters; sync a tracker issue if the project uses one. If review finds
+gaps, revise (preserve known risks/blockers) and re-run the relevant review path.
+- **Exit:** the plan is specific, scoped, and reviewable enough to evaluate splitting.
 
-Launch **2-3 Explore agents in a single turn** (fan out in the same tool-call batch — do not sequence them), each with a specific mandate:
+### GATE 6 — Task splitting evaluation
+Invoke the `task-splitter` agent on the **finalized, reviewed** parent plan (provide the task-directory
+path + the `tech-decomposition-[feature-name].md` path). It either:
+- recommends **NO SPLIT** — keep the parent doc active and proceed to handoff, or
+- creates `splitting-decision.md` — present the recommendation with `AskUserQuestion`.
 
-1. **Architecture & Patterns** — understand the change area:
-   - Closest similar feature, module, or workflow
-   - Relevant data models or persisted state
-   - Shared abstractions, utilities, or base patterns worth reusing
-
-2. **Change Surface** — identify what needs to be touched:
-   - Files and directories that will need modification
-   - API surfaces, contracts, background jobs, events, or integrations near the change
-   - Test files and test patterns already used in the affected module
-
-3. **Risks & Constraints** — find what could go wrong:
-   - Likely failure modes and edge cases
-   - Configuration touchpoints and integration boundaries
-   - Dependencies that could break or require coordinated changes
-
-**If the task is UI-heavy, also inspect:**
-- Existing component composition patterns
-- State management and navigation conventions
-- Loading, empty, error, success, and accessibility states
-- Visual/system constraints already used in the codebase
-
-**Optional adjuncts:**
-- If visual uncertainty blocks planning, use `/vp` or another design helper
-- If the task changes a user-facing flow and the product tracks analytics, include analytics coverage in the plan
-
-Return a short findings summary:
-- existing patterns
-- likely files / directories
-- integration points
-- constraints discovered
-
-**Exit criteria:** The plan can be grounded in real codebase evidence instead of guesses.
-
----
-
-### GATE 3: Resolve Ambiguity Before Decomposition
-**Complete after exploration, before writing the plan:**
-
-Identify gray areas across the inputs and codebase findings:
-- Requirements that could be interpreted multiple ways
-- Missing acceptance criteria or edge cases
-- Technical choices with multiple valid approaches
-- Unclear boundaries between current scope and future work
-
-For each gray area:
-1. **Resolve from docs or code** if the answer already exists
-2. **Ask the user** when product or implementation judgment is required
-3. **Mark as blocker/prerequisite** when external input is still missing
-
-**Glossary updates**: if a new domain term appears during ambiguity resolution, or if a term needs sharpening, invoke `/ubiquitous-language` to update `product-docs/UBIQUITOUS_LANGUAGE.md` inline. The decomposition then uses the canonical term, and `/si` and reviewers inherit it.
-
-Document non-trivial choices in the tech-decomposition file:
-
-| # | Question | Decision | Rationale |
-|---|----------|----------|-----------|
-| 1 | [gray area] | [chosen approach] | [why this is the right choice] |
-
-**Scope guardrail:** This gate clarifies HOW to implement what is already in scope. It does not expand the task. If a new capability emerges, note it as a follow-up instead of folding it into the current plan.
-
-**Exit criteria:** All meaningful ambiguities are resolved or marked as blockers. If an unresolved ambiguity would materially change implementation, the task is not ready for decomposition.
-
----
-
-### GATE 4: Write the Technical Decomposition
-**Complete after context, exploration, and ambiguity resolution:**
-
-**Step 0: Load the Output Shape**
-- Before drafting, read `.claude/docs/templates/technical-decomposition-template.md`
-- Treat the template as the **output contract**:
-  - it defines the expected structure and level of detail
-  - the decomposition should contain exactly what is needed to fill it clearly
-  - do not restate the template inside the document; use it as the source of truth for the final shape
-
-**Required sections:**
-- Linked Inputs / Context
-- Primary Objective
-- Must Haves
-- Test Plan
-- Technical Requirements
-- Implementation Decisions (if any)
-- Implementation Steps
-- Dependencies / Risks / Blockers
-- Tracking / Notes (optional)
-
-**Planning rules:**
-- **Entity lifecycle** (when the task creates, updates, or deletes entities): add a `## Entity Lifecycle` section covering:
-  - Creation entry points: where can the entity be created?
-  - Persistence defaults: which fields must be set, including semantic defaults (category, type, order, visibility)?
-  - Immediate feedback: what confirms success to the user?
-  - Canonical visibility: where should the entity appear after creation?
-  - Cross-surface visibility: what other pages, lists, widgets, searches, or groupings must reflect it?
-  - Data normalization: should existing misclassified or orphaned entities be migrated?
-- **Constraint-to-UI traceability**: for every service-layer validation rule in the spec, require a mapped UI element — error message, disabled/hidden option, input hint, or highlighted field. If a validation rule has no corresponding UI affordance, flag it as a gap.
-- Add `## Must Haves` immediately after the objective:
-  ```markdown
-  ## Must Haves
-  Non-negotiable truths when this task is complete:
-  - [ ] [Observable behavior 1]
-  - [ ] [Interface, file, endpoint, or workflow truth 2]
-  - [ ] [Constraint or invariant 3]
-  ```
-  These become the source of truth for goal-backward verification during implementation if that workflow exists.
-- Define the **Test Plan before implementation steps**
-- If discovery or product docs exist, do **not** restate `Feature Overview`, `Why This Exists`, `How It Works`, or scope sections in full. Translate them into `Must Haves`, `Technical Requirements`, `Implementation Decisions`, and `Implementation Steps`.
-- Include explicit verification commands
-- Treat `Technical Requirements` as the implementation-facing version of the source requirements
-- Use `Implementation Decisions` only for real technical choices, resolved gray areas, or explicit trade-offs. If none were needed, write `No additional implementation decisions required.`
-- Break work into clear steps and sub-steps with concrete files, directories, or modules
-- State what each step changes and what it proves
-- If source requirements exist, assign `REQ-XXX` IDs and tag the relevant steps
-- If no formal requirements doc exists, still write explicit requirement statements in plain language
-- Add optional wave annotations only when steps are genuinely independent
-- Reference constraints or architecture decisions that shaped the plan
-- Leave `Issue ID`, `Branch / PR`, `Split status`, and `Completion Summary` blank or omitted unless prior workflow steps produced real values — those fields are owned by later skills (`/si`, tracker integration) and must reflect reality
-- Exclude time estimates — this doc is a technical contract, not a schedule; estimates expire fast and mislead consumers of the doc
-
-#### Test Case Format (Given/When/Then)
-- **Given**: preconditions already in place
-- **When**: the action being exercised
-- **Then**: the observable outcome that proves the behavior
-- Prefer declarative behavior descriptions over click-by-click UI scripts
-
-**Exit criteria:** A fresh developer could implement the task from the document without needing a separate planning meeting.
-
----
-
-### GATE 5: Review and Strengthen the Plan
-**Complete after the first draft exists:**
-
-**Minimum self-check:**
-- Does every must-have map to tests and steps?
-- Are any steps scope creep?
-- Are blockers and constraints explicit?
-- Does the plan follow existing repo patterns?
-- Is the test strategy sufficient for the change risk?
-
-**Required review policy:**
-
-| Complexity | Typical signal | Required review |
-|------------|----------------|-----------------|
-| Simple | 1-2 focused steps | `plan-reviewer` agent |
-| Medium | 3-5 steps, multiple touchpoints | `plan-reviewer` agent + `senior-architecture-reviewer` agent |
-| Complex | 6+ steps, architecture or cross-system risk | `plan-reviewer` agent + `senior-architecture-reviewer` agent + cross-AI validation |
-
-> Reviewer agents should follow a coverage-then-filter pattern — surface every issue they find (with severity + confidence), and filter in a separate pass. Do not instruct them to report "only important" findings; 4.7 obeys that literally and recall drops.
-
-Follow the review path for the complexity tier above — skipping it has historically produced plans that miss architecture risks and require re-decomposition.
-For **Complex** plans, cross-AI validation is part of the required review path. Follow `.claude/docs/templates/cross-ai-protocol.md` if present.
-
-**Additional validation branches and follow-ups:**
-- Run `/analyze` when source specs exist and traceability matters
-- If the project uses Linear or another tracker and the user wants synced tracking, create or update the issue with the appropriate integration skill/tool
-
-**Feedback loop:** If review finds gaps, revise the decomposition, preserve the known risks and blockers, and re-run the relevant review path until the plan is ready.
-
-**Exit criteria:** The plan is specific, scoped, and reviewable enough to proceed to task splitting evaluation.
-
----
-
-### GATE 6: Task Splitting Evaluation
-**Complete after the required review path and iterative feedback loop are finished:**
-
-Invoke the `task-splitter` agent on the finalized parent plan so the splitting decision is made against the reviewed doc, not a draft. Provide:
-- task directory path
-- finalized `tech-decomposition-[feature-name].md` path
-
-The `task-splitter` agent either:
-- recommends **NO SPLIT** — keep the parent doc active and proceed to handoff
-- creates `splitting-decision.md` — present the recommendation with `AskUserQuestion`
-
-If the user approves splitting:
-- invoke the `task-decomposer` agent with the task directory
-- let it create phase folders and phase tech-decomposition docs aligned to the canonical template, retain the parent doc as reference, and update `splitting-decision.md`
-- hand off using the phase documents
-
-If the user declines splitting:
-- keep the parent doc active
-- proceed to handoff
-
-**Exit criteria:** The task is confirmed as a single implementation unit or decomposed into approved phases.
-
----
+If the user approves splitting: invoke `task-decomposer` with the task directory to create phase folders
+and phase tech-decomposition docs aligned to the template, retain the parent as reference, update
+`splitting-decision.md`, and hand off using the phase docs. If declined: keep the parent doc active and
+proceed.
+- **Exit:** the task is confirmed as a single implementation unit or decomposed into approved phases.
 
 ## Output
-Create `tech-decomposition-[feature-name].md` in the repo's existing task-doc convention, or in the fallback task directory if no convention exists.
+Create `tech-decomposition-[feature-name].md` in the repo's existing task-doc convention, or in the
+fallback task directory if none exists. After GATE 6 the active output is either the parent
+`tech-decomposition-[feature-name].md` or the phase-specific docs created by `task-decomposer`.
 
-After `GATE 6`, the active output is one of:
-- the parent `tech-decomposition-[feature-name].md`, or
-- phase-specific tech-decomposition documents created by the `task-decomposer` agent
-
-## Handoff to Implementation
-
+## Handoff
 After the gates complete, present a concise summary:
 
 ```text
@@ -322,7 +183,9 @@ Next steps:
 -> Start implementation: /si [task-directory or doc path]
 ```
 
-## Flexibility Notes
-- For small changes, keep the doc lean but still include `Must Haves`, `Test Plan`, and concrete implementation steps
-- For large features, keep one parent objective and split only when execution would otherwise be unsafe or vague
-- This skill keeps the decomposition core lightweight, but the required review path and the `task-splitter` / `task-decomposer` agent workflow are part of the standard completion path
+## Flexibility notes
+- Small changes: keep the doc lean but still include `Must Haves`, `Test Plan`, and concrete steps.
+- Large features: keep one parent objective and split only when execution would otherwise be unsafe or
+  vague.
+- The decomposition core stays lightweight, but the required review path and the `task-splitter` /
+  `task-decomposer` workflow are part of the standard completion path.

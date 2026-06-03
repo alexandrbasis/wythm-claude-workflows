@@ -220,7 +220,7 @@ The skill initialization step loads each validator's CLI contract, so invented C
 
 Two phases — initialization (sequential), then review (parallel):
 
-Phase 1 — Initialization. Invoke `/codex-cli`, then `/gemini-cli`, then `/cursor-cli` in separate turns. Each skill loads its CLI contract into runtime state, so they must run serially.
+Phase 1 — Initialization. Invoke `/codex-cli`, then `/antigravity-cli`, then `/cursor-cli` in separate turns. Each skill loads its CLI contract into runtime state, so they must run serially.
 
 Phase 2 — Review. In a single assistant turn, dispatch all three validator runs as parallel tool calls. The three reviews are independent — sequential execution only adds latency. If one validator is unavailable, dispatch the other two anyway.
 

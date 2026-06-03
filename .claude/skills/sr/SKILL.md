@@ -6,7 +6,7 @@ description: >-
   'review PR', 'review my changes', 'review this branch', 'is this ready to
   merge', or other pre-merge review requests. Supports task/spec-aware review
   when task docs exist. NOT for addressing review comments (use /prc).
-argument-hint: [task-path | PR-url | branch | range | no-arg auto-detect]
+argument-hint: [task-path | PR-url | branch | range | deep | no-arg auto-detect]
 allowed-tools:
   - Read
   - Write
@@ -101,9 +101,21 @@ Use `quick` only when ALL are true:
 
 Otherwise use `full`.
 
+**Deep (thermo) scope (`/sr deep`):** opt-in structural-quality tier. `deep` runs everything `full`
+does **plus** the `structural-quality-reviewer` (STEP 5.3). It is never auto-selected — only the user
+invokes it via `/sr deep`.
+
+**Auto-suggest deep:** after resolving scope, if the diff crosses any structural threshold — a changed
+file `> 1000` lines, `> 15` changed files, `> 600` changed lines, or a module rename/move — and the user
+did not request `deep`, add a one-line recommendation to the review output (alongside the STEP 10 QA
+recommendation): `Deep structural review recommended: <trigger>. Run /sr deep.` This is a recommendation,
+not a blocker — continue with `full`.
+
 **Full-feature scope option (`--scope=feature`):** When reviewing Phase N of a multi-phase task and the task directory contains earlier phases, optionally include the full feature diff (all phases from the earliest base commit to HEAD). Flag files changed in earlier phases but not in the current phase as **integration surface** — these are where cross-phase bugs hide. Use this when the current phase integrates with prior phases or when the task doc mentions cross-phase dependencies.
 
 ## STEP 5: Review Pipeline
+
+`deep` is a superset of `full`: apply every `full`-scope rule below, then add the structural pass (5.3).
 
 ### 5.1 Optional Spec Gate
 
@@ -130,30 +142,16 @@ In `full` scope, also run:
 - `documentation-accuracy-reviewer`
 - `performance-reviewer`
 
-### 5.4 Targeted Review Passes (orchestrator-owned, not subagents)
+In `deep` scope, additionally run `structural-quality-reviewer` — a whole-module structural audit
+(details in its agent file). It writes to `<!-- SECTION:structural-quality -->`. Never run it in `quick`
+or `full`.
 
-When the diff matches these triggers, the orchestrator runs the check inline and adds findings to `key-findings`. These are not separate agents — no subagent file exists for them.
+### 5.4 Targeted Review Passes & Pattern Propagation
 
-**Error-path pass** — trigger: diff contains `async` / `await` / `.then(` / `Promise`:
-- For each async call chain: what happens if it throws? Where does the error propagate?
-- Does the caller have try/catch with a user-visible error state?
-- Does a modal/dialog/overlay close before the async chain resolves?
-- Are there multi-step write operations that lack atomicity (if step 2 fails, step 1 is orphaned)?
-
-**Integration-seams pass** — trigger: diff crosses component/module boundaries:
-- Data passed through navigation or routing (are all required params forwarded?)
-- Callback shapes: does the caller await the callback? Does it handle errors?
-- State subscriptions: after a mutation, is every dependent state snapshot refreshed?
-- Modal/dialog lifecycle vs async operations: does the UI update only after resolution?
-
-**Cross-surface entity pass** — trigger: diff creates, updates, or deletes entities:
-- Does the entity appear correctly on its canonical management/list surface, not just the origin screen?
-- Are semantic defaults set (category, type, grouping, order)?
-- Is there success feedback visible to the user after the operation?
-
-### 5.5 Pattern Propagation
-
-When a reviewer flags a major or critical finding, scan sibling files for the same anti-pattern before finalizing. Sibling occurrences are often where the real bug lives — the flagged file is frequently just the first place it was spotted. Spend up to ~5 minutes scanning; stop at 5 sibling occurrences, or when coverage of plausible locations (same module, same layer, same call-site shape) is exhausted — whichever comes first. Record findings in `key-findings` even if those files are outside the current diff; if clean, record "scanned N files, no sibling occurrences".
+Orchestrator-owned inline checks (not subagents) plus a sibling-scan procedure. The trigger table and
+per-pass checklists — error-path, integration-seams, cross-surface entity — and the pattern-propagation
+procedure live in **`references/review-passes.md`**. Read it now when the diff matches any trigger, run
+the matching pass, and add findings to `key-findings`.
 
 For every skipped reviewer, write a one-line reason in that section.
 
@@ -188,7 +186,7 @@ There is always exactly **one** Code Review file per review target. Compute `cr_
 
 Pass `cr_file_path` to every agent so they use **File Mode**.
 
-Dispatch **all agents selected in STEP 5 in a single turn** — issue every Agent tool call in the same assistant message. The agents write to disjoint `<!-- SECTION:xxx -->` markers in `cr_file_path`, so there are no ordering dependencies. Each agent already receives the same `full_diff` / `changed_files` context computed once in STEP 3, so the tool calls are independent and safe to batch. Do not dispatch one, wait for it to finish, then dispatch the next; that serializes a parallel workload.
+Dispatch **all agents selected in STEP 5 in a single turn** — issue every Agent tool call in the same assistant message. The agents write to disjoint `<!-- SECTION:xxx -->` markers in `cr_file_path`, so there are no ordering dependencies (in `deep` scope this batch also includes `structural-quality-reviewer`, writing to its own `structural-quality` markers). Each agent already receives the same `full_diff` / `changed_files` context computed once in STEP 3, so the tool calls are independent and safe to batch. Do not dispatch one, wait for it to finish, then dispatch the next; that serializes a parallel workload.
 
 Each agent reads → edits its own section markers only; no agent touches another agent's section.
 
@@ -204,7 +202,7 @@ The orchestrator writes the remaining sections that agents do not own:
 - `review-context` — fill from STEP 2 capabilities
 - `summary` — synthesize a 2-5 sentence note from agent findings
 - `verdict` — one of the verdicts below
-- `key-findings` — consolidate actionable findings from all agents. Include every CRITICAL and MAJOR regardless of confidence. For MINOR/INFO, include items marked `confidence: high`; drop or collapse `confidence: low` MINOR/INFO into a single "Other low-confidence notes" bullet. Order by severity, then confidence.
+- `key-findings` — consolidate actionable findings from all agents. Include every CRITICAL and MAJOR regardless of confidence. For MINOR/INFO, include items marked `confidence: high`; drop or collapse `confidence: low` MINOR/INFO into a single "Other low-confidence notes" bullet. Order by severity, then confidence. **Structural `[OPPORTUNITY]` findings** (deep scope) go in a dedicated "Structural Opportunities" sub-block — they surface prominently but do NOT count toward the verdict; route them to `/prc` or a follow-up task.
 - `coverage` — record what was reviewed and what was skipped
 - `verification` — record commands run and results
 - `metadata` — changed files, diff source, reviewers invoked
@@ -215,7 +213,7 @@ Verdicts:
 - `DRAFT REVIEW`: working-tree review or no immutable snapshot
 - `APPROVED`: committed snapshot, sufficient coverage, `0 critical`, `0 major`
 - `APPROVED WITH NOTES`: committed snapshot, `0 critical`, `0 major`, but verification or coverage is partial
-- `NEEDS FIXES`: any critical or major finding
+- `NEEDS FIXES`: any critical or major finding (including structural CRITICAL/MAJOR from deep scope; `[OPPORTUNITY]` findings never trigger this)
 
 Never return `APPROVED` for an uncommitted working-tree draft.
 
@@ -229,13 +227,11 @@ This is a recommendation, not a blocker. It surfaces the gap between "code looks
 
 ## Operating Reminders
 
-A few gates are worth re-stating because mis-handling them corrupts the review output:
+Three gates are worth re-stating because mis-handling them corrupts the review file:
 
 - One CR file per review target — reuse and clear existing markers instead of creating a second file (see STEP 7).
 - Pass `cr_file_path` to every dispatched agent so they write in File Mode (see STEP 8).
 - Use Edit, not Write, on `cr_file_path` after agents have populated their sections — a full overwrite destroys their work (see STEP 9).
-- Verification that was skipped is recorded as skipped, not as passing (see STEP 6).
-- Spec compliance is only claimed when a spec artifact exists (see STEP 2).
 
 ## Related Skills
 
