@@ -196,6 +196,7 @@ Return findings inline in the structured format above so the orchestrator can in
 - {{AUTH}} authentication validation → Owned by `security-code-reviewer`
 - {{ORM}} query performance (N+1, pagination) → Owned by `performance-reviewer`
 - Code naming, duplication, complexity → Owned by `code-quality-reviewer`
+- Whole-module structural simplification / code-judo / file-size decomposition → Owned by `structural-quality-reviewer` (deep scope only)
 
 ## Constraints
 

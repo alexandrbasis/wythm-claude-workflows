@@ -194,7 +194,7 @@ agent -p "[review prompt]" --model gpt-5.4-medium # ...pipeline
 agent -p "[review prompt]" --model gemini-3.1-pro # ...pipeline
 ```
 
-This gives three model perspectives through a single CLI — useful when codex-cli or gemini-cli are unavailable.
+This gives three model perspectives through a single CLI — useful when codex-cli or antigravity-cli are unavailable.
 
 ### Cloud Agent (Heavy Tasks)
 

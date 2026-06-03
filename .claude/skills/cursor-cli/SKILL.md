@@ -121,7 +121,7 @@ Read with the **Read tool** (not `cat`) so the file is registered with the harne
 
 | Flag | Why |
 |---|---|
-| `--model composer-2` | Pins to Cursor's Kimi-K2.5 lineage — the whole reason to use this skill instead of codex/gemini. Without it, you get a default that may duplicate another CLI. |
+| `--model composer-2` | Pins to Cursor's Kimi-K2.5 lineage — the whole reason to use this skill instead of codex/antigravity. Without it, you get a default that may duplicate another CLI. |
 | `--mode=ask` | Read-only mode, enforced at the CLI level. A review must not modify files. |
 | `--trust` | Bypasses the workspace-trust prompt, which would otherwise hang headless mode. |
 
@@ -134,7 +134,7 @@ Cursor starts with zero context. Always include in your prompt:
 - **Implementation file paths** — so cursor knows what to review
 - **Directory paths** — for broader context
 
-File paths are referenced directly in the prompt text (no `@path` syntax like Gemini).
+File paths are referenced directly in the prompt text (no `@path` syntax like Antigravity).
 
 **Example**:
 ```bash
@@ -150,7 +150,7 @@ Focus on: correctness, edge cases, error handling" \
 
 ### Parallel with sibling CLI skills
 
-When the caller wants perspectives from multiple external CLIs (e.g. codex + cursor + gemini) on the same diff or question, issue the three Bash calls in the same turn rather than sequentially. The calls have no dependency on each other and the external CLIs take 1-10 minutes each — serializing them multiplies wall-clock time.
+When the caller wants perspectives from multiple external CLIs (e.g. codex + cursor + antigravity) on the same diff or question, issue the three Bash calls in the same turn rather than sequentially. The calls have no dependency on each other and the external CLIs take 1-10 minutes each — serializing them multiplies wall-clock time.
 
 ### One-Shot Only
 
@@ -166,7 +166,7 @@ Cursor runs non-interactively via `-p`. No follow-up questions, no conversation.
 
 ## Unique Strengths
 
-Compared to codex-cli and gemini-cli, cursor-cli offers:
+Compared to codex-cli and antigravity-cli, cursor-cli offers:
 
 - **Composer 2 model**: Fine-tuned Kimi K2.5 — a non-OpenAI/non-Anthropic model lineage, providing a genuinely different perspective in cross-AI validation
 - **Explicit read-only mode**: `--mode=ask` guarantees no file modifications (enforced at CLI level)

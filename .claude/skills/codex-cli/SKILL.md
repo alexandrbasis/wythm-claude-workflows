@@ -201,7 +201,7 @@ Focus on: correctness, edge cases, error handling" \
 
 ### Parallel with sibling CLI skills
 
-When the caller wants perspectives from multiple external CLIs (e.g. codex + cursor + gemini) on the same diff or question, issue the three Bash calls in the same turn rather than sequentially. The calls have no dependency on each other and the external CLIs take 1-10 minutes each — serializing them multiplies wall-clock time.
+When the caller wants perspectives from multiple external CLIs (e.g. codex + cursor + antigravity) on the same diff or question, issue the three Bash calls in the same turn rather than sequentially. The calls have no dependency on each other and the external CLIs take 1-10 minutes each — serializing them multiplies wall-clock time.
 
 ### One-Shot Only
 

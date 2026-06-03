@@ -61,7 +61,7 @@ Index of skills in this repo (31). Each folder contains a `SKILL.md`.
 | Skill | Purpose |
 |-------|---------|
 | [/cc-linear](./cc-linear) | Linear GraphQL from the session |
-| [/gemini-cli](./gemini-cli) | Gemini CLI |
+| [/antigravity-cli](./antigravity-cli) | Antigravity CLI (agy) |
 | [/codex-cli](./codex-cli) | OpenAI Codex CLI |
 | [/cursor-cli](./cursor-cli) | Cursor Agent (Composer) |
 | [/parallelization](./parallelization) | Parallel workers / worktrees |

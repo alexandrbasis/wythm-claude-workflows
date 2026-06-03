@@ -261,7 +261,7 @@ Irrelevant skill detection rules:
 - `cc-linear` — skip if no Linear integration detected
 - `codex-cli` — skip if user doesn't use Codex
 - `cursor-cli` — skip if user doesn't use Cursor
-- `gemini-cli` — skip if user doesn't use Gemini CLI
+- `antigravity-cli` — skip if user doesn't use Antigravity CLI (agy)
 - `parallelization` — skip if project is too small (< 5 source files)
 
 Gate: only rename skills the user explicitly selected in the multi-select below. Never disable a skill that wasn't in the returned selection set, even if detection flagged it as irrelevant. Before renaming, print the final list of skills to be disabled and wait for a plain "yes" confirmation.
