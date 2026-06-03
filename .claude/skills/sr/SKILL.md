@@ -233,6 +233,26 @@ Three gates are worth re-stating because mis-handling them corrupts the review f
 - Pass `cr_file_path` to every dispatched agent so they write in File Mode (see STEP 8).
 - Use Edit, not Write, on `cr_file_path` after agents have populated their sections — a full overwrite destroys their work (see STEP 9).
 
+## Common Rationalizations
+
+The shortcuts that turn a review into a rubber stamp:
+
+| Rationalization | Reality |
+|---|---|
+| "The implementer says it's done and tested — I'll trust the summary" | Review reads the code, not the claim. Verify against the diff; never sign off on a self-report. |
+| "It looks fine, I'll approve" | "Looks fine" is not a finding. Either name what you verified, or read deeper — an empty review is worse than no review. |
+| "I'll only look at the changed lines" | Cross-phase and integration bugs live in files the diff touches indirectly. Use `--scope=feature` when a change integrates with prior work (STEP 4). |
+| "No spec artifact, so I'll claim it matches the spec anyway" | Never assert spec compliance without a spec artifact — emit `Skipped - no task/spec artifact available` (STEP 6). |
+| "Lots of nits — I'll mark them all CRITICAL to be safe" | Severity inflation trains the author to ignore you. Label honestly: Nit/Optional/FYI vs MAJOR/CRITICAL. |
+
+## Red Flags
+
+- Writing a verdict without having read the actual changed code.
+- Approving with zero findings and zero stated verification.
+- Claiming spec compliance when no spec/task artifact exists.
+- Every finding tagged the same severity (all critical, or all nits).
+- Reviewing only the literal diff when the change clearly integrates with earlier phases.
+
 ## Related Skills
 
 | Need | Use |
