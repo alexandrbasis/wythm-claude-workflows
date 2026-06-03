@@ -171,6 +171,9 @@ If the diff accumulated obvious slop, run a focused cleanup before the final qua
 ---
 
 ## STEP 5: Prepare for Code Review
+
+Before handoff, run a quick **doubt pass** on any non-trivial decision (new branching, a cross-boundary change, an invariant the compiler can't verify): try to *disprove* it, not confirm it. If you spawn a fresh-context reviewer to help, give it the artifact + contract — never your conclusion, which just gets rubber-stamped. Bound it to ~3 cycles; if substantive findings keep coming, the work isn't review-ready — say so instead of handing off. (`/grill-me` carries the full discipline.)
+
 1. **Permission gate**: push + PR require explicit user approval.
 2. **If approved, create PR**.
 3. **Hand off to `/sr`** once the task document status is `Implementation Complete` and review context
@@ -183,3 +186,25 @@ If the diff accumulated obvious slop, run a focused cleanup before the final qua
    quality gate path/summary); deferred follow-ups or known skips; and a one-line **pointer** to
    `## Deviations & Decisions` if it has entries (e.g., "See journal: 4 entries, 1 scope-expand, 2
    tradeoffs, 1 unplanned decision"). Don't restate — point reviewers at it.
+
+---
+
+## Common Rationalizations
+
+The shortcuts that feel reasonable mid-implementation and cost a re-do later:
+
+| Rationalization | Reality |
+|---|---|
+| "I'll write the test after the code" | Test-after isn't TDD — it's shaped to pass code you already wrote and won't catch a design flaw. Write the failing test first (STEP 3 / `/tdd` RED). |
+| "This step is obvious, I'll skip updating the task doc" | The next session and the reviewer read the doc, not your memory. Skipping a status/checkbox update breaks traceability (STEP 5). |
+| "Tests fail but it's unrelated — I'll fix it later" | A red suite blocks review. Fix it now, or record it explicitly as a known skip in the Completion Summary. |
+| "I'll mark it Implementation Complete now and verify later" | "Complete" without verification evidence is a claim, not a fact. Run the quality gate first, then set the status. |
+| "One big commit at the end is cleaner" | A large undifferentiated diff is unreviewable. Commit vertical slices as each acceptance criterion goes green. |
+
+## Red Flags
+
+- Writing implementation before a failing test exists for it.
+- 5+ files changed and the task document hasn't been touched once.
+- Status set to `Implementation Complete` but tests/build were never run this session.
+- An acceptance criterion checked off with no artifact (command output, test) backing it.
+- Pushing or opening a PR without the explicit approval gate in STEP 5.

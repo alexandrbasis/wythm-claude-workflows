@@ -46,7 +46,13 @@ Reviews run in two stages so we get recall AND precision:
    a list, not 5 separate findings). Explain why each issue matters. Highlight
    positive practices alongside problems.
 
-## Diff-Scoped Review (when `changed_files` provided)
+## Sizing & Comment Hygiene
+
+Norms from Google's [engineering practices guide](https://google.github.io/eng-practices/):
+
+- **Change sizing** — a reviewable change is small (~100 lines is a healthy target). If the diff is large and not mechanically generated, flag it and suggest splitting; a 1000-line PR gets a worse review, not a better one.
+- **The standard is "improves code health"** — approve a change that improves the codebase even if it isn't perfect. Don't block on personal preference; block on real problems.
+- **Mark non-blocking comments** — prefix advisory notes (`Nit:`, `Optional:`, `FYI:`) so the author can tell what must change from what's a suggestion. Severity inflation trains authors to ignore you.
 
 - Primary scope: only review files in `changed_files`
 - Use `full_diff` to focus on changed lines

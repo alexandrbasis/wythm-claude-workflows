@@ -361,6 +361,28 @@ In any of these cases, report the actual state honestly and let the user decide 
 
 ---
 
+## Common Rationalizations
+
+The shortcuts that land a broken main or lose someone else's work:
+
+| Rationalization | Reality |
+|---|---|
+| "CI is still running but it'll pass — I'll merge now" | Still-running counts as not-green (STOP CONDITIONS). Merging on a guess can land a broken main. Wait for green. |
+| "`git add -A` is faster than staging by name" | It silently commits `.env`, `tasks/` scratch, and debug artifacts. Stage by filename (Gate 2). |
+| "Push was rejected — I'll `--force` it" | A rejected push means the remote changed. Force overwrites someone else's work. Investigate, never force from this skill. |
+| "It's a phase task but the next-phase docs look close enough" | Stale next-phase assumptions cost the next implementer real time. Apply the Gate 3 handoff updates before merging. |
+| "The summary reads better if I just say all-green" | Optimistic summaries that mask a failed check or skipped handoff cost debugging time later. Report the actual state. |
+
+## Red Flags
+
+- Merging while any check is failed, cancelled, or still running.
+- `git add -A` / `git add .` instead of staging by filename.
+- Any use of `--force`, `--force-with-lease`, or `--no-verify`.
+- Declaring "Shipped" when the PR is not in `merged: true` state.
+- Skipping Gate 3 handoff updates on a multi-phase task.
+
+---
+
 ## NOTES ON SAFETY
 
 - Never use `--no-verify`, `--force`, `--force-with-lease`, or `git push -f` from this skill. Pushing to a PR branch is normal `git push`; if it's rejected, that's a signal something changed remotely (someone else pushed, a bot rebased) and the right move is to investigate, not overwrite.

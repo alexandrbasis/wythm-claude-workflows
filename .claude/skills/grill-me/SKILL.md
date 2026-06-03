@@ -24,6 +24,12 @@ Pressure-test a plan or design until the remaining ambiguity is explicit, bounde
   is to sharpen an existing plan, not to bolt on new features under the
   guise of stress-testing.
 
+## Adversarial Discipline
+
+- When you offer a recommended answer, first spend one beat trying to **disprove** it. Confirmation is the failure mode — a default you only defended is weaker than one you tried to break.
+- **Bound the loop.** If two consecutive rounds surface only minor or already-considered points, stop and report — continuing is grill theater (motion without new information), not rigor.
+- For a high-stakes or irreversible decision, offer the user a **fresh-context adversarial check**: a subagent prompted to *find what's wrong*, given the artifact and its constraints — **not** your preferred answer. Handing over your conclusion biases the reviewer toward agreement. Never invoke an external CLI for this without explicit user authorization.
+
 ## When Invoked From Discovery
 
 Scan every section of the discovery document (scope, flows, states,

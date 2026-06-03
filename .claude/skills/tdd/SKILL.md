@@ -23,6 +23,12 @@ disable-model-invocation: true
 
 See [tests.md](tests.md) for examples and [mocking.md](mocking.md) for mocking guidelines.
 
+**Named principles** (from *Software Engineering at Google*):
+
+- **Beyoncé Rule** — "if you liked it, you should have put a test on it." If a behavior matters, it has a test; anything untested is fair game to break and nobody will notice.
+- **Test pyramid (≈80/15/5)** — favor many fast unit tests, fewer integration tests, very few end-to-end. An inverted pyramid (mostly E2E) is slow and flaky.
+- **DAMP over DRY in tests** — tests may repeat themselves for readability. A test should be obvious in isolation; don't hide its meaning behind shared helpers the way you would in production code.
+
 ## Anti-pattern: horizontal slices
 
 **DO NOT write all tests first, then all implementation.** This is "horizontal slicing" — treating RED as "write all tests" and GREEN as "write all code."
@@ -119,3 +125,23 @@ After all tests pass, look for [refactor candidates](refactoring.md):
 - `/si` and `/si-quick` defer to this skill for the canonical TDD discipline.
 - `developer-agent` enforces vertical slicing during implementation.
 - `senior-architecture-reviewer` verifies TDD compliance via git history (test commits precede implementation commits).
+
+## Common Rationalizations
+
+The excuses that quietly turn TDD back into test-after:
+
+| Rationalization | Reality |
+|---|---|
+| "I'll add tests after the code works" | That's test-after, not TDD. The test no longer drives the design and tends to encode whatever the code happens to do. RED comes before code. |
+| "Testing the implementation is fine, it's faster" | Tests bound to internals break on every refactor and stop being a safety net. Test behavior through the public interface. |
+| "This slice is small, I'll skip the failing-test step" | If you didn't watch it fail, you don't know the test tests anything. A test that never went RED can pass for the wrong reason. |
+| "I'll build the whole layer, then test the stack" | Horizontal slices defer integration risk to the end. Build thin vertical slices that prove the whole path early (see Anti-pattern above). |
+| "Tests are green-ish, I'll refactor now" | Never refactor while RED. Get fully GREEN first, then refactor with the net in place. |
+
+## Red Flags
+
+- Code committed before any failing test for it exists.
+- A test that has never been observed to fail.
+- Tests that assert on private methods or internal state.
+- A growing pile of untested code "to be covered later."
+- Refactoring while the suite is red.

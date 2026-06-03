@@ -4,7 +4,7 @@ Automated actions that fire when Claude Code edits files, runs commands, or ends
 
 ## Quick Start
 
-This template ships with **6 hooks wired by default** (universal, zero-config) and **9 hooks ready to enable** (project-specific, need configuration).
+This template ships with **6 hooks wired by default** (universal, zero-config) and **10 hooks ready to enable** (project-specific, need configuration).
 
 To enable a disabled hook:
 1. Open the script file — the header contains the exact JSON snippet
@@ -15,6 +15,7 @@ To enable a disabled hook:
 
 ```
 .claude/hooks/
+├── cache/           # WebFetch HTTP cache (ETag/304 revalidation)
 ├── guards/          # Safety guardrails (bash, file, sensitive, stop, analytics)
 ├── lifecycle/       # Session lifecycle (auto-commit on stop)
 ├── lint/            # Format on write (Prettier, etc.)
@@ -52,6 +53,32 @@ These hooks are wired in `settings.json` and work in any project without configu
 ---
 
 ## Available Hooks (Enable for Your Project)
+
+### WebFetch Cache
+
+Caches WebFetch results by URL and serves them on a later fetch **only if the origin confirms the page is unchanged** (HTTP 304 via `ETag`/`Last-Modified` revalidation). No TTL — the origin decides freshness, not a timer, so cached docs never go stale. Cuts repeated fetches of unchanged documentation. Two paired scripts; degrades to a normal fetch if `jq`/`curl`/`shasum` are missing or the origin sends no validator.
+
+- **Files:** `cache/webfetch-cache-pre.sh` (serve), `cache/webfetch-cache-post.sh` (store)
+- **Event:** PreToolUse → WebFetch (pre), PostToolUse → WebFetch (post)
+- **Blocking:** Conditional (pre exits 2 on a cache hit to deliver the cached body; never blocks on a miss)
+- **Configure:** None — works universally. Cache state in `hooks/logs/webfetch-cache/` (gitignored). Debug: `WEBFETCH_CACHE_DEBUG=1`.
+
+```json
+{
+  "PreToolUse": [
+    {
+      "matcher": "WebFetch",
+      "hooks": [{"type": "command", "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/cache/webfetch-cache-pre.sh", "timeout": 15}]
+    }
+  ],
+  "PostToolUse": [
+    {
+      "matcher": "WebFetch",
+      "hooks": [{"type": "command", "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/cache/webfetch-cache-post.sh", "timeout": 15}]
+    }
+  ]
+}
+```
 
 ### Bash Guard
 

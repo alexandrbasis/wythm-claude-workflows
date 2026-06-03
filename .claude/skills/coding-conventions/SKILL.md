@@ -58,3 +58,12 @@ Shared knowledge preloaded into developer agents. Follow these when implementing
   codebase's flow.
 - Match existing codebase patterns — new code should look like it belongs.
 - No git writes unless explicitly approved by orchestrator
+
+## Engineering Principles
+
+Named heuristics worth applying by name (mostly from *Software Engineering at Google* and Ousterhout's *A Philosophy of Software Design*):
+
+- **Chesterton's Fence** — don't remove or rewrite code whose purpose you don't understand. Find out why it's there first; "it looks unnecessary" is not a reason.
+- **Code is a liability** — every line is maintenance surface, not an asset. The best change is often less code; prefer deleting over adding.
+- **Hyrum's Law** — with enough users, every observable behavior of an interface will be depended on. "It's just an implementation detail" doesn't make a change safe — treat observable behavior as the contract.
+- **Deep modules** — hide substantial functionality behind a narrow, simple interface. Many shallow pass-through layers add complexity without earning it.
