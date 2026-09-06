@@ -4,6 +4,9 @@
   "private": true,
   "scripts": {
     "start": "npx serve public -l ${PORT:-3000}",
-    "dev": "npx serve public -l 3000"
+    "dev": "npx serve public -l 3000",
+    "build:plugins": "python3 scripts/build_plugins.py",
+    "validate:plugins": "python3 scripts/validate_plugins.py",
+    "test:plugins": "python3 -m unittest discover -s tests"
   }
 }

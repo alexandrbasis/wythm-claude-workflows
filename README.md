@@ -1,6 +1,6 @@
 # claudops
 
-> Universal Claude Code workflow template — clone, run `/setup`, start building
+> Development workflows for Claude Code, also packaged as Agent Plugins v1 skills.
 
 **Author:** [@alexandrbasis](https://x.com/alexandrbasis) | [@MishkaKey](https://x.com/MishkaKey)
 
@@ -18,12 +18,12 @@ Works with any language, framework, and architecture — TypeScript, Python, Go,
 
 ## Philosophy
 
-This is a **human-in-the-loop pipeline**, not a fully autonomous agent. Every stage is triggered by you, every output is validated by you. The AI proposes — you approve, adjust, or reject. Nothing ships without your explicit sign-off.
+This is a **human-in-the-loop pipeline**, not a fully autonomous agent. You choose the work and review the required artifacts. Once a bounded stage is approved, the agent completes that scope without asking again for the same decision. Nothing ships without your explicit sign-off.
 
 - **You trigger** each stage — `/nf` for discovery, `/ct` for planning, `/si` for implementation, `/sr` for review
 - **You validate** between stages — review the discovery doc before planning, review the plan before coding
 - **You control the gates** — quality checks run automatically, but merging is always your decision
-- **Agents assist, not replace** — 17 agents handle the grunt work (linting, testing, architecture checks), you make the calls
+- **Agents assist, not replace** — 18 agents handle the grunt work (linting, testing, architecture checks), you make the calls
 
 The result: AI speed with human judgment. Full context at every step, no black-box automation.
 
@@ -31,8 +31,8 @@ The result: AI speed with human judgment. Full context at every step, no black-b
 
 - **`/setup` wizard** — auto-detects your tech stack, project structure, and commands, then configures all skills, agents, and hooks in one pass
 - **`/update-setup`** — pulls upstream changes from claudops, shows a diff, lets you cherry-pick updates while preserving your local customizations
-- **17 specialized agents** — TDD, code review, task validation, research
-- **31 skills** — full dev lifecycle, dev server monitoring, and cross-AI helpers (Gemini CLI, Codex CLI, Cursor CLI)
+- **18 specialized agents** — TDD, code review, task validation, research
+- **40 skills** — full dev lifecycle, dev server monitoring, and cross-AI helpers (Antigravity, Codex CLI, Cursor CLI)
 - **Skills ↔ Agents composability** — agents preload shared convention skills via `skills:` frontmatter
 - **Cross-AI plan review** — optional Gemini verification of plans (see `review-plan-gemini.sh`)
 - **Hooks** — lint on write, sync, validation, guards, metrics
@@ -42,7 +42,7 @@ The result: AI speed with human judgment. Full context at every step, no black-b
 
 ## What's Inside
 
-### Agents (17)
+### Agents (18)
 
 **Automation** (`.claude/agents/automation-agents/`)
 | Agent | Purpose |
@@ -61,6 +61,7 @@ The result: AI speed with human judgment. Full context at every step, no black-b
 | `security-code-reviewer` | OWASP Top 10, injection, auth issues |
 | `spec-compliance-reviewer` | Spec and requirements alignment |
 | `test-coverage-reviewer` | Coverage gaps, test quality |
+| `structural-quality-reviewer` | Structural patterns across changed surfaces |
 
 **Task validators** (`.claude/agents/tasks-validators-agents/`)
 | Agent | Purpose |
@@ -83,7 +84,7 @@ The result: AI speed with human judgment. Full context at every step, no black-b
 
 ---
 
-### Skills (31)
+### Skills (40)
 
 See [`.claude/skills/README.md`](.claude/skills/README.md) for the full index. Summary:
 
@@ -93,7 +94,7 @@ See [`.claude/skills/README.md`](.claude/skills/README.md) for the full index. S
 | Core workflow | `ct`, `si`, `si-quick`, `sr`, `prc`, `ph`, `nf`, `product`, `vp`, `blueprint` |
 | Discovery & design | `brainstorm`, `design-exploration`, `analyze`, `grill-me`, `rip` |
 | Quality & debugging | `dev-server`, `code-analysis`, `dbg`, `fci` |
-| Cross-AI | `gemini-cli`, `codex-cli`, `cursor-cli` |
+| Cross-AI | `antigravity-cli`, `codex-cli`, `cursor-cli` |
 | Integrations & meta | `cc-linear`, `deep-research`, `parallelization`, `sbs`, `update-docs` |
 
 ---
@@ -130,6 +131,10 @@ Python/shell hooks under `.claude/hooks/` — lint on write, agent sync, pre-com
 ## Repository structure
 
 ```
+plugin.json                  # Agent Plugins manifest source
+.claude-plugin/plugin.json   # Claude manifest source
+scripts/                    # Reproducible build and validation
+dist/                       # Generated packages (not source)
 .claude/
 ├── agents/           # Specialized subagents
 ├── docs/
@@ -145,13 +150,51 @@ workflow-visualization.html   # Interactive workflow map (open in browser)
 
 ---
 
-## Quick Start
+## Use as a plugin
 
-### 1. Clone into your project
+Build both packages from the maintained `.claude/` source:
+
+```bash
+python3 -m venv .venv
+.venv/bin/pip install -r requirements-dev.txt
+.venv/bin/python scripts/build_plugins.py
+.venv/bin/python scripts/validate_plugins.py
+```
+
+For **Claude Code**, launch it in your target project with the built directory:
+
+```bash
+claude --plugin-dir /absolute/path/to/claudops/dist/claude/claudops
+```
+
+Run `/claudops:setup` once for that project, then `/claudops:ct`, `/claudops:si`,
+or `/claudops:sr`. The package contains all 40 skills and 18 agents. Setup creates
+missing project templates, preserves existing and disabled files, and asks you to
+review configuration values. It activates hooks only after approval of the exact
+settings change. Shared plugin files stay unchanged.
+
+For **Agent Plugins v1**, use `dist/agent/claudops` with a compatible client.
+The portable package has `plugin.json` and all 40 skills; its format does not provide
+Claude's agent execution or invocation controls. Clients must supply the capabilities
+a selected workflow needs. Explicit-only policies are retained as metadata and text;
+portable clients must enforce those policies for equivalent discovery behavior.
+See [package architecture and validation](packaging/README.md) for the precise limits.
+
+These are generated packages, ready for local loading or distribution after review.
+Building does not install, publish, enable hooks, or change account settings.
+Agent Plugins is a [package format](https://agent-plugins.org/specification);
+installation and publication belong to each client. Claude's local loader is documented
+in its [plugin reference](https://code.claude.com/docs/en/plugins-reference).
+
+## Use the copied workflow
+
+### 1. Clone the source and preview project templates
 ```bash
 git clone https://github.com/alexandrbasis/claudops.git
-cp -r claudops/.claude your-project/
-cd your-project
+python3 claudops/.claude/skills/setup/scripts/bootstrap_project.py --project /absolute/your-project
+# Review the listed additions, then materialize them:
+python3 claudops/.claude/skills/setup/scripts/bootstrap_project.py --project /absolute/your-project --apply
+cd /absolute/your-project
 ```
 
 ### 2. Run the setup wizard
@@ -160,18 +203,18 @@ cd your-project
 ```
 
 The wizard will:
-1. **Scan your codebase** with 3 parallel agents (tech stack, project structure, commands)
+1. **Inspect your codebase** for stack, structure, commands, and architecture
 2. **Confirm** detected values with you (framework, ORM, test/lint/build commands, architecture)
-3. **Fill in** all `{{PLACEHOLDER}}` variables directly in every skill, agent, and hook file
+3. **Apply confirmed values** to project files, reporting unresolved placeholders and previewing hook activation
 
-After setup, every file has your real values baked in — no runtime resolution, no config indirection.
+Configured values live in your local `.claude/` files. Unknown values remain visible for follow-up; a copied hook is not active until it is wired into settings.
 
 ### 3. Keep it updated
 ```
 /update-setup
 ```
 
-Pulls latest changes from the upstream claudops repo, shows what's new or modified, and lets you cherry-pick what to apply. Your custom local skills and hooks are never touched.
+Pulls latest changes from the upstream claudops repo, shows what's new or modified, and lets you cherry-pick what to apply. Local-only files are excluded; updates to customized upstream files require an explicit conflict decision.
 
 ### 4. Start using workflows
 ```

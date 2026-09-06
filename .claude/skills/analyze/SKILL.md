@@ -1,11 +1,11 @@
 ---
 name: analyze
 description: >-
-  Cross-artifact consistency check between spec documents and tech decomposition.
-  Use when asked to 'analyze consistency', 'check alignment', 'verify spec matches plan',
-  'traceability check', 'spec drift', 'are my docs aligned', or after /ct completes
-  to verify the tech decomposition covers all requirements. Also invoked automatically
-  as GATE 4 in /ct.
+  Compare a task's discovery or product requirements with its tech decomposition and
+  report traceability gaps. Use when asked to 'analyze consistency', 'check alignment',
+  'verify spec matches plan', 'traceability check', 'spec drift', 'are my docs aligned',
+  or after /ct completes to verify the plan covers the requirements. Also invoked
+  automatically as GATE 4 in /ct.
   NOT for code review (use /sr), NOT for code analysis (use /code-analysis),
   NOT for debugging (use /dbg).
 argument-hint: [task-directory]
@@ -41,6 +41,9 @@ Find the task directory and its documents:
 **If spec docs are missing**: Report "No spec documents found — cannot verify alignment. This task was created without /nf or /product documentation." Verdict: `SKIPPED`.
 
 **If tech decomposition is missing**: Report "No tech decomposition found — run /ct first." Verdict: `SKIPPED`.
+
+When an argument identifies a task, prefer documents matching that task and feature name;
+do not load unrelated PRDs or JTBDs merely because they exist elsewhere in the repository.
 
 ---
 
@@ -144,6 +147,10 @@ Present the report to the user:
 - **Fix gaps** — go back and update the tech decomposition
 - **Acknowledge and proceed** — gaps are intentional or will be addressed later
 - **Re-run /nf** — spec docs need revision first
+
+Complete the read-only matrix, findings, counts, and verdict before asking this question.
+The user's choice is a follow-up decision; it does not authorize this skill to edit the
+specification or plan.
 
 ---
 

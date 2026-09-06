@@ -33,7 +33,7 @@ Guide the user through their requested task as an interactive teacher, explainin
 
 **If no `[topic]` argument provided:**
 1. Use `AskUserQuestion`: "What would you like to learn about?"
-   - Scan recent `git log --oneline -5` and open `tasks/` for contextual topic suggestions
+   - For a project-specific topic, scan recent `git log --oneline -5` and `tasks/` for contextual suggestions; for a general topic, skip repository discovery
    - Offer 2-3 relevant suggestions based on recent project activity
    - Include a free-text option
 
@@ -191,9 +191,10 @@ Scale detail to the session depth chosen in setup:
 Long sessions (Full Tutorial, Deep Mastery) can span many turns. If
 context is compacted mid-session, do not wrap the session up early —
 the learning plan from SESSION SETUP is the source of truth. Before
-any summarisation pass, save current step number, chosen depth, and
-pending bonus-learning notes into the resume file under `docs/learning/`
-so the session can pick up from the correct step.
+any summarisation pass, update the session's resume file under `docs/learning/`
+with the current step number, chosen depth, and pending bonus-learning notes so the
+session can pick up from the correct step. Create that resume artifact only when a
+long session needs cross-turn continuity or the user asks for resumable notes.
 
 ## SESSION CAPTURE
 
@@ -233,7 +234,10 @@ After the learning session, offer a natural handoff based on what the user learn
 - **"I'm good, thanks"** → Wrap up with a 1-sentence recap of what was covered
 
 ## DEFINITION OF DONE
-- [ ] Topic requested by user is fully covered (at the chosen depth)
-- [ ] User confirmed understanding at each step
-- [ ] Key concepts are transferable (user could apply them to similar tasks)
-- [ ] Learning notes offered and saved (if user wanted them)
+- [ ] The requested topic is covered at the chosen depth
+- [ ] Each planned step ends with user confirmation, an intentional skip, or an explicit blocker
+- [ ] Key concepts are transferable: the user can explain or adapt the pattern
+- [ ] Learning notes are offered and saved only if the user wants them
+
+Do not end on an explanation alone when the user asked to work through a task: finish the
+current step's user-visible outcome or record the blocker and next action.

@@ -40,12 +40,12 @@ If no `[feature-description]` is provided, `AskUserQuestion`: "What feature woul
 
 ### Step 0 — Load Output Shape & Upstream Context
 Read `.claude/docs/templates/discovery-template.md` first — it is the **output contract** (defines what the final doc contains). Don't duplicate its structure here; use the template as the source of truth for final shape.
-Then load, if present:
-- `docs/product-docs/PRD/PRD-*[feature-name]*.md` and `docs/product-docs/JTBD/JTBD-*[feature-name]*.md` — product-level "what & why"; reference them in the discovery doc.
-- `docs/product-docs/UBIQUITOUS_LANGUAGE.md` — use its terms verbatim; flag conflicts with user wording immediately. If missing or new terms surface, plan to invoke `/ubiquitous-language` at the Step 4 → 5 transition.
+Then load only matching upstream context, if present:
+- `product-docs/PRD/PRD-*[feature-name]*.md` and `product-docs/JTBD/JTBD-*[feature-name]*.md` — product-level "what & why"; reference them in the discovery doc.
+- `product-docs/UBIQUITOUS_LANGUAGE.md` — use its terms verbatim; flag conflicts with user wording immediately. If missing or new terms surface, plan to invoke `/ubiquitous-language` at the Step 4 → 5 transition.
 
 ### Step 1 — Context Gathering & Design Exploration
-Invoke the `design-exploration` skill to ground discovery in the real codebase. Ask it for: key codebase findings & current fit, viable design directions, constraints, and risk flags. Prefer fit / options / constraints / risks over implementation decomposition.
+When the feature will change or extend this project's code, invoke the `design-exploration` skill to ground discovery in the real codebase. Ask it for: key codebase findings & current fit, viable design directions, constraints, and risk flags. For a greenfield or product-only feature, record that no codebase fit was available and focus on the user's context. Prefer fit / options / constraints / risks over implementation decomposition.
 **Checkpoint** — `AskUserQuestion`: "Does this direction look right?" → "Continue with this approach" / "Explore a different direction" / "I have corrections".
 
 ### Step 2 — External Research (if needed)
@@ -54,21 +54,21 @@ Invoke the `design-exploration` skill to ground discovery in the real codebase. 
 
 ### Step 3 — Deep-Dive Questions
 Drive the conversation toward the template sections with **non-obvious** questions. **Read `references/interview-guide.md` now** — it holds the full question bank (Overview, Usage Context, Chosen Direction, How It Works, Scope, Requirements, and Post-Action / Cross-Surface behavior).
-Stop when every template section has an answer the user confirmed once — don't re-confirm. For sections that need speculation, ask once, accept "skip / TBD", and note as `[NEEDS CLARIFICATION: ...]`. The draft needn't be perfect before writing — the grill round catches real gaps.
+Stop when every template section has either a user-confirmed answer or an explicit `[NEEDS CLARIFICATION: ...]` marker — don't re-confirm. For sections that need speculation, ask once, accept "skip / TBD", and mark the unresolved question. The draft needn't be perfect before writing — the grill round catches real gaps.
 
 ### Step 4 — "Grill Me" Challenge Round
 Invoke the `/grill-me` skill to pressure-test design and clarity. Before invoking, summarize: feature name/description, why it exists, chosen direction, how it works, in / out scope, key requirements, known risks.
 After grilling: incorporate findings; tighten wording, scope boundaries, hidden assumptions, missing states / edge cases.
-**Update glossary** (before writing): if new terms, synonym conflicts, or sharpened terms surfaced, invoke `/ubiquitous-language` to update `docs/product-docs/UBIQUITOUS_LANGUAGE.md` so downstream `/vp`, `/ct`, `/si` inherit the vocabulary.
+**Update glossary** (before writing): if new terms, synonym conflicts, or sharpened terms surfaced, invoke `/ubiquitous-language` to update `product-docs/UBIQUITOUS_LANGUAGE.md` so downstream `/vp`, `/ct`, `/si` inherit the vocabulary.
 **Checkpoint** — `AskUserQuestion`: "Proceed to discovery document" / "Revisit design based on findings" / "Cut scope based on grill findings".
 
 ### Completion Check
-One pass (not a loop): verify each has a ≥ 1-sentence answer — what is it? why exist? how works? in scope? out of scope? what constraints shape it? If ≤ 2 are weak, flag inline and proceed (grill + cross-AI catch blockers). If > 2 missing, run one more question round, then proceed regardless.
+One pass (not a loop): verify each has a ≥ 1-sentence answer or an explicit marker — what is it? why exist? how works? in scope? out of scope? what constraints shape it? If ≤ 2 are weak, flag inline and proceed. If > 2 are missing, run one more question round; then write only with explicit markers for unresolved items, never blank required sections.
 
 ### Step 5 — Discovery Document Writing
 1. Re-read `.claude/docs/templates/discovery-template.md` (long interviews drift; re-reading prevents section/heading mismatches that `/vp` and `/ct` parsers depend on).
 2. Create `tasks/task-YYYY-MM-DD-[feature-name]/` and write `discovery-[feature-name].md` by filling the template with resolved decisions, flows, scope, requirements, and constraints. (Writing the file creates the task directory.)
-3. If any required section can't be filled clearly, continue discovery instead of finalizing.
+3. If any required section is blank, continue discovery instead of finalizing; preserve explicit `[NEEDS CLARIFICATION: ...]` markers when the user accepted an unresolved question.
 4. Present a summary for confirmation.
 
 ### Step 6 — Cross-AI Validation

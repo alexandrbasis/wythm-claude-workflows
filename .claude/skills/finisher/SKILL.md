@@ -1,18 +1,12 @@
 ---
 name: finisher
 description: >-
-  Close out work by committing local changes, pushing, waiting for green CI,
-  and merging the PR. Universal — works on any branch with an open PR; no
-  task structure required. Use when asked to 'merge the PR', 'ship it', 'merge
-  and close', 'commit push merge', 'finalize the PR', 'land it on main',
-  'we're done — close it out', or whenever the user signals end-of-work and
-  the next step is to merge. If (and only if) the current work is one phase
-  of a multi-phase task in `tasks/**/phase-N-*/`, also make upcoming phase
-  tech-decomposition documents accurate for the implementation that just
-  landed by adding handoff notes or updating stale assumptions before merging
-  — otherwise this step is silently skipped. Make sure to
-  use this skill whenever the user signals end-of-implementation and wants
-  the changes merged — even if they don't say the word "skill".
+  Ship an existing implementation by committing local changes, pushing an open
+  PR, waiting for green CI, and merging it. Use when the user explicitly asks
+  to 'merge the PR', 'ship it', 'merge and close', 'commit push merge',
+  'finalize this PR', or 'land this branch'. Do not trigger on generic
+  end-of-work language without a resolved PR or branch destination. This flow
+  works with or without a task directory; phase handoff details live in Gate 3.
   NOT for opening a new PR (use plain `gh pr create`).
   NOT for addressing review comments (use /prc).
   NOT for preparing a session handoff to a fresh context (use /ph).
@@ -116,6 +110,9 @@ Otherwise, present what's pending:
 Ask the user:
 - Confirm which files to include. Stage **specific files by name** — never `git add -A` or `git add .` (could pull in secrets, scratch files, or `tasks/` debug output).
 - Confirm the commit message. Default to a single focused message describing the final delta; squash trivial scratch commits into the description if helpful.
+- Reuse explicit push authorization already granted in the current task/session for this branch or PR
+  (for example, `commit-push-merge` or `ship/merge this PR`). Ask only when the push destination or
+  operation is new or unclear. Approval to commit alone does not authorize pushing.
 
 ### Step 2: Commit
 
@@ -241,6 +238,10 @@ If no upcoming phase docs changed, do not create a commit. Carry the evidence-ba
 
 ### Step 1: Push
 
+Before pushing, verify that the current task/session explicitly authorizes pushing this branch or
+PR. Reuse that authorization without asking again. If the request only says "finish" or leaves the
+destination unclear, stop after the local commit and ask whether to push.
+
 ```bash
 git push
 ```
@@ -264,11 +265,20 @@ If checks fail:
 
 If checks are stuck "queued" or "in_progress" for an unreasonable time, surface that too — sometimes a runner is wedged and the user needs to retrigger manually.
 
+After a successful push and green checks, read back the remote head and PR status. The pushed commit
+and the checked PR head must match before continuing.
+
 ---
 
 ## GATE 5: Merge
 
 ### Step 1: Final Confirmation
+
+Before presenting the merge confirmation, consume the review evidence required by the user, task, or
+repository. Accept the latest provider review status or a local review artifact when that workflow
+created one. This universal PR-only flow does not require inventing a local artifact when no such
+review was requested or configured. If required evidence is missing or unresolved, surface that
+state before merge.
 
 Before merging, summarize for the user:
 

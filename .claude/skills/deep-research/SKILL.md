@@ -1,14 +1,11 @@
 ---
 name: deep-research
 description: >-
-  In-depth research on technical topics using web search, documentation, and codebase analysis.
-  Use when asked to 'research', 'investigate', 'find out about', 'look into', 'dig into',
-  'compare X vs Y', 'what's the best library for', 'how does X work', 'should we use',
-  'find alternatives to', 'evaluate options for', 'what are others doing for',
-  or explore unfamiliar technologies, libraries, or architectural patterns.
-  Also triggers for technology evaluation, migration research, and dependency decisions.
-  NOT for quick brainstorming (use /brainstorm), NOT for feature discovery (use /nf),
-  NOT for static code analysis (use /code-analysis).
+  Research an external, current, niche, or unfamiliar technical topic with cited evidence.
+  Use for explicit research, comparisons, technology evaluation, migration/dependency
+  decisions, or questions whose answer depends on sources outside the local codebase. Do
+  not use for quick brainstorming (use /brainstorm), feature discovery (use /nf), or
+  static local code analysis (use /code-analysis).
 argument-hint: "[topic or question]"
 context: fork
 allowed-tools:
@@ -76,25 +73,14 @@ Since this runs in a fork, optimize for speed by launching parallel queries:
 
 ## 3. Research Strategies
 
-**Technology Evaluation:**
-1. Official documentation overview
-2. GitHub — stars, recent activity, open issues, release cadence
-3. Comparison articles (vs alternatives)
-4. Real-world adoption signals (who uses it, at what scale)
-5. Local codebase — integration points, migration effort
+Choose the smallest strategy that answers the question:
 
-**Problem Solving:**
-1. Error message / symptom search (Exa code context)
-2. GitHub issues in relevant repos
-3. Stack Overflow discussions
-4. Official troubleshooting guides
-5. Local codebase — similar patterns or workarounds
-
-**Best Practices:**
-1. Official style guides and recommendations
-2. Community conventions (popular repos, conference talks)
-3. Existing patterns in our codebase
-4. Project preferences (read from CLAUDE.md)
+- **Technology evaluation:** official documentation first, then repository activity or
+  adoption evidence only when it affects the decision, then local integration constraints.
+- **Problem solving:** search the exact symptom, confirm with official troubleshooting
+  guidance, and inspect local code only when the fix depends on it.
+- **Best practices:** use official guidance and local conventions; add community sources
+  only when they resolve an open trade-off.
 
 ## 4. Cross-Verification
 
@@ -153,7 +139,7 @@ Adapt output to the research depth determined in step 1.
 2. [recommendation with rationale]
 
 ## Sources
-- [Source](url) — [what it provided]
+- [Source title] — [URL] — [what it provided]
 
 ## Open Questions
 - [anything unresolved]
@@ -162,10 +148,11 @@ Adapt output to the research depth determined in step 1.
 ## 6. Project Context
 
 Instead of relying on a static list, read project context dynamically:
-- Check `CLAUDE.md` at the repo root for current stack and architecture
-- Check `{{DOCS_DIR}}/AGENTS.md` for project-specific constraints
-- Check `package.json` / `tsconfig.json` for actual dependencies and versions
-- Reference existing patterns in the codebase when making recommendations. If you cite a file or function, open it with `Read` first — do not speculate about code you have not read.. If you cite a file or function, open it with `Read` first — do not speculate about code you have not read.
+- Read a root `CLAUDE.md` or `AGENTS.md` only when one exists and local constraints affect
+  the answer.
+- Inspect manifests only when the recommendation depends on installed versions or stack.
+- Reference local patterns only when they change the recommendation; if you cite a file or
+  function, open it with `Read` first rather than speculating.
 
 This ensures recommendations stay aligned with the project as it evolves.
 

@@ -42,6 +42,10 @@ Context may compact while this skill runs. Create `HANDOFF.md` with section head
 1. If `$ARGUMENTS` provided, locate the task directory
 2. Otherwise, detect from current branch or ask: "Which task to prepare handoff for?"
 3. Read the task document (tech-decomposition)
+4. If `HANDOFF.md` already exists, read and reconcile it with the task document before editing it;
+   otherwise create it with the section headers from STEP 5 immediately after resolving the task.
+   Never overwrite an existing handoff before reading it; fill the reconciled artifact as the
+   remaining steps complete.
 
 ### STEP 2: Capture Git State
 

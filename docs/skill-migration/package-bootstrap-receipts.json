@@ -1,0 +1,18 @@
+[
+  {
+    "kind": "claude",
+    "preview_additions": 119,
+    "created": 119,
+    "repeat_created": 0,
+    "source_identical_skills": 40,
+    "existing_settings_preserved": true
+  },
+  {
+    "kind": "agent",
+    "preview_additions": 119,
+    "created": 119,
+    "repeat_created": 0,
+    "source_identical_skills": 40,
+    "existing_settings_preserved": true
+  }
+]

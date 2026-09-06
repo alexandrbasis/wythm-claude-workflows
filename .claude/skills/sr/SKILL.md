@@ -153,7 +153,13 @@ per-pass checklists — error-path, integration-seams, cross-surface entity — 
 procedure live in **`references/review-passes.md`**. Read it now when the diff matches any trigger, run
 the matching pass, and add findings to `key-findings`.
 
-For every skipped reviewer, write a one-line reason in that section.
+For every skipped reviewer, write a one-line reason in that section. If the host cannot dispatch
+the selected reviewers in one batch, run the same selected passes sequentially and preserve their
+scope; do not silently reduce coverage.
+
+When pattern propagation finds occurrences outside the diff, report them as contextual,
+non-gating evidence unless the current change amplifies or newly exposes the pattern. Keep changed
+file findings primary and do not expand the verdict to unrelated pre-existing defects.
 
 ## STEP 6: Verification Policy
 

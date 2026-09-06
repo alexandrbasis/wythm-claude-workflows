@@ -11,10 +11,10 @@ description: >
   Use this skill whenever the user says "start dev server", "run dev",
   "start the app", "launch the server", "npm run dev", "cargo run",
   "python manage.py runserver", "rails server", "go run", or anything that
-  implies starting a local development server. Also trigger when the user
-  asks to "monitor the server", "watch the build", "check for errors while
-  I work", or simply "dev".
-user-invokable: true
+  implies starting a local development server. Also trigger when the user asks to
+  "monitor the server", "watch the build", "check for errors while I work", or simply
+  "dev".
+user-invocable: true
 argument-hint: "[port] [-- extra-args]"
 allowed-tools: Bash, Monitor, Read, Glob
 ---
@@ -86,7 +86,10 @@ Before starting:
    ```bash
    lsof -i :<port> -t 2>/dev/null
    ```
-   If occupied, identify the occupying process (`ps -p <pid>`) and present two options to the user: kill PID N, or bind to port+1. Pick a default — don't block on the question if the occupying process is clearly another dev-server instance of the same project.
+   If occupied, identify the occupying process (`ps -p <pid>`) and present two options to
+   the user: kill PID N, or bind to port+1. Never kill a process without authorization. If
+   the process is clearly another instance of this project, prefer port+1 when no choice is
+   needed to start safely.
 
 2. **Dependencies installed?**
    - Node: check `node_modules/` exists
@@ -94,7 +97,8 @@ Before starting:
    - Ruby: check `bundle check` passes
    - Go/Rust/Java: no check needed (build tools handle it)
 
-   If missing, ask the user if you should install first.
+   If missing, ask the user if you should install first. If the user or caller already
+   authorized setup and installation for this project, reuse that authorization.
 
 ### 3. Start with Monitor
 

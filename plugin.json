@@ -1,0 +1,18 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "claudops",
+  "version": "1.0.0",
+  "description": "Portable workflow skills for planning, implementation, review, and delivery.",
+  "author": {
+    "name": "Alex Basis"
+  },
+  "homepage": "https://github.com/alexandrbasis/claudops",
+  "repository": "https://github.com/alexandrbasis/claudops",
+  "license": "MIT",
+  "keywords": [
+    "workflow",
+    "agent-skills",
+    "claude-code",
+    "software-development"
+  ]
+}

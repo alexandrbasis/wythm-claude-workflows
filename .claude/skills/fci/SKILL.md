@@ -50,8 +50,9 @@ Fix all CI pipeline failures blocking the PR merge while maintaining code qualit
    - These commands are independent — batch them in one turn as parallel
      Bash tool calls, do not chain sequentially.
    - Ensure dependencies are installed first (sequential prerequisite).
-   - Then in parallel: `{{LINT_CMD}}`, `{{TYPECHECK_CMD}}`, `{{TEST_CMD}}`,
-     `{{BUILD_CMD}}`.
+   - Resolve the selected workflow's actual scripts and working directory before running checks.
+     Then in parallel: `{{LINT_CMD}}`, `{{TYPECHECK_CMD}}`, `{{TEST_CMD}}`, `{{BUILD_CMD}}`.
+     Do not run unresolved placeholders or assume every command belongs to the repository root.
    - Collect all failure logs before choosing where to start fixing —
      don't stop at the first red check.
 
@@ -92,8 +93,8 @@ this PR.
    - Fix any import or runtime errors
 
 ## VERIFICATION REQUIREMENTS
-Before completion, run the full CI validation suite locally and confirm
-every command exits zero:
+Before completion, run the full CI-equivalent validation suite locally and confirm every resolved
+command exits zero. Run each package command from its declared working directory:
 ```bash
 # Run full CI validation suite
 {{LINT_CMD}} && \
@@ -116,7 +117,8 @@ Optional additional checks (if relevant jobs are failing):
 
 ## DEFINITION OF DONE
 - [ ] All CI checks pass (lint, typing, format, tests, build)
-- [ ] Test coverage did not drop below the pre-fix baseline (>=80% floor).
+- [ ] Test coverage did not drop below the repository or CI-configured baseline (use the configured
+      floor; do not invent a new percentage target).
 - [ ] No test logic simplified or removed
 - [ ] Security vulnerabilities resolved (if applicable)
 - [ ] Build succeeds

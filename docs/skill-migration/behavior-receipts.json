@@ -1,0 +1,26 @@
+{
+  "date": "2026-09-06",
+  "model": "gpt-5.6-luna",
+  "reasoning": "xhigh",
+  "comparison": "candidate execution only; no baseline comparison or Astra benchmark",
+  "cases": [
+    {
+      "skill": "setup",
+      "input": "Apply two preconfirmed values to seven local sample skills only; preserve custom notes and settings.",
+      "observed": "Seven files configured; all KEEP-N notes and settings preserved; no repeat questions; 1 fixture test passed.",
+      "root_readback": "7/7 verified",
+      "writes_scope": "temporary project fixture only"
+    },
+    {
+      "skill": "update-setup",
+      "input": "Check copied target workflow against supplied local upstream; report only, no apply/network.",
+      "observed": "One modified skill reported. Target skill and settings hashes unchanged; no lock manifest created; no approval question.",
+      "root_readback": "target file bytes/settings and report summary verified",
+      "hashes": {
+        "skill": "466aff9b69e798e77ee5c46526a52820afe5c9765d2c895317760ff1d77f60a3",
+        "settings": "38f33b4d04ffb776a20e31ad63661ac9902c403d1b3ea3105d8f90bd8e6a9c91"
+      },
+      "writes_scope": "report in temporary target fixture only"
+    }
+  ]
+}

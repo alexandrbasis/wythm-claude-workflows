@@ -82,8 +82,10 @@ through.
 ## Before Acting
 
 Linear mutations are visible to the whole team and send notifications. Before
-running any of these commands, echo back what you are about to do and wait for
-confirmation on first use in a session:
+running any of these commands, state what visible change is about to happen and
+confirm it unless the user or calling workflow already authorized that exact
+destination and scope in this task. Existing authorization covers the remaining
+commands in the same chain; do not ask again between dependent steps:
 
 - `create-issue`, `add-comment`, `add-relation`, `link-pr` (new visible content)
 - `update-status`, `update-issue`, `assign`, `add-label`, `remove-label` (state changes)
@@ -93,6 +95,21 @@ do not need confirmation — run them freely.
 
 For multi-step patterns below, confirm the whole chain once, then execute
 without re-prompting between steps.
+
+Before creating an issue, search the intended team for duplicates and confirm the
+team/state/label names. Before updating an issue that is not already established in
+context, read it first. Then run one narrow mutation and independently read back the
+resulting object before reporting it. Match the read-back to the mutation:
+
+- `create-issue`, `update-issue`, `update-status`, `add-label`, `remove-label`, and `assign`:
+  read the affected issue with `get-issue` (use the identifier returned by `create-issue`).
+- `add-comment`: read the issue's comments with `list-comments`; `get-issue` omits comments.
+- `add-relation` and `link-pr`: this wrapper has no matching read command, so report the
+  mutation receipt and say independent verification is unavailable rather than treating the
+  mutation response as a read-back.
+
+The mutation's JSON response can help diagnose failure, but it is not the independent
+read-back.
 
 ## Configuration
 

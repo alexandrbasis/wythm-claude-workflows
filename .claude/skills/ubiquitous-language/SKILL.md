@@ -1,12 +1,11 @@
 ---
 name: ubiquitous-language
 description: >-
-  Extract a DDD-style ubiquitous language glossary from the current
-  conversation, flagging ambiguities and proposing canonical terms. Saves to
-  product-docs/UBIQUITOUS_LANGUAGE.md. Use when user wants to define domain
-  terms, build a glossary, harden terminology, or mentions "domain model" or
-  "DDD". Also invoked from /nf, /product, /ct as Step 0 (load) and after grill
-  (update). NOT for architectural vocabulary (use /architecture-language).
+  Build or update a DDD-style ubiquitous language glossary when the user explicitly asks to
+  define domain terms, build/update the project glossary, or harden terminology. For /nf,
+  /product, or /ct Step 0 calls, load and report the glossary; for authorized post-grill
+  updates, merge and write it. Do not write for a load-only or explanatory request. NOT for
+  architectural vocabulary (use /architecture-language).
 ---
 
 # Ubiquitous Language
@@ -15,17 +14,34 @@ description: >-
 
 Extract and formalize domain terminology from the current conversation into a consistent glossary stored at `product-docs/UBIQUITOUS_LANGUAGE.md`. The same vocabulary is used by domain experts, the user, and the AI — both in planning docs (PRD, JTBD, discovery, tech-decomposition) and in code.
 
+Classify the invocation before writing. A caller's Step 0 request is read-only loading. An
+explicit request to build/update the project glossary or define its domain terms authorizes
+the glossary update; an authorized post-grill caller may do the same. An explanatory request
+without that update intent returns proposed terms without writing.
+
 ## When this fires
 
 - **`/nf` Step 0**: load existing glossary so discovery questions and the discovery doc use canonical terms.
 - **`/nf` Step 4 → Step 5 transition**: after the grill round, update glossary with new terms before writing the discovery doc.
 - **`/product` Step 0** and **after Step 4 grill**: same pattern — load before interview, update before writing PRD/JTBD.
 - **`/ct` GATE 1**: load alongside discovery/PRD docs so decomposition aligns with project terms.
-- **Manual invocation**: any time the user asks to harden terminology or names a term that needs disambiguation.
+- **Manual update invocation**: when the user explicitly asks to harden terminology, define
+  domain terms in the project glossary, or build/update the glossary. If the user only asks
+  an explanatory terminology question, return a proposal without writing.
 
 ## Process
 
-1. **Read existing glossary** at `product-docs/UBIQUITOUS_LANGUAGE.md` (if it exists). Hold its content in memory — do NOT use Edit/section-patching. The file is small; the safe path is read → merge in memory → overwrite.
+### Load-only branch (Step 0)
+
+1. **Read existing glossary** at `product-docs/UBIQUITOUS_LANGUAGE.md` (if it exists) and
+   report its current canonical terms. Stop here. Do not scan, merge, rewrite, or update the
+   example dialogue for a load-only call.
+
+### Build/update branch (explicit request or authorized post-grill call)
+
+1. **Read existing glossary** at `product-docs/UBIQUITOUS_LANGUAGE.md` (if it exists). Hold
+   its content in memory — do NOT use Edit/section-patching. The file is small; the safe path
+   is read → merge in memory → overwrite.
 2. **Scan the relevant scope** for domain-relevant nouns, verbs, and concepts:
    - Current conversation
    - The active task's PRD / JTBD / discovery doc
@@ -35,8 +51,11 @@ Extract and formalize domain terminology from the current conversation into a co
    - Different words used for the same concept (synonyms)
    - Vague or overloaded terms
 4. **Merge in memory**: combine existing entries with new findings. Preserve every existing term unless evidence shows it's wrong; revise definitions that have sharpened. Add newly discovered terms. Update "Flagged ambiguities" with anything resolved.
-5. **Ensure parent directory exists** before writing: `mkdir -p product-docs/` (the directory is repo-level, alongside `.claude/`, and may not exist on a fresh repo).
-6. **Write the full merged glossary** to `product-docs/UBIQUITOUS_LANGUAGE.md`, fully overwriting the prior file.
+5. **When the update branch is authorized**, ensure the parent directory exists:
+   `mkdir -p product-docs/` (the directory is repo-level, alongside `.claude/`, and may not
+   exist on a fresh repo).
+6. **When the update branch is authorized**, write the full merged glossary to
+   `product-docs/UBIQUITOUS_LANGUAGE.md`, fully overwriting the prior file.
 7. **Output a summary** inline so the caller (`/nf`, `/product`, `/ct`) can paste it into its doc.
 
 ## Output format
@@ -90,13 +109,12 @@ Extract and formalize domain terminology from the current conversation into a co
 
 ## Re-running
 
-When invoked again in the same conversation:
+When invoked again in the same conversation, follow the invocation branch:
 
-1. Read existing `UBIQUITOUS_LANGUAGE.md`
-2. Incorporate new terms from subsequent discussion
-3. Update definitions if understanding has evolved
-4. Re-flag any new ambiguities
-5. Rewrite the example dialogue to incorporate new terms
+- **Step 0 load:** reread and report the existing `UBIQUITOUS_LANGUAGE.md`; do not rewrite it.
+- **Explicit build/update or authorized post-grill update:** read the existing file,
+  incorporate new terms, update definitions and ambiguities, and rewrite the example dialogue
+  before the authorized full-file write.
 
 ## Return to caller
 

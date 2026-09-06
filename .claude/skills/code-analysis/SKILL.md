@@ -1,15 +1,11 @@
 ---
 name: code-analysis
 description: >-
-  Deep code analysis with metrics, patterns, and recommendations. Use when asked
-  to 'analyze this code', 'explore the codebase', 'code audit', 'tech debt assessment',
-  'architecture review', 'codebase overview', 'show me the project structure',
-  'where are the hotspots', 'code metrics', 'what patterns are used', 'how is
-  this organized', 'code quality check', 'find complexity', 'module dependencies',
-  or any request to understand, assess, or explore code quality and structure.
-  Also triggers for pre-implementation codebase exploration and dependency analysis.
-  NOT for code review before merge (use /sr). NOT for debugging (use /dbg).
-  NOT for research on external technologies (use /deep-research).
+  Analyze the structure and quality of the current codebase with evidence-backed metrics,
+  patterns, and recommendations. Use for an explicit code audit, architecture assessment,
+  codebase overview, hotspot/complexity question, module-dependency analysis, or
+  pre-implementation exploration. Do not use for pre-merge review (use /sr), runtime
+  debugging (use /dbg), or external-technology research (use /deep-research).
 argument-hint: "[scope: file, module, or project]"
 context: fork
 agent: Explore
@@ -69,15 +65,22 @@ find . -type f -name "*.ts" ! -path "*/node_modules/*" ! -path "*/dist/*" \
 ```
 
 Read project context dynamically — don't assume the stack:
-- `CLAUDE.md` at repo root for architecture overview
-- `{{DOCS_DIR}}/AGENTS.md` for project-specific conventions
-- `package.json` / `tsconfig.json` for actual dependencies and versions
+- Read a root `CLAUDE.md` or `AGENTS.md` only if one exists and applies to the target.
+- Inspect manifests that exist (`package.json`, `pyproject.toml`, `go.mod`, and similar)
+  before choosing language-specific commands.
+- Read project architecture or test guidance only when discovery finds the relevant file.
 
-If any `{{VARIABLE}}` placeholder in this skill or in `references/project-checks.md` is not populated (e.g. `{{SRC_DIR}}` is still literal), detect the real path by inspection (e.g. `ls` the repo root for `src/`, `lib/`, `app/`) before running any command. Do not run a command containing an unresolved `{{…}}` placeholder.
+If any `{{VARIABLE}}` placeholder in this skill or in `references/project-checks.md` is
+still literal, resolve it by inspection (for example, discover `src/`, `lib/`, or `app/`)
+before running a command. Do not run a command containing an unresolved placeholder.
+
+The command snippets below use TypeScript/JavaScript as examples. Adapt extensions and
+exclusions to the detected stack before running them; do not run a snippet unchanged when
+the repository uses another language.
 
 ## 3. Architecture Analysis
 
-- Identify layers and boundaries (read `{{DOCS_DIR}}/project-structure.md` for canonical structure)
+- Identify layers and seams; read a project-structure document only if discovery finds one.
 - Map module dependencies and import relationships
 - Find circular dependencies or layer violations
 - Check adherence to documented patterns
@@ -131,12 +134,16 @@ git rev-list --count --since="6 months ago" --until="3 months ago" HEAD
 
 ## 7. Project-Specific Checks
 
-For this project, run targeted checks. Read `references/project-checks.md` for detailed commands.
+For Standard and Deep analyses, read `references/project-checks.md` when it exists. Run only
+the checks whose paths and stack were established during discovery; skip absent or irrelevant
+checks. Quick analyses stop before this section.
 
 Key areas:
 - **Architecture layer separation**: verify layer boundaries are respected (e.g., domain must NOT import from infrastructure)
-- **Database schema health**: model count, index coverage, migration count (check {{SCHEMA_PATH}} if configured)
-- **{{FRAMEWORK}} module boundaries**: providers/services stay within their module
+- **Database schema health**: model count, index coverage, and migration count when a
+  schema or migrations path was discovered
+- **Framework module boundaries**: providers/services stay within their module when the
+  detected framework defines that concept
 - **Error handling**: consistent use of domain exceptions (not raw `Error` throws)
 - **API surface**: endpoint inventory, guard/middleware coverage, DTO/contract definitions
 

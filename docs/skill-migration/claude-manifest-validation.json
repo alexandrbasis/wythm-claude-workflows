@@ -1,0 +1,13 @@
+{
+  "success": true,
+  "strict": true,
+  "target": "/private/tmp/claudops-astra-plugin-20260906/dist/claude/claudops/.claude-plugin/plugin.json",
+  "manifest": {
+    "file": "/private/tmp/claudops-astra-plugin-20260906/dist/claude/claudops/.claude-plugin/plugin.json",
+    "type": "plugin",
+    "errors": [],
+    "warnings": [],
+    "notes": []
+  },
+  "contents": []
+}

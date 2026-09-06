@@ -81,3 +81,6 @@ Thumbs.db
 # Local audit/scratch artifacts (kept locally, not committed)
 tasks/
 test-results/
+
+# Local plugin build environment
+.venv/

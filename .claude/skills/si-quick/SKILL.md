@@ -57,7 +57,8 @@ Quick plan:
 - Test: [how to verify it works]
 ```
 
-Get user confirmation before proceeding.
+If the request already specifies the quick scope and expected files, treat that as confirmation and
+proceed. Otherwise get user confirmation before proceeding.
 
 ### STEP 3: Implement
 - Stay inside the quick plan from STEP 2. Don't refactor adjacent code, rename unrelated symbols, or add defensive checks for cases the plan didn't identify. If you find something tempting, note it as a follow-up instead of doing it.
@@ -72,7 +73,9 @@ Get user confirmation before proceeding.
 - For non-logic changes (config, docs, formatting): just make the change
 
 ### STEP 4: Verify
-Run the smallest repo-appropriate verification that proves the changed behavior for the touched package(s).
+Run the smallest repo-appropriate verification that proves the changed behavior for the touched
+package(s). Resolve each command from the affected package's scripts and working directory first;
+never execute an unresolved placeholder or repeat a `cd` into the same package in one shell chain.
 
 Examples:
 

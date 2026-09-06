@@ -1,0 +1,1478 @@
+{
+  "date": "2026-09-06",
+  "repository": "https://github.com/alexandrbasis/claudops",
+  "baseline_commit": "11d93ebc9adaa0b23322b2dc30c76d284121426f",
+  "scope": "All 40 maintained .claude/skills/*/SKILL.md entrypoints; linked resources when a finding depends on them.",
+  "coverage": {
+    "reviewed": 40,
+    "changed": 33,
+    "preserved": 7
+  },
+  "evidence_rules": [
+    "Source locators identify the audited instruction; excerpt_kind distinguishes verbatim text from summaries.",
+    "Instruction conflicts and hypotheses are not measured model-quality regressions.",
+    "No model/account settings changed; no Astra benchmark claim."
+  ],
+  "records": [
+    {
+      "skill": "analyze",
+      "disposition": "migrated",
+      "findings": [
+        {
+          "excerpt": "Cross-artifact consistency check ... list recent task directories ...",
+          "request": "Compare only the selected task's specification and plan and finish with an evidenced read-only verdict.",
+          "classification": "demonstrated",
+          "consequence": "A task-specific run could load unrelated product documents, and a matrix preview could be mistaken for a complete report.",
+          "replacement": "Prefer task and feature matches, complete the matrix/findings/counts/verdict before the gap question, and define the complete report shape.",
+          "preserved": "Read-only behavior, SKIPPED verdicts, traceability IDs, severity gating, and the AskUserQuestion follow-up remain.",
+          "validation": "Read back the entrypoint; inventory.py returned 0 errors; git diff --check passed; no linked external files are required.",
+          "source_locator": "Description; Step 1; Completion",
+          "source": ".claude/skills/analyze/SKILL.md",
+          "excerpt_kind": "paraphrase of referenced instruction"
+        }
+      ],
+      "checks": [
+        "Full 164-line entrypoint read before editing",
+        "Frontmatter and allowed tools preserved",
+        "Static diff and inventory validation passed"
+      ],
+      "limits": [
+        "No runtime model behavior or workflow execution was performed",
+        "No plan/spec files were edited"
+      ],
+      "path": ".claude/skills/analyze/SKILL.md",
+      "changed": true,
+      "baseline_sha256": "16a8ee8cbf13c82996e3e22dd25b2745985dfa95ab7c2e1044e79f42a994dc14",
+      "candidate_sha256": "b2b7bfea7cc76ad6bcbb8d6277e608f87d31ce88bd68f056cfff07cad7e5afd8",
+      "baseline_lines": 157,
+      "candidate_lines": 164
+    },
+    {
+      "skill": "antigravity-cli",
+      "disposition": "migrated",
+      "findings": [
+        {
+          "excerpt": "or when you need Google Search grounding or a different AI perspective",
+          "request": "An ordinary review or research question that does not need Antigravity grounding or a distinct cross-AI perspective",
+          "classification": "hypothesis",
+          "consequence": "The broad fallback trigger can select a second CLI when the primary workflow already owns the request.",
+          "replacement": "Select agy when its Google Search grounding or distinct cross-AI perspective is needed, or when a caller delegates to it; retain one-shot-only scope.",
+          "preserved": "Model invocation policy, agy invocation, Bash/Read scope, task-selected cross-AI and web-grounded use cases, and persisted model selection.",
+          "validation": "Frontmatter parses; final inventory includes the canonical entrypoint; no command flags changed.",
+          "source_locator": ".claude/skills/antigravity-cli/SKILL.md:3-6",
+          "source": ".claude/skills/antigravity-cli/SKILL.md",
+          "excerpt_kind": "exact baseline excerpt"
+        },
+        {
+          "excerpt": "After the command completes, read the captured result and report what it established.",
+          "request": "A one-shot review or research call is used as evidence for a local task",
+          "classification": "demonstrated",
+          "consequence": "Without an explicit completion boundary, a result can be mistaken for authorization or implementation.",
+          "replacement": "Read back the result and state that it does not authorize edits, shell work, or publication.",
+          "preserved": "Read-only one-shot behavior and the existing prohibition on dangerous skip-permissions mode.",
+          "validation": "Diff review confirms only post-call authority wording was added.",
+          "source_locator": ".claude/skills/antigravity-cli/SKILL.md:157-160",
+          "source": ".claude/skills/antigravity-cli/SKILL.md",
+          "excerpt_kind": "exact candidate excerpt"
+        }
+      ],
+      "checks": [
+        "SKILL.md read fully with linked reference files inspected.",
+        "Ruby YAML safe_load passed for all 14 assigned entrypoints.",
+        "Relative-link check passed with 0 broken links.",
+        "Final inventory passed with 14 files and 0 errors."
+      ],
+      "limits": [
+        "No agy binary invocation was run; CLI behavior remains source-verified text, not live runtime evidence."
+      ],
+      "path": ".claude/skills/antigravity-cli/SKILL.md",
+      "changed": true,
+      "baseline_sha256": "db00f10c19a565c7c1fcb3b5d8347b69b39429edae1bd09121f65cdb5079e2ce",
+      "candidate_sha256": "12e4b07ea46a50c2551df7ea2d6cd7e31bc1d3e1c4f3797e5461bc7af4ef0667",
+      "baseline_lines": 185,
+      "candidate_lines": 189
+    },
+    {
+      "skill": "architecture-language",
+      "disposition": "preserved",
+      "findings": [],
+      "checks": [
+        "Entrypoint and LANGUAGE.md read fully.",
+        "Existing disable-model-invocation policy and conditional glossary pointer preserved.",
+        "Frontmatter and relative links validated."
+      ],
+      "limits": [
+        "No runtime task was used to measure vocabulary consistency."
+      ],
+      "path": ".claude/skills/architecture-language/SKILL.md",
+      "changed": false,
+      "baseline_sha256": "2191bdc86b7ad3146d97b915a7c3085346ba29f7bbbde8f7a59e045ec0ecd98b",
+      "candidate_sha256": "2191bdc86b7ad3146d97b915a7c3085346ba29f7bbbde8f7a59e045ec0ecd98b",
+      "baseline_lines": 30,
+      "candidate_lines": 30
+    },
+    {
+      "skill": "blueprint",
+      "disposition": "migrated",
+      "findings": [
+        {
+          "excerpt": "spawn one Agent subagent per area ... rather than reading sequentially",
+          "request": "Produce a complete saved multi-session plan while using delegation only when independent coverage warrants it.",
+          "classification": "demonstrated",
+          "consequence": "Every multi-area objective was pushed toward fixed fan-out, even when a narrow sequential read was sufficient; the old text also left completion implicit.",
+          "replacement": "Make fan-out conditional on independent areas and access; require self-contained briefs for steps executable next, bounded objectives/dependencies/scope/acceptance for later steps, and review risks, open questions, and rollback implications.",
+          "preserved": "Cold-start briefs, dependency DAG, 3-8 step bound, acceptance criteria, plan path, and no-code-edit scope remain.",
+          "validation": "Read back the entrypoint; inventory.py returned 0 errors; git diff --check passed; no linked references are used.",
+          "source_locator": "Phase 1 research delegation; Phase 4 review; Constraints",
+          "source": ".claude/skills/blueprint/SKILL.md",
+          "excerpt_kind": "paraphrase of referenced instruction"
+        }
+      ],
+      "checks": [
+        "Full 161-line entrypoint read before editing",
+        "Agent/WebSearch/WebFetch flags preserved",
+        "Static diff and inventory validation passed"
+      ],
+      "limits": [
+        "No blueprint was generated or executed",
+        "No implementation handoff was invoked"
+      ],
+      "path": ".claude/skills/blueprint/SKILL.md",
+      "changed": true,
+      "baseline_sha256": "a4ca1950690ebbaea5dffc7867ae39e4490cf8f05e4c8b31624a39db7f370897",
+      "candidate_sha256": "34d6e36f258dd1687726f18962a364c9d0f308290f439e3e9047b8a0b0032a0b",
+      "baseline_lines": 152,
+      "candidate_lines": 161
+    },
+    {
+      "skill": "brainstorm",
+      "disposition": "migrated",
+      "findings": [
+        {
+          "excerpt": "for project-related topics you must ground the conversation in real code ... read CLAUDE.md and skim the 1–2 files",
+          "request": "Brainstorm at the selected depth, loading project context only when a code decision needs it and returning a usable decision artifact.",
+          "classification": "demonstrated",
+          "consequence": "A product-level or underspecified topic could trigger a repository scan and design exploration before the decision needed that evidence.",
+          "replacement": "Inspect only the named area, ask for missing code context, invoke design exploration only when code evidence affects the choice, and make completion observable by depth.",
+          "preserved": "Depth calibration, resume choices, AskUserQuestion gates, research tool names, notes paths, and optional handoffs remain.",
+          "validation": "Read back the entrypoint; template path exists; inventory.py returned 0 errors; git diff --check passed.",
+          "source_locator": "Step 2 context gathering; completion signals; Output",
+          "source": ".claude/skills/brainstorm/SKILL.md",
+          "excerpt_kind": "paraphrase of referenced instruction"
+        }
+      ],
+      "checks": [
+        "Full 163-line entrypoint read before editing",
+        "Allowed tools and artifact paths preserved",
+        "Static diff and linked template validation passed"
+      ],
+      "limits": [
+        "No brainstorm session or research was run",
+        "No notes artifact was created"
+      ],
+      "path": ".claude/skills/brainstorm/SKILL.md",
+      "changed": true,
+      "baseline_sha256": "b0820611193c4745c428d6a364ee12059941985ced4d1826907d141350c3ce04",
+      "candidate_sha256": "3d9e0ef8159e2bf22ef7613ac3c0f8acadd3da49cc2420c7a9734f35a5e40cc0",
+      "baseline_lines": 160,
+      "candidate_lines": 163
+    },
+    {
+      "skill": "cc-linear",
+      "disposition": "migrated",
+      "findings": [
+        {
+          "excerpt": "Match the read-back to the mutation ... add-comment: read the issue's comments with list-comments",
+          "request": "A Linear mutation is reported as complete after the mutation response alone or with a mismatched issue read",
+          "classification": "demonstrated",
+          "consequence": "get-issue omits comments, and the wrapper has no relation or PR-attachment read command; a generic issue read-back cannot prove every mutation.",
+          "replacement": "Use get-issue for issue fields/status/labels/assignee, list-comments for add-comment, and explicitly report independent verification unavailable for add-relation/link-pr.",
+          "preserved": "Mutation confirmation for unapproved visible changes, duplicate/schema checks, scoped authorization reuse, atomic commands, and Linear notifications.",
+          "validation": "linear-api.sh was inspected: get-issue omits comments, list-comments returns comments, and no relation or attachment read command exists.",
+          "source_locator": ".claude/skills/cc-linear/SKILL.md:99-112",
+          "source": ".claude/skills/cc-linear/SKILL.md",
+          "excerpt_kind": "paraphrase of referenced instruction"
+        }
+      ],
+      "checks": [
+        "SKILL.md and linear-api-reference.md read fully.",
+        "Frontmatter and relative links validated.",
+        "Final inventory passed with 0 read errors."
+      ],
+      "limits": [
+        "No Linear mutation or network call was executed."
+      ],
+      "path": ".claude/skills/cc-linear/SKILL.md",
+      "changed": true,
+      "baseline_sha256": "266c10794df0d06a59910a7eb45e26c70f5bae8b4135f233092041a8537ad379",
+      "candidate_sha256": "5b06ee34973d5bbfdd433673699c04571ffee96f63c3d0b2dbf62696cda53188",
+      "baseline_lines": 172,
+      "candidate_lines": 189
+    },
+    {
+      "skill": "code-analysis",
+      "disposition": "migrated",
+      "findings": [
+        {
+          "excerpt": "or any request to understand, assess, or explore code quality and structure",
+          "request": "A request is a pre-merge review, runtime debug, or external technology investigation",
+          "classification": "hypothesis",
+          "consequence": "The broad description competes with sr, dbg, and deep-research despite explicit exclusions in the body.",
+          "replacement": "Trigger on explicit local audits, architecture assessments, overviews, hotspot questions, dependency analysis, and pre-implementation exploration.",
+          "preserved": "Forked Explore agent, read/report-only scope, allowed tools, depth tiers, and sibling skill routing.",
+          "validation": "Entrypoint read fully; frontmatter parses; sibling routes remain present.",
+          "source_locator": ".claude/skills/code-analysis/SKILL.md:3-8",
+          "source": ".claude/skills/code-analysis/SKILL.md",
+          "excerpt_kind": "exact baseline excerpt"
+        },
+        {
+          "excerpt": "{{DOCS_DIR}}/AGENTS.md ... references/project-checks.md for detailed commands",
+          "request": "Analysis runs in a repository without the template variables or project-specific check file",
+          "classification": "demonstrated",
+          "consequence": "Unconditional prerequisites and unresolved schema/framework placeholders invite invalid commands and unrelated reads.",
+          "replacement": "Discover existing manifests and guidance first; read project checks only for Standard/Deep analyses and run only resolved, relevant checks.",
+          "preserved": "Dynamic stack detection, project-specific checks, deep-mode git history, and no unresolved placeholder execution.",
+          "validation": "The revised entrypoint contains no runnable unresolved placeholder command; project-checks.md was inspected.",
+          "source_locator": ".claude/skills/code-analysis/SKILL.md:67-76,130-145",
+          "source": ".claude/skills/code-analysis/SKILL.md",
+          "excerpt_kind": "paraphrase of referenced instruction"
+        },
+        {
+          "excerpt": "The command snippets below use TypeScript/JavaScript as examples",
+          "request": "Analysis runs against a Python, Go, Rust, or other non-TypeScript repository",
+          "classification": "demonstrated",
+          "consequence": "The original examples could silently undercount files or produce irrelevant metrics after the stack was supposedly detected dynamically.",
+          "replacement": "Adapt extensions and exclusions to the discovered stack before running the examples.",
+          "preserved": "The useful find/wc metric recipes and read-only Bash scope.",
+          "validation": "The conditional adaptation note is present in the canonical entrypoint; no command recipe was executed.",
+          "source_locator": ".claude/skills/code-analysis/SKILL.md:77-82",
+          "source": ".claude/skills/code-analysis/SKILL.md",
+          "excerpt_kind": "exact candidate excerpt"
+        }
+      ],
+      "checks": [
+        "SKILL.md and references/project-checks.md read fully.",
+        "Frontmatter and relative links validated.",
+        "Final inventory passed with 0 errors."
+      ],
+      "limits": [
+        "No independent analysis task was executed against a fixture repository."
+      ],
+      "path": ".claude/skills/code-analysis/SKILL.md",
+      "changed": true,
+      "baseline_sha256": "90b8cc1b115a781ff6eba71348c754d8ba892be5219746183ccbecc70bab783e",
+      "candidate_sha256": "ae2f3c4d8deec5dc39910bf3cb77c72c6cb2201c3784b276ebba7267e4368b81",
+      "baseline_lines": 203,
+      "candidate_lines": 210
+    },
+    {
+      "skill": "codex-cli",
+      "disposition": "preserved",
+      "findings": [],
+      "checks": [
+        "Entrypoint, reference.md, and templates.md read fully.",
+        "Explicit invocation, gpt-5.4 default examples, full-auto scope, and output capture preserved.",
+        "Frontmatter validated."
+      ],
+      "limits": [
+        "OpenAI CLI claims were not refreshed; no model identifier or current product claim was changed."
+      ],
+      "path": ".claude/skills/codex-cli/SKILL.md",
+      "changed": false,
+      "baseline_sha256": "ce26e0a82c9bdc7229e9e316a378bba86f8b08e37ebcbe11e4f2dcf028de6943",
+      "candidate_sha256": "ce26e0a82c9bdc7229e9e316a378bba86f8b08e37ebcbe11e4f2dcf028de6943",
+      "baseline_lines": 232,
+      "candidate_lines": 232
+    },
+    {
+      "skill": "coding-conventions",
+      "disposition": "preserved",
+      "findings": [],
+      "checks": [
+        "Entrypoint read fully.",
+        "Internal reference status, placeholders, test rules, secret handling, and no-git-write rule preserved.",
+        "Frontmatter validated."
+      ],
+      "limits": [
+        "Template placeholders require project setup before runtime use."
+      ],
+      "path": ".claude/skills/coding-conventions/SKILL.md",
+      "changed": false,
+      "baseline_sha256": "7cb9bb919a0f971b9389a72415ecb30077f950f3dd9d844701aa5453cef60ded",
+      "candidate_sha256": "7cb9bb919a0f971b9389a72415ecb30077f950f3dd9d844701aa5453cef60ded",
+      "baseline_lines": 69,
+      "candidate_lines": 69
+    },
+    {
+      "skill": "ct",
+      "disposition": "refactor",
+      "findings": [
+        {
+          "excerpt": "Medium and complex plans required senior-architecture-reviewer review.",
+          "request": "Create a medium or complex decomposition before implementation exists.",
+          "classification": "conflict",
+          "consequence": "The configured senior reviewer requires completed implementation and git-history evidence, so a plan gate can dispatch the wrong contract or invite fabricated evidence.",
+          "replacement": "Require a plan-capable architecture review; use the decomposition-only fallback when none is configured.",
+          "preserved": "Complexity-based plan review, cross-AI validation for complex plans, and the plan-reviewer gate remain required.",
+          "validation": "Read the local plan-reviewer and senior-architecture-reviewer contracts; final text explicitly limits the latter to inputs it supports.",
+          "source_locator": ".claude/skills/ct/SKILL.md:131-149",
+          "source": ".claude/skills/ct/SKILL.md",
+          "excerpt_kind": "paraphrase of referenced instruction"
+        },
+        {
+          "excerpt": "Launch 2–3 Explore agents in a single turn.",
+          "request": "Plan a task on a host without the named Explore worker role.",
+          "classification": "hypothesis",
+          "consequence": "A host capability mismatch can stop discovery before the plan has grounded evidence.",
+          "replacement": "Use scoped Explore workers when available; otherwise perform the same three discovery passes directly and record the fallback.",
+          "preserved": "Architecture, change-surface, risk, and UI checks remain required.",
+          "validation": "Static review of the revised branch/fallback wording; no host runtime dispatch was executed.",
+          "source_locator": ".claude/skills/ct/SKILL.md:82-97",
+          "source": ".claude/skills/ct/SKILL.md",
+          "excerpt_kind": "paraphrase of referenced instruction"
+        }
+      ],
+      "checks": [
+        "entrypoint read to EOF",
+        "decomposition-guide link exists",
+        "plan-reviewer and senior reviewer contracts inspected",
+        "diff read back"
+      ],
+      "limits": [
+        "No plan was executed; host-specific worker availability remains untested."
+      ],
+      "path": ".claude/skills/ct/SKILL.md",
+      "changed": true,
+      "baseline_sha256": "c9f4c8dfc57bec0768b2b5f9befbd6f91cfd3a37ec906a5f67d64be60004de44",
+      "candidate_sha256": "230e1745db64d326ea562ddd41d468635ad1e8712203f7e3497ee6dc83e34070",
+      "baseline_lines": 191,
+      "candidate_lines": 198
+    },
+    {
+      "skill": "cursor-cli",
+      "disposition": "preserved",
+      "findings": [],
+      "checks": [
+        "Entrypoint, reference.md, and templates.md read fully.",
+        "Explicit-only trigger, composer-2 default, ask-mode read-only guarantee, trust flag, and output capture preserved.",
+        "Frontmatter and relative links validated."
+      ],
+      "limits": [
+        "No Cursor binary invocation was run; model and CLI claims remain the existing source text."
+      ],
+      "path": ".claude/skills/cursor-cli/SKILL.md",
+      "changed": false,
+      "baseline_sha256": "3b3eec846a4de0daeabddc1f9ff6c71b8a7f05fd1596502765cd677a5f5f0264",
+      "candidate_sha256": "3b3eec846a4de0daeabddc1f9ff6c71b8a7f05fd1596502765cd677a5f5f0264",
+      "baseline_lines": 182,
+      "candidate_lines": 182
+    },
+    {
+      "skill": "dbg",
+      "disposition": "keep",
+      "findings": [],
+      "checks": [
+        "entrypoint read to EOF",
+        "runtime evidence, sensitive-value redaction, fix ordering, and cleanup rules reviewed"
+      ],
+      "limits": [
+        "No runtime bug was reproduced and no instrumentation was added."
+      ],
+      "path": ".claude/skills/dbg/SKILL.md",
+      "changed": false,
+      "baseline_sha256": "0074da35c61770b279ad4f402c06949b69a94c8c072c041b81b138dc15028c84",
+      "candidate_sha256": "0074da35c61770b279ad4f402c06949b69a94c8c072c041b81b138dc15028c84",
+      "baseline_lines": 149,
+      "candidate_lines": 149
+    },
+    {
+      "skill": "deep-research",
+      "disposition": "migrated",
+      "findings": [
+        {
+          "excerpt": "or explore unfamiliar technologies, libraries, or architectural patterns",
+          "request": "A local codebase question can be answered from repository files without external evidence",
+          "classification": "hypothesis",
+          "consequence": "The trigger can route local analysis into a forked web-research workflow.",
+          "replacement": "Require external/current/niche evidence, an explicit research/comparison/evaluation request, or a source-dependent decision.",
+          "preserved": "Forked context, Exa-first tool priority, source citation, depth tiers, and sibling routing.",
+          "validation": "Entrypoint read fully; frontmatter parses; sibling exclusions remain explicit.",
+          "source_locator": ".claude/skills/deep-research/SKILL.md:3-11",
+          "source": ".claude/skills/deep-research/SKILL.md",
+          "excerpt_kind": "exact baseline excerpt"
+        },
+        {
+          "excerpt": "Official documentation ... GitHub ... comparison articles ... adoption signals",
+          "request": "A quick factual answer or one unresolved best-practice question",
+          "classification": "hypothesis",
+          "consequence": "The fixed five-source recipes can spend search and context budget on branches the question does not need.",
+          "replacement": "Choose the smallest strategy: authoritative docs first, add activity/adoption or community evidence only when it resolves the decision.",
+          "preserved": "Cross-verification source counts, disagreement handling, current-date checks, and cited outputs.",
+          "validation": "Diff review confirms source and output requirements remain intact.",
+          "source_locator": ".claude/skills/deep-research/SKILL.md:73-89",
+          "source": ".claude/skills/deep-research/SKILL.md",
+          "excerpt_kind": "paraphrase of referenced instruction"
+        },
+        {
+          "excerpt": "Check CLAUDE.md ... Check package.json / tsconfig.json",
+          "request": "Research whose recommendation is independent of local stack or constraints",
+          "classification": "hypothesis",
+          "consequence": "Unconditional local context reads add load without changing the answer.",
+          "replacement": "Read local guidance and manifests only when discovered and relevant to the recommendation.",
+          "preserved": "Local pattern verification before citing files and project alignment when it matters.",
+          "validation": "Revised project-context section is conditional and contains no unresolved path command.",
+          "source_locator": ".claude/skills/deep-research/SKILL.md:148-156",
+          "source": ".claude/skills/deep-research/SKILL.md",
+          "excerpt_kind": "paraphrase of referenced instruction"
+        }
+      ],
+      "checks": [
+        "SKILL.md read fully.",
+        "Frontmatter parses and placeholder source template was corrected to a non-link placeholder.",
+        "Relative-link check passed with 0 broken links.",
+        "Final inventory passed with 0 errors."
+      ],
+      "limits": [
+        "No web search or independent evaluator run was performed."
+      ],
+      "path": ".claude/skills/deep-research/SKILL.md",
+      "changed": true,
+      "baseline_sha256": "9065ffff1af7f1f0dd33e61a60e9f7b0d2d7a8135240d401f29b436f8bd6ee6a",
+      "candidate_sha256": "7cbaa18a4848e83d507e3a82145cc156d9f95f5995c253ec7c45774edc6a4732",
+      "baseline_lines": 178,
+      "candidate_lines": 165
+    },
+    {
+      "skill": "design-exploration",
+      "disposition": "migrated",
+      "findings": [
+        {
+          "excerpt": "Spawn 2–3 Explore agents ... do not sequentialize them",
+          "request": "Ground a design decision with the minimum relevant code evidence and a caller-facing choice checkpoint.",
+          "classification": "demonstrated",
+          "consequence": "A narrow design question incurred mandatory multi-agent fan-out, and the final response had an arbitrary per-section word target.",
+          "replacement": "Use the checklist as a branch menu, fan out only for independent broad coverage, keep evidence-sized sections, and require findings, options, questions, and risks before completion.",
+          "preserved": "Explore-agent capability, checklist reference, caller-sensitive depth, 2-3 approaches when appropriate, and the continue/revise checkpoint remain.",
+          "validation": "Read back the entrypoint and exploration-checklist.md; both paths exist; inventory.py returned 0 errors; git diff --check passed.",
+          "source_locator": "Step 1 parallel context gathering; incremental summary; key principles",
+          "source": ".claude/skills/design-exploration/SKILL.md",
+          "excerpt_kind": "paraphrase of referenced instruction"
+        }
+      ],
+      "checks": [
+        "Full 116-line entrypoint and linked checklist read",
+        "Allowed tools preserved",
+        "Static reference and diff validation passed"
+      ],
+      "limits": [
+        "No Explore agents were spawned",
+        "No codebase design decision was evaluated"
+      ],
+      "path": ".claude/skills/design-exploration/SKILL.md",
+      "changed": true,
+      "baseline_sha256": "ae292ad4c32a51f31f0f649eb0a62fde57b38351db945b518c20bc5a744dd1d1",
+      "candidate_sha256": "95faf99a6782eff49a732782a3ad818eb8ab78d0ba59587c196d83d7023684a1",
+      "baseline_lines": 112,
+      "candidate_lines": 116
+    },
+    {
+      "skill": "dev-server",
+      "disposition": "migrated",
+      "findings": [
+        {
+          "excerpt": "or simply \"dev\"; user-invokable: true",
+          "request": "A concrete server-start request or a user invokes the skill",
+          "classification": "demonstrated",
+          "consequence": "The misspelled metadata key is not valid host metadata, while the unqualified \"dev\" trigger remains a compatibility path.",
+          "replacement": "Correct the key to user-invocable: true and retain the baseline \"dev\" trigger while narrowing unrelated contexts through the remaining description.",
+          "preserved": "Automatic selection for concrete server-start requests and the unqualified \"dev\" compatibility trigger, user invocation, stack detection, Monitor workflow, allowed tools, and server lifecycle behavior.",
+          "validation": "Ruby YAML safe_load passed; frontmatter now uses user-invocable: true and does not set disable-model-invocation.",
+          "source_locator": ".claude/skills/dev-server/SKILL.md:11-17",
+          "source": ".claude/skills/dev-server/SKILL.md",
+          "excerpt_kind": "paraphrase of referenced instruction"
+        },
+        {
+          "excerpt": "present two options ... kill PID N ... ask the user if you should install",
+          "request": "A port is occupied or dependencies are missing while starting a requested server",
+          "classification": "conflict",
+          "consequence": "Port killing and dependency installation are separate state changes whose authorization should be explicit, while a prior setup authorization should not cause a redundant prompt.",
+          "replacement": "Keep the existing ask before installation or killing; reuse authorization already granted for this project and setup scope, and prefer port+1 for a clearly same-project stale server when no choice is needed.",
+          "preserved": "Port diagnostics, dependency preflight, user choice, Monitor startup, HTTP/UI verification, and stop behavior.",
+          "validation": "Diff review confirms no stack command or port mapping changed.",
+          "source_locator": ".claude/skills/dev-server/SKILL.md:86-101",
+          "source": ".claude/skills/dev-server/SKILL.md",
+          "excerpt_kind": "paraphrase of referenced instruction"
+        }
+      ],
+      "checks": [
+        "SKILL.md read fully.",
+        "Frontmatter parses for the corrected invocation key.",
+        "Final inventory passed with 0 errors."
+      ],
+      "limits": [
+        "No server was started and no Monitor/browser verification was run."
+      ],
+      "path": ".claude/skills/dev-server/SKILL.md",
+      "changed": true,
+      "baseline_sha256": "aeb2eda3c4e48addd3d4157d5b597a9c989e09bc5a3ed35b7ae5354cb3d84ece",
+      "candidate_sha256": "f3cc8d77608ab64c49a133718cc52c44c2da9653b8615af489890662a9009d35",
+      "baseline_lines": 161,
+      "candidate_lines": 165
+    },
+    {
+      "skill": "fci",
+      "disposition": "refactor",
+      "findings": [
+        {
+          "excerpt": "The workflow ran generic placeholders as if all checks shared one root working directory.",
+          "request": "Fix CI failures and prove the fix with local CI-equivalent checks.",
+          "classification": "hypothesis",
+          "consequence": "Unresolved commands or an incorrect cwd can produce a false failure or incomplete evidence.",
+          "replacement": "Resolve the selected workflow's actual scripts and cwd first, then run independent checks and the full resolved suite.",
+          "preserved": "Failure collection, scope discipline, no suppression shortcuts, and remote green-check requirement remain.",
+          "validation": "Static review of command-resolution wording; no workflow or CI run executed.",
+          "source_locator": ".claude/skills/fci/SKILL.md:49-55, 94-103",
+          "source": ".claude/skills/fci/SKILL.md",
+          "excerpt_kind": "paraphrase of referenced instruction"
+        },
+        {
+          "excerpt": "Definition of done imposed a generic >=80% coverage floor.",
+          "request": "Repair CI in a repository whose configured coverage floor may differ.",
+          "classification": "conflict",
+          "consequence": "The skill can invent a quality target that is not part of the repository's CI contract.",
+          "replacement": "Use the repository or CI-configured baseline/floor and do not invent a percentage target.",
+          "preserved": "Coverage regressions remain visible and applicable CI security/build checks remain required.",
+          "validation": "Static review of the revised definition of done.",
+          "source_locator": ".claude/skills/fci/SKILL.md:116-124",
+          "source": ".claude/skills/fci/SKILL.md",
+          "excerpt_kind": "paraphrase of referenced instruction"
+        }
+      ],
+      "checks": [
+        "entrypoint read to EOF",
+        "frontmatter explicit-only policy preserved",
+        "diff read back"
+      ],
+      "limits": [
+        "No GitHub workflow, run log, or local CI command was executed."
+      ],
+      "path": ".claude/skills/fci/SKILL.md",
+      "changed": true,
+      "baseline_sha256": "e69be08034e9284085ab480c7be3e6aa8b61142301dfd11d13132d7181a93b4a",
+      "candidate_sha256": "f56d6781960ac95afeb880f2ab5811a2fed3f7dd6d64f03a0a19b43b122fe810",
+      "baseline_lines": 124,
+      "candidate_lines": 126
+    },
+    {
+      "skill": "finisher",
+      "disposition": "refactor",
+      "findings": [
+        {
+          "excerpt": "Commit approval and push authorization were not clearly separated for already-authorized ship/merge requests.",
+          "request": "Finish work through push, CI, and merge.",
+          "classification": "conflict",
+          "consequence": "The workflow could either publish without push authority or re-ask after the current task already authorized commit-push-merge/ship, depending on interpretation.",
+          "replacement": "Reuse explicit authorization already granted in the current task/session for the exact branch or PR; ask only when the destination or operation is new or unclear, then read back the remote head and checks.",
+          "preserved": "Specific-file staging, commit approval, green-CI requirement, and final merge confirmation remain.",
+          "validation": "Static gate review; no push or PR interaction executed.",
+          "source_locator": ".claude/skills/finisher/SKILL.md:111-122; 238-249",
+          "source": ".claude/skills/finisher/SKILL.md",
+          "excerpt_kind": "paraphrase of referenced instruction"
+        },
+        {
+          "excerpt": "The universal PR-only flow had no review-evidence rule and the migration added an unconditional local APPROVED-artifact requirement.",
+          "request": "Merge a PR after CI passes.",
+          "classification": "conflict",
+          "consequence": "A universal PR-only finisher could be blocked by an artifact that was never requested or created, while configured provider review evidence might be ignored.",
+          "replacement": "Consume review evidence required by the user, task, or repository; accept provider review/checks or a local artifact when that workflow created one, and do not invent a local requirement for a PR-only flow without configured review.",
+          "preserved": "The merge action remains user-controlled and CI must be green.",
+          "validation": "Static review of the new pre-confirmation gate.",
+          "source_locator": ".claude/skills/finisher/SKILL.md:278-292",
+          "source": ".claude/skills/finisher/SKILL.md",
+          "excerpt_kind": "paraphrase of referenced instruction"
+        }
+      ],
+      "checks": [
+        "entrypoint read to EOF",
+        "phase-handoff sections preserved",
+        "git write/merge gates read back",
+        "diff read back"
+      ],
+      "limits": [
+        "No PR, remote head, CI, or merge was inspected or changed."
+      ],
+      "path": ".claude/skills/finisher/SKILL.md",
+      "changed": true,
+      "baseline_sha256": "d51bca5652bee95b9c6590af7e6d6d1348656cfafbe6b32f585a77da9e7e433a",
+      "candidate_sha256": "338d3fff630ef8f5c8907ec16a390bc24b1d491f8ccaeb5b17e08b8dca5b51a4",
+      "baseline_lines": 390,
+      "candidate_lines": 400
+    },
+    {
+      "skill": "git-guardrails",
+      "disposition": "migrated",
+      "findings": [
+        {
+          "excerpt": "Status: DISABLED ... Active out of the box",
+          "request": "A user asks whether the git guard currently blocks push or branch deletion",
+          "classification": "conflict",
+          "consequence": "The disabled banner and active wording can lead the reader to report enforcement that settings.json does not wire.",
+          "replacement": "Describe the patterns as blocked when wired and state that this skill does not enable or remove the hook without explicit configuration authorization.",
+          "preserved": "Disabled state, re-enable instructions, hook fail-fast ordering, blocked patterns, and sibling bash-guard coverage.",
+          "validation": "settings.json was read and confirms no git-guardrails hook entry; wording now matches that state.",
+          "source_locator": ".claude/skills/git-guardrails/SKILL.md:12,32-35",
+          "source": ".claude/skills/git-guardrails/SKILL.md",
+          "excerpt_kind": "paraphrase of referenced instruction"
+        }
+      ],
+      "checks": [
+        "SKILL.md read fully; settings.json and both guard scripts inspected for the status finding.",
+        "Frontmatter and shell command links/path references validated by existence checks.",
+        "Final inventory passed with 0 errors."
+      ],
+      "limits": [
+        "The hook was not enabled and no destructive git operation or smoke test was executed."
+      ],
+      "path": ".claude/skills/git-guardrails/SKILL.md",
+      "changed": true,
+      "baseline_sha256": "e985a885c0a71fa8f63669b6febec979d7f82d490804c1360db4d0f03385abe8",
+      "candidate_sha256": "a8a100d21bd42544fa875357bc792fc83f2be4f9d73ef3b8c16bd508f9bc0729",
+      "baseline_lines": 76,
+      "candidate_lines": 79
+    },
+    {
+      "skill": "grill-me",
+      "disposition": "migrated",
+      "findings": [
+        {
+          "excerpt": "finish by returning this compact summary",
+          "request": "Return a bounded adversarial summary without silently turning review into an artifact mutation.",
+          "classification": "hypothesis",
+          "consequence": "A caller could treat the stop condition or recommendation as implicit permission to edit the reviewed plan.",
+          "replacement": "State the read-only boundary and require explicit caller authorization before editing.",
+          "preserved": "Risk enumeration, one-question loop, disproof beat, two-round bound, fresh-context option, and stop condition remain.",
+          "validation": "Read back the entrypoint; inventory.py returned 0 errors; git diff --check passed.",
+          "source_locator": "Return To Caller",
+          "source": ".claude/skills/grill-me/SKILL.md",
+          "excerpt_kind": "exact baseline excerpt"
+        }
+      ],
+      "checks": [
+        "Full 70-line entrypoint read before editing",
+        "No metadata or tool flags changed",
+        "Static diff and inventory validation passed"
+      ],
+      "limits": [
+        "No plan or design was grilled",
+        "The authorization boundary is a static clarity improvement, not a behavior benchmark"
+      ],
+      "path": ".claude/skills/grill-me/SKILL.md",
+      "changed": true,
+      "baseline_sha256": "de4ba532f576f7e55418e3740bc2dffb875db7c9d7f8b70f02b7ea8f8fd99e63",
+      "candidate_sha256": "d08b0e098d8d2a9bf41b829b8b5668aaca9933ce4194ac96c7e4ca926b64a8aa",
+      "baseline_lines": 66,
+      "candidate_lines": 70
+    },
+    {
+      "skill": "improve-codebase-architecture",
+      "disposition": "migrated",
+      "findings": [
+        {
+          "excerpt": "Read existing context first ... product-docs/PRD/*.md ... {{DOCS_DIR}}/project-structure.md",
+          "request": "A focused architectural exploration whose target is unrelated to product planning documents",
+          "classification": "hypothesis",
+          "consequence": "The unconditional reading list spends context on absent or irrelevant documents before the target is known.",
+          "replacement": "Discover and read glossary, product/task, and architecture documents only when they exist and cover the target or a needed decision.",
+          "preserved": "Domain and architecture vocabulary, load-bearing decision context, silent handling of absent docs, and Explore-agent analysis.",
+          "validation": "Entrypoint plus DEEPENING.md and INTERFACE-DESIGN.md read fully; revised links resolve.",
+          "source_locator": ".claude/skills/improve-codebase-architecture/SKILL.md:31-43",
+          "source": ".claude/skills/improve-codebase-architecture/SKILL.md",
+          "excerpt_kind": "paraphrase of referenced instruction"
+        },
+        {
+          "excerpt": "Add the term via /ubiquitous-language right there ... Note it in the relevant tasks/ doc",
+          "request": "A read-only architecture exploration identifies a new term or rejected candidate",
+          "classification": "conflict",
+          "consequence": "Inline side effects can exceed the read-only scope without a separately authorized documentation update.",
+          "replacement": "Invoke glossary or task/product documentation updates only when authorized; otherwise report the proposed term or durable rejection reason for a separate update.",
+          "preserved": "Candidate selection gate, grilling loop, interface-design branch, rejection rationale, and no code writes.",
+          "validation": "Diff review confirms the allowed tool list and output scope were not broadened.",
+          "source_locator": ".claude/skills/improve-codebase-architecture/SKILL.md:70-76",
+          "source": ".claude/skills/improve-codebase-architecture/SKILL.md",
+          "excerpt_kind": "paraphrase of referenced instruction"
+        }
+      ],
+      "checks": [
+        "SKILL.md and both linked reference files read fully.",
+        "Frontmatter and relative links validated.",
+        "Final inventory passed with 0 errors."
+      ],
+      "limits": [
+        "No architecture exploration or subagent was run."
+      ],
+      "path": ".claude/skills/improve-codebase-architecture/SKILL.md",
+      "changed": true,
+      "baseline_sha256": "9f7bdfb60e1901ed70d2f1610c6ff5820fbfaa4921afc9ee229679009aa8b01a",
+      "candidate_sha256": "af495931c6b85811e2103b2d6d1dbe4a421447163517d8ad9a48e956d68f3669",
+      "baseline_lines": 92,
+      "candidate_lines": 99
+    },
+    {
+      "skill": "nf",
+      "disposition": "migrated",
+      "findings": [
+        {
+          "excerpt": "docs/product-docs/...",
+          "request": "Run feature discovery against the repository's canonical product-docs paths and finalize only a complete or explicitly marked discovery document.",
+          "classification": "conflict",
+          "consequence": "The source repository stores product-docs at its root, so the old docs/product-docs pointers could miss matching PRD, JTBD, or glossary material; the completion text also allowed proceeding regardless of missing sections while Step 5 rejected unclear required sections.",
+          "replacement": "Use product-docs paths, invoke code exploration only for code-changing features, and allow unresolved items only as explicit markers; never leave required sections blank.",
+          "preserved": "Discovery template, interview-guide branch, grill and glossary gates, cross-AI initialization/parallel review, output path, and validation choices remain.",
+          "validation": "Read back the entrypoint and interview-guide.md; product-docs and all referenced templates exist; inventory.py returned 0 errors; git diff --check passed.",
+          "source_locator": "Step 0 upstream context; Step 1; Completion Check; Step 5",
+          "source": ".claude/skills/nf/SKILL.md",
+          "excerpt_kind": "paraphrase of referenced instruction"
+        }
+      ],
+      "checks": [
+        "Full 93-line entrypoint and linked interview guide read",
+        "Task/Skill flags preserved",
+        "Stale path corrected against repository layout"
+      ],
+      "limits": [
+        "No feature discovery interview, glossary update, or cross-AI validation was run",
+        "Model behavior was not measured"
+      ],
+      "path": ".claude/skills/nf/SKILL.md",
+      "changed": true,
+      "baseline_sha256": "c712104d522407d26520a60ce3eb95404401f62c10586fb7651afd2effde8be3",
+      "candidate_sha256": "a92c8a3b206b89342006b9b821186e0285db9e76f08b7c21262436b289050906",
+      "baseline_lines": 93,
+      "candidate_lines": 93
+    },
+    {
+      "skill": "parallelization",
+      "disposition": "refactor",
+      "findings": [
+        {
+          "excerpt": "Any dirty working tree required commit or stash before isolated workers.",
+          "request": "Parallelize independent work while preserving unrelated local edits.",
+          "classification": "conflict",
+          "consequence": "Unrelated dirty files force unnecessary git writes or user interruption even when isolated workers are safe.",
+          "replacement": "Classify dirty paths; isolate when only unrelated files are dirty, and fall back to sequential work when task inputs are dirty.",
+          "preserved": "Workers still branch from HEAD, shared task docs remain orchestrator-owned, and task-file edits are never lost silently.",
+          "validation": "Static scenario walkthrough for unrelated-dirty and task-dirty trees.",
+          "source_locator": ".claude/skills/parallelization/SKILL.md:48-54",
+          "source": ".claude/skills/parallelization/SKILL.md",
+          "excerpt_kind": "paraphrase of referenced instruction"
+        },
+        {
+          "excerpt": "Validation used generic root-level commands without a package working-directory contract.",
+          "request": "Validate merged worker patches in a multi-package repository.",
+          "classification": "hypothesis",
+          "consequence": "A root command or unresolved placeholder can fail before the changed package is checked.",
+          "replacement": "Resolve scripts and cwd from task/repository configuration, replace placeholders, and run each package command from its explicit cwd.",
+          "preserved": "Post-consolidation lint, type, and test verification remains required.",
+          "validation": "Static command-path review; no package validation executed.",
+          "source_locator": ".claude/skills/parallelization/SKILL.md:135-146",
+          "source": ".claude/skills/parallelization/SKILL.md",
+          "excerpt_kind": "paraphrase of referenced instruction"
+        }
+      ],
+      "checks": [
+        "entrypoint read to EOF",
+        "worker and task-document safety rules preserved",
+        "diff read back"
+      ],
+      "limits": [
+        "No workers were spawned and no patches were applied."
+      ],
+      "path": ".claude/skills/parallelization/SKILL.md",
+      "changed": true,
+      "baseline_sha256": "290454c26db529fa9fca8d0a61b4e6f6a5baed9978fba39c7711e8445b51d8b6",
+      "candidate_sha256": "dbc93d58bd15c5888822960c229a6b4cad51bae7c8b058364647ee760425d932",
+      "baseline_lines": 176,
+      "candidate_lines": 183
+    },
+    {
+      "skill": "ph",
+      "disposition": "tighten",
+      "findings": [
+        {
+          "excerpt": "Write-first discipline was stated in prose, while the workflow did not explicitly create or safely resume the handoff at task resolution.",
+          "request": "Prepare a handoff during a context-compacting session.",
+          "classification": "hypothesis",
+          "consequence": "A stop or compaction between task resolution and the write step can leave no durable partial handoff; blindly creating one can overwrite useful prior state.",
+          "replacement": "Read and reconcile an existing HANDOFF.md before editing; create it with section headers only when absent, then fill the reconciled artifact through the capture steps.",
+          "preserved": "Transient uncommitted handoff, truthful state capture, and task-document pointer remain.",
+          "validation": "Static consistency check between write-first prose and STEP 1/STEP 5.",
+          "source_locator": ".claude/skills/ph/SKILL.md:24-30, 40-48",
+          "source": ".claude/skills/ph/SKILL.md",
+          "excerpt_kind": "paraphrase of referenced instruction"
+        }
+      ],
+      "checks": [
+        "entrypoint read to EOF",
+        "HANDOFF.md path and archive rules read back",
+        "diff read back"
+      ],
+      "limits": [
+        "No handoff was generated; no task directory was selected."
+      ],
+      "path": ".claude/skills/ph/SKILL.md",
+      "changed": true,
+      "baseline_sha256": "7bcbddafb5ca81d072c97104cf073897728ef44d279c475587f22cd247d31569",
+      "candidate_sha256": "0e5e5f296ee6d54a05840d338a95bdd025c6e33a03b86d60d9f9aa0e66d5e68c",
+      "baseline_lines": 183,
+      "candidate_lines": 187
+    },
+    {
+      "skill": "prc",
+      "disposition": "refactor",
+      "findings": [
+        {
+          "excerpt": "The workflow pushed and replied to every comment after commit approval.",
+          "request": "Address PR comments with local fixes and optional reviewer communication.",
+          "classification": "conflict",
+          "consequence": "A local fix request could publish pushes and reviewer messages without a distinct external-write decision.",
+          "replacement": "Gate push separately and draft replies by default; send only after explicit communication authorization or approval of the reply set.",
+          "preserved": "Comment categorization, user-approved action plan, verification, and commit gate remain.",
+          "validation": "Static review; no GitHub API calls executed.",
+          "source_locator": ".claude/skills/prc/SKILL.md:108-124",
+          "source": ".claude/skills/prc/SKILL.md",
+          "excerpt_kind": "paraphrase of referenced instruction"
+        }
+      ],
+      "checks": [
+        "entrypoint read to EOF",
+        "reply and commit gates read back",
+        "diff read back"
+      ],
+      "limits": [
+        "No PR comments were fetched or replied to."
+      ],
+      "path": ".claude/skills/prc/SKILL.md",
+      "changed": true,
+      "baseline_sha256": "b93cf31517dc942b420847f646b7dfc4082ba890ee14c65125d1a6380d683759",
+      "candidate_sha256": "61da1b2acea86f6dfbcce51bd021d34d9e70e0779bc7d683471baf2ec902e8e3",
+      "baseline_lines": 151,
+      "candidate_lines": 154
+    },
+    {
+      "skill": "product",
+      "disposition": "migrated",
+      "findings": [
+        {
+          "excerpt": "Research is required for both JTBD and PRD ... read the templates ... Invoke design-exploration",
+          "request": "Create the selected product document with evidence proportionate to its claims and only the context needed for the product decision.",
+          "classification": "conflict",
+          "consequence": "Mandatory research conflicted with quick mode's explicit research skip, while both templates and codebase exploration were loaded for every path.",
+          "replacement": "Read the selected template, load a companion JTBD template only when a PRD may create one, use code exploration for existing-project decisions, and research/cite only external or current claims. In quick mode, record supplied-evidence citations or an explicit no-external-lookup rationale and mark unsupported external claims for clarification.",
+          "preserved": "JTBD/PRD parsing, quick mode, glossary, grill, user checkpoints, exact validator initialization order and CLI names, output paths, companion-JTBD evidence gate, and cross-AI skip conditions remain.",
+          "validation": "Read back the 272-line entrypoint including the quick-mode evidence/rationale path; selected templates and cross-AI protocol exist; architecture vocabulary path corrected to .claude/skills/architecture-language/LANGUAGE.md; inventory.py returned 0 errors; git diff --check passed.",
+          "source_locator": "Guidelines; Step 0; Step 1; Step 2",
+          "source": ".claude/skills/product/SKILL.md",
+          "excerpt_kind": "paraphrase of referenced instruction"
+        }
+      ],
+      "checks": [
+        "Full 272-line entrypoint read in chunks and linked template/protocol paths read",
+        "Allowed tools and validator commands preserved",
+        "Static diff and path validation passed"
+      ],
+      "limits": [
+        "No PRD/JTBD, research, or validator run was performed",
+        "No claim is made about research quality or model efficiency"
+      ],
+      "path": ".claude/skills/product/SKILL.md",
+      "changed": true,
+      "baseline_sha256": "e096ac514896196a0e9a88f21c4f5a90bd35ce3360723378ba867652c01e13c8",
+      "candidate_sha256": "f062f9b305f675e2ff72131e88e7045dbbbd8d6271f1f170000de512d6e035e1",
+      "baseline_lines": 256,
+      "candidate_lines": 272
+    },
+    {
+      "skill": "qa",
+      "disposition": "migrated",
+      "findings": [
+        {
+          "excerpt": "file tracker issues ... Do NOT ask the user to review first",
+          "request": "File one issue per reported QA problem in one resolved tracker destination, with a durable URL or explicit failure.",
+          "classification": "hypothesis",
+          "consequence": "The prior recipe made tracker writes the default without stating the audit/draft boundary or what to report when creation failed.",
+          "replacement": "Treat a QA/file request as scoped authorization, resolve repository/team once, keep the tracker fixed, and report failures without claiming creation.",
+          "preserved": "Linear/GitHub choice, one-by-one issue flow, background exploration, dependency breakdown, no fixes, behavior-level issue templates, and user-controlled session end remain.",
+          "validation": "Read back the 158-line entrypoint; no file paths/line numbers were added to issue-body rules; inventory.py returned 0 errors; git diff --check passed.",
+          "source_locator": "Session introduction; Pick the tracker; File the issues; Completion",
+          "source": ".claude/skills/qa/SKILL.md",
+          "excerpt_kind": "paraphrase of referenced instruction"
+        }
+      ],
+      "checks": [
+        "Full entrypoint read before editing",
+        "Tracker commands and allowed tools preserved",
+        "Static diff and inventory validation passed"
+      ],
+      "limits": [
+        "No tracker was selected and no issue was created",
+        "No Linear/GitHub write or read-back was performed"
+      ],
+      "path": ".claude/skills/qa/SKILL.md",
+      "changed": true,
+      "baseline_sha256": "ec56aa787a0af059f67154701ab2178754fbd1bcb357abab842d8e25f76dd01f",
+      "candidate_sha256": "d391f43402b7429f6ff8af5cb7f7509abea3cc1d173190489b3ee8be346c6011",
+      "baseline_lines": 145,
+      "candidate_lines": 156
+    },
+    {
+      "skill": "review-conventions",
+      "disposition": "preserved",
+      "findings": [],
+      "checks": [
+        "Entrypoint read fully.",
+        "Internal reference status, ownership boundaries, two-stage review quality rules, and diff scope preserved.",
+        "Frontmatter validated."
+      ],
+      "limits": [
+        "Template placeholders require project setup before runtime use."
+      ],
+      "path": ".claude/skills/review-conventions/SKILL.md",
+      "changed": false,
+      "baseline_sha256": "8de41ae0fe2c89983bf53999eccc4f236d5a7ae8a184548f28d3acc6dcadef7b",
+      "candidate_sha256": "8de41ae0fe2c89983bf53999eccc4f236d5a7ae8a184548f28d3acc6dcadef7b",
+      "baseline_lines": 87,
+      "candidate_lines": 87
+    },
+    {
+      "skill": "rip",
+      "disposition": "migrated",
+      "findings": [
+        {
+          "excerpt": "If plan is ambiguous or missing context — use AskUserQuestion to clarify before proceeding",
+          "request": "Review an authorized plan continuously, pausing only when missing context materially changes the review.",
+          "classification": "demonstrated",
+          "consequence": "Any ambiguity could interrupt a read-only review even when a stated assumption was enough to continue.",
+          "replacement": "Ask only for material blockers, state non-blocking assumptions, and define completion as every step plus warnings and self-check being reported.",
+          "preserved": "Read-completely and verify-not-assume rules, continuous walkthrough, facts-plus-question warnings, confidence tags, and read-only scope remain.",
+          "validation": "Read back the entrypoint; inventory.py returned 0 errors; git diff --check passed.",
+          "source_locator": "Phase 1 Analysis",
+          "source": ".claude/skills/rip/SKILL.md",
+          "excerpt_kind": "exact baseline excerpt"
+        }
+      ],
+      "checks": [
+        "Full 138-line entrypoint read before editing",
+        "Read-only allowed tools preserved",
+        "Static diff and inventory validation passed"
+      ],
+      "limits": [
+        "No implementation plan was reviewed",
+        "No PRD alignment verdict was produced"
+      ],
+      "path": ".claude/skills/rip/SKILL.md",
+      "changed": true,
+      "baseline_sha256": "6d5a1e4ad52ae9aee64ab6e6a261d530bc2ec078907c50fc5d88497056d8d25b",
+      "candidate_sha256": "12e317b5a8f30ba5646e3236dac62452547454d112903890938a7c8ac6206174",
+      "baseline_lines": 131,
+      "candidate_lines": 138
+    },
+    {
+      "skill": "sbs",
+      "disposition": "migrated",
+      "findings": [
+        {
+          "excerpt": "Scan recent git log ... and open tasks/ ... Before any summarisation pass, save ... into the resume file",
+          "request": "Teach interactively at the chosen depth while keeping repository reads and resume artifacts relevant to the actual topic.",
+          "classification": "demonstrated",
+          "consequence": "A general topic could trigger project discovery, and every long-session summarization was pushed toward creating a resume artifact even when no resume was needed.",
+          "replacement": "Scan git/tasks only for project topics, create or update resumable state only when cross-turn continuity needs it, and treat confirmation/skip/blocker plus transferable understanding as completion.",
+          "preserved": "Calibration, guided/Socratic modes, user-executed steps, per-step confirmation, research conditions, notes artifact, and handoff options remain.",
+          "validation": "Read back the 243-line entrypoint; inventory.py returned 0 errors; git diff --check passed; no external references were required.",
+          "source_locator": "Argument Validation; Context continuity; Definition of Done",
+          "source": ".claude/skills/sbs/SKILL.md",
+          "excerpt_kind": "paraphrase of referenced instruction"
+        }
+      ],
+      "checks": [
+        "Full entrypoint read in chunks",
+        "Allowed tools and teaching gates preserved",
+        "Static diff and inventory validation passed"
+      ],
+      "limits": [
+        "No teaching session or user confirmation was run",
+        "No learning notes or resume file was created"
+      ],
+      "path": ".claude/skills/sbs/SKILL.md",
+      "changed": true,
+      "baseline_sha256": "95c858df23be0716e65aa8634aea11b749be89e0169d8ec9b1f683cb973e390d",
+      "candidate_sha256": "d75cd6d417a9cba312d6be8e18b96f24544313fe0c7d12eabbbec25b8f2f2f2d",
+      "baseline_lines": 239,
+      "candidate_lines": 243
+    },
+    {
+      "skill": "setup",
+      "disposition": "migrated",
+      "findings": [
+        {
+          "excerpt": "the four rounds below are the minimum, not the maximum",
+          "request": "Configure a repository whose stack and commands have already been confirmed.",
+          "classification": "conflict",
+          "consequence": "Forces repeated interactive approval despite an evidenced authorized configuration.",
+          "replacement": "One reviewable confirmation covering every detected category; preserve approval for the same values and scope.",
+          "preserved": "All values confirmed; unresolved placeholders remain explicit; exact settings diff approved before activation.",
+          "validation": "Static walkthrough of first setup, reconfiguration and preapproved values.",
+          "source_locator": ".claude/skills/setup/SKILL.md:120",
+          "source": ".claude/skills/setup/SKILL.md",
+          "excerpt_kind": "exact baseline excerpt"
+        },
+        {
+          "excerpt": "Ask user confirmation every 5 files",
+          "request": "Apply an already approved set of configuration values to all workflow files.",
+          "classification": "conflict",
+          "consequence": "Artificial batches can leave an authorized configuration incomplete.",
+          "replacement": "Continue through the authorized file set with read-back and unresolved-value reporting.",
+          "preserved": "Per-file substitution visibility; user text outside selected regions; final disabled-skill confirmation.",
+          "validation": "Static scope and completion review.",
+          "source_locator": ".claude/skills/setup/SKILL.md:198",
+          "source": ".claude/skills/setup/SKILL.md",
+          "excerpt_kind": "exact baseline excerpt"
+        },
+        {
+          "excerpt": ".claude/hooks/bash-guard.sh",
+          "request": "Wire the configured Bash guard.",
+          "classification": "demonstrated",
+          "consequence": "Example points to a nonexistent file; actual guard is under hooks/guards.",
+          "replacement": "Correct guard/testing paths and require existence and quoting checks before activation.",
+          "preserved": "Existing matchers, explicit hook approval and side-effect visibility.",
+          "validation": "Filesystem path check.",
+          "source_locator": ".claude/skills/setup/SKILL.md:243",
+          "source": ".claude/skills/setup/SKILL.md",
+          "excerpt_kind": "exact baseline excerpt"
+        },
+        {
+          "excerpt": "fill in all {{PLACEHOLDER}} variables directly in the files",
+          "request": "Configure one project using a shared installed plugin.",
+          "classification": "conflict",
+          "consequence": "Without source ownership, the recipe could mutate shared plugin cache templates.",
+          "replacement": "Resolve loaded assets, preview/materialize missing project templates, configure only the target .claude directory.",
+          "preserved": "No overwrites on bootstrap; settings, credentials, runtime state excluded; hooks remain inactive until approved.",
+          "validation": "Eight disposable-fixture bootstrap tests passed.",
+          "source_locator": ".claude/skills/setup/SKILL.md:176",
+          "source": ".claude/skills/setup/SKILL.md",
+          "excerpt_kind": "paraphrase of referenced instruction"
+        }
+      ],
+      "checks": [
+        "All source entrypoint lines read before editing",
+        "Conditional discovery and hooks references retained",
+        "Bootstrap unit suite: 8 passed"
+      ],
+      "limits": [
+        "Full model-driven setup and hook execution not yet exercised."
+      ],
+      "path": ".claude/skills/setup/SKILL.md",
+      "changed": true,
+      "baseline_sha256": "3c5dbe28309e0d363ce846813d8ed83408d7d08f5e3c741aa348d8d307271145",
+      "candidate_sha256": "ef93cd17ba270225fc775dba557875a8e7c1c762809843154198ddc358819215",
+      "baseline_lines": 333,
+      "candidate_lines": 103
+    },
+    {
+      "skill": "si",
+      "disposition": "refactor",
+      "findings": [
+        {
+          "excerpt": "Invoke /simplify or do a targeted manual cleanup.",
+          "request": "Complete a task in a repository without a /simplify skill.",
+          "classification": "demonstrated",
+          "consequence": "The named cleanup capability is absent in this package, so the required completion step can fail or stall.",
+          "replacement": "Use a discoverable code-simplifier agent when present, otherwise perform the bounded manual cleanup directly; do not assume /simplify exists.",
+          "preserved": "Cleanup remains bounded and relevant tests rerun after cleanup.",
+          "validation": "Checked the local skill and agent trees; no /simplify skill or code-simplifier agent exists.",
+          "source_locator": ".claude/skills/si/SKILL.md:164-170",
+          "source": ".claude/skills/si/SKILL.md",
+          "excerpt_kind": "paraphrase of referenced instruction"
+        },
+        {
+          "excerpt": "si permits code-plus-tests commits while the reviewer contract checks test commits before implementation commits.",
+          "request": "Implement a TDD task and hand it to the configured architecture reviewer.",
+          "classification": "conflict",
+          "consequence": "A valid vertical slice can be treated as a reviewer violation when commit chronology is not the repository policy.",
+          "replacement": "Keep RED-before-GREEN evidence; choose coupled or separate commits according to repository review policy and never manufacture history.",
+          "preserved": "Git writes remain user-gated, commit conventions remain, and the TDD invariant is explicit.",
+          "validation": "Cross-read si, tdd, and senior-architecture-reviewer; the reviewer file is outside this ownership boundary and remains a delivery risk.",
+          "source_locator": ".claude/skills/si/SKILL.md:147-153; .claude/skills/tdd/SKILL.md:117-121",
+          "source": ".claude/skills/si/SKILL.md",
+          "excerpt_kind": "paraphrase of referenced instruction"
+        },
+        {
+          "excerpt": "The git-write gate did not state whether authorization already granted in the current task/session could be reused.",
+          "request": "Continue an authorized implementation across its exact branch/commit/push scope.",
+          "classification": "conflict",
+          "consequence": "The workflow can re-ask for each git operation even after the user authorized that exact operation and scope.",
+          "replacement": "Reuse current task/session authorization for an exact operation and scope; ask only for a new operation, destination, or unclear boundary.",
+          "preserved": "Explicit permission remains required at genuinely new git boundaries.",
+          "validation": "Static read-back of the revised permission gate; no git write was executed.",
+          "source_locator": ".claude/skills/si/SKILL.md:147-153",
+          "source": ".claude/skills/si/SKILL.md",
+          "excerpt_kind": "paraphrase of referenced instruction"
+        }
+      ],
+      "checks": [
+        "entrypoint read to EOF",
+        "implementation-checklists and verification-gate links exist",
+        "missing cleanup capability checked",
+        "diff read back"
+      ],
+      "limits": [
+        "The external senior reviewer was not edited; its chronology policy still needs coordination by the owning migration scope."
+      ],
+      "path": ".claude/skills/si/SKILL.md",
+      "changed": true,
+      "baseline_sha256": "bfa15809261a9285b7be9c008811ff2c700606e4a036ef5c5ebb662cd9838faf",
+      "candidate_sha256": "9b319d865f8a6d8b500061d29499f177a7e8c221adba28f05c711153c8ba6d9d",
+      "baseline_lines": 210,
+      "candidate_lines": 216
+    },
+    {
+      "skill": "si-quick",
+      "disposition": "refactor",
+      "findings": [
+        {
+          "excerpt": "Get user confirmation before proceeding.",
+          "request": "Apply a clearly scoped quick fix already authorized in the request.",
+          "classification": "conflict",
+          "consequence": "The workflow can pause for duplicate approval after the scope and expected files are already explicit.",
+          "replacement": "Treat an explicit quick scope as confirmation; ask only when the plan or boundaries remain unclear.",
+          "preserved": "The quick-plan summary and commit permission gate remain.",
+          "validation": "Static scenario walkthrough for explicit-scope and ambiguous-scope requests.",
+          "source_locator": ".claude/skills/si-quick/SKILL.md:54-58",
+          "source": ".claude/skills/si-quick/SKILL.md",
+          "excerpt_kind": "exact baseline excerpt"
+        },
+        {
+          "excerpt": "Run repository verification commands using placeholders.",
+          "request": "Verify a quick change in a package-scoped repository.",
+          "classification": "hypothesis",
+          "consequence": "Unresolved or repeated package-directory commands can make verification fail for reasons unrelated to the change.",
+          "replacement": "Resolve scripts and working directory first; reject unresolved placeholders and repeated package cd chains.",
+          "preserved": "Smallest relevant lint, type, and test evidence remains required.",
+          "validation": "Static command-path check; no project workflow was executed.",
+          "source_locator": ".claude/skills/si-quick/SKILL.md:75-85",
+          "source": ".claude/skills/si-quick/SKILL.md",
+          "excerpt_kind": "paraphrase of referenced instruction"
+        }
+      ],
+      "checks": [
+        "entrypoint read to EOF",
+        "frontmatter alias verified as name: quick",
+        "diff read back"
+      ],
+      "limits": [
+        "The source directory remains si-quick by request; catalog relocation is owned by the root agent."
+      ],
+      "path": ".claude/skills/si-quick/SKILL.md",
+      "changed": true,
+      "baseline_sha256": "ad035b3d4176e6f35ca71828a4d267fa9bb9d2d3d3691120808e449070738069",
+      "candidate_sha256": "58aff907372818799119c216ce237ab91703bd40cb433d547060f3f96ed8e704",
+      "baseline_lines": 130,
+      "candidate_lines": 133
+    },
+    {
+      "skill": "sr",
+      "disposition": "refactor",
+      "findings": [
+        {
+          "excerpt": "Pattern propagation records sibling findings even when files are outside the current diff.",
+          "request": "Review a bounded diff and scan siblings for a repeated anti-pattern.",
+          "classification": "conflict",
+          "consequence": "Unchanged pre-existing siblings can become gating findings, blurring review scope and verdict semantics.",
+          "replacement": "Report outside-diff occurrences as contextual/non-gating unless the current change amplifies or exposes them; keep changed files primary.",
+          "preserved": "Sibling scanning and all selected reviewer coverage remain required.",
+          "validation": "Static reconciliation with review-passes reference; no review workflow executed.",
+          "source_locator": ".claude/skills/sr/SKILL.md:153-160; .claude/skills/sr/references/review-passes.md:29-33",
+          "source": ".claude/skills/sr/SKILL.md",
+          "excerpt_kind": "paraphrase of referenced instruction"
+        },
+        {
+          "excerpt": "Dispatch all selected reviewers in one turn.",
+          "request": "Run review on a host without batch reviewer dispatch.",
+          "classification": "hypothesis",
+          "consequence": "A host limitation can silently reduce review coverage or leave the review file incomplete.",
+          "replacement": "Run the selected passes sequentially when batch dispatch is unavailable and preserve the same scope.",
+          "preserved": "One review file, section ownership, fallback notes, and verdict rules remain.",
+          "validation": "Static review of dispatch fallback wording.",
+          "source_locator": ".claude/skills/sr/SKILL.md:195-200",
+          "source": ".claude/skills/sr/SKILL.md",
+          "excerpt_kind": "paraphrase of referenced instruction"
+        }
+      ],
+      "checks": [
+        "entrypoint read to EOF",
+        "review-passes link exists",
+        "frontmatter reviewed",
+        "diff read back"
+      ],
+      "limits": [
+        "No PR, branch, or working-tree review was run."
+      ],
+      "path": ".claude/skills/sr/SKILL.md",
+      "changed": true,
+      "baseline_sha256": "738577f359fa5a86da4da49005db9d4cd8ad6f8ca062cfbacafc430118a4e9f5",
+      "candidate_sha256": "6f246a409330dd1dcb13a53b4194eb0b92cac76356d4f42bda5644c8d1d5cf6a",
+      "baseline_lines": 262,
+      "candidate_lines": 268
+    },
+    {
+      "skill": "tdd",
+      "disposition": "refactor",
+      "findings": [
+        {
+          "excerpt": "The planning checklist and following paragraph required fresh user approval even when /si already had an approved decomposition.",
+          "request": "Run canonical TDD inside an already approved /si or /si-quick task.",
+          "classification": "conflict",
+          "consequence": "The canonical reference can repeat a decision gate and interrupt authorized work without a new ambiguity.",
+          "replacement": "Co-locate one rule: use approved task priorities and ask only for missing/materially changed decisions; otherwise confirm priorities before coding.",
+          "preserved": "Interface design, behavior-first tests, and user approval when no approved plan exists remain.",
+          "validation": "Static cross-read with si and si-quick invocation paths.",
+          "source_locator": ".claude/skills/tdd/SKILL.md:53-68",
+          "source": ".claude/skills/tdd/SKILL.md",
+          "excerpt_kind": "paraphrase of referenced instruction"
+        },
+        {
+          "excerpt": "The integration section claimed a reviewer verifies TDD through test-before-implementation commits.",
+          "request": "Assess TDD compliance when commit chronology is unavailable or coupled commits are allowed.",
+          "classification": "conflict",
+          "consequence": "Commit shape can be mistaken for observed RED-before-GREEN behavior.",
+          "replacement": "Treat git history as supporting evidence only; report chronology as unverifiable when needed and retain behavioral RED-before-GREEN as the invariant.",
+          "preserved": "Vertical slicing, public-interface tests, and no horizontal slicing remain canonical.",
+          "validation": "Static comparison with senior-architecture-reviewer; external reviewer remains outside this ownership boundary.",
+          "source_locator": ".claude/skills/tdd/SKILL.md:117-121",
+          "source": ".claude/skills/tdd/SKILL.md",
+          "excerpt_kind": "paraphrase of referenced instruction"
+        }
+      ],
+      "checks": [
+        "entrypoint read to EOF",
+        "all five linked TDD references read",
+        "disable-model-invocation preserved",
+        "diff read back"
+      ],
+      "limits": [
+        "No TDD cycle or reviewer run was executed."
+      ],
+      "path": ".claude/skills/tdd/SKILL.md",
+      "changed": true,
+      "baseline_sha256": "1681ad39e18765202ea008eeea941a11d40a561fafdfec483b41171a2c3a25b4",
+      "candidate_sha256": "c7f73c37020956736b0defc53a8479d1599e1196fa7565b265c06b15794c4648",
+      "baseline_lines": 147,
+      "candidate_lines": 156
+    },
+    {
+      "skill": "triage-issue",
+      "disposition": "migrated",
+      "findings": [
+        {
+          "excerpt": "create a tracker issue ... If unclear, ask once",
+          "request": "Investigate one bug and either create the authorized tracker issue with a URL or return a complete unfiled body.",
+          "classification": "hypothesis",
+          "consequence": "Diagnosis-only requests could be interpreted as permission to write, and tracker switching or a missing URL could leave completion ambiguous.",
+          "replacement": "Separate file authorization from diagnosis/body-only mode, resolve and keep the tracker destination, and require a URL for filed completion.",
+          "preserved": "Single-bug scope, Explore/TDD investigation, behavior-level issue body, no-fix boundary, tracker choices, /si handoff, and acceptance criteria remain.",
+          "validation": "Read back the 153-line entrypoint; architecture vocabulary path corrected to .claude/skills/architecture-language/LANGUAGE.md; inventory.py returned 0 errors; git diff --check passed.",
+          "source_locator": "Process introduction; Pick the tracker; Create the issue; Completion",
+          "source": ".claude/skills/triage-issue/SKILL.md",
+          "excerpt_kind": "paraphrase of referenced instruction"
+        }
+      ],
+      "checks": [
+        "Full entrypoint read before editing",
+        "Tracker commands and allowed tools preserved",
+        "Static diff and path validation passed"
+      ],
+      "limits": [
+        "No bug investigation or tracker mutation was performed",
+        "No issue URL or external read-back exists by design"
+      ],
+      "path": ".claude/skills/triage-issue/SKILL.md",
+      "changed": true,
+      "baseline_sha256": "c93d28b127f7be8b3eeaa44937f28306d9cdd44fa35e9ced6940fac7d6a19514",
+      "candidate_sha256": "5d13f2f8c0f0bfd4763cd5c4fbbebf99f2fee3b230e7782ae9d87d6bb66d3241",
+      "baseline_lines": 143,
+      "candidate_lines": 153
+    },
+    {
+      "skill": "ubiquitous-language",
+      "disposition": "migrated",
+      "findings": [
+        {
+          "excerpt": "Build/update branch ... Load-only branch (Step 0) ... follow the invocation branch",
+          "request": "The skill is rerun after a Step 0 load, an explicit glossary build/define request, or an authorized post-grill update",
+          "classification": "conflict",
+          "consequence": "The previous rerun recipe unconditionally rewrote the glossary, so a load-only invocation could mutate durable project state and explanatory requests had no coherent write boundary.",
+          "replacement": "Stop after read/report for Step 0; merge and write only for an explicit project glossary build/update or authorized post-grill update, with reruns following the same branch.",
+          "preserved": "Full merge semantics, preservation of existing terms, parent-directory creation for writes, output summary, and domain-only rules.",
+          "validation": "Diff review confirms the two invocation branches and conditional rerun behavior; no glossary file was created or modified.",
+          "source_locator": ".claude/skills/ubiquitous-language/SKILL.md:3-8,17-20,32-57,108-115",
+          "source": ".claude/skills/ubiquitous-language/SKILL.md",
+          "excerpt_kind": "paraphrase of referenced instruction"
+        }
+      ],
+      "checks": [
+        "SKILL.md read fully.",
+        "Frontmatter parses and write path remains product-docs/UBIQUITOUS_LANGUAGE.md.",
+        "Final inventory passed with 0 errors."
+      ],
+      "limits": [
+        "No glossary load or update was executed against a project fixture."
+      ],
+      "path": ".claude/skills/ubiquitous-language/SKILL.md",
+      "changed": true,
+      "baseline_sha256": "dd0863ccaa09a5b6684ad2345f1fe88c9c4b8af9f1cc3d5cd29b1881cd8445f6",
+      "candidate_sha256": "10d95aeb8ae6ead7588a55a6416765bfa938a779c92623480e37dbae7eb2b1ed",
+      "baseline_lines": 108,
+      "candidate_lines": 126
+    },
+    {
+      "skill": "update-docs",
+      "disposition": "clarify",
+      "findings": [
+        {
+          "excerpt": "The workflow asked whether to push only after the commit decision, without defining publication as a separate authorization.",
+          "request": "Update docs/changelog and optionally publish the resulting commit.",
+          "classification": "conflict",
+          "consequence": "A documentation commit approval can be read as approval to push it to a remote.",
+          "replacement": "Ask separately before pushing; commit approval does not authorize publication or other external writes.",
+          "preserved": "Task-path validation, parallel documentation/changelog work, precise staging, and user-gated commit remain.",
+          "validation": "Static read-back; frontmatter alias remains name: udoc.",
+          "source_locator": ".claude/skills/update-docs/SKILL.md:68-73",
+          "source": ".claude/skills/update-docs/SKILL.md",
+          "excerpt_kind": "paraphrase of referenced instruction"
+        }
+      ],
+      "checks": [
+        "entrypoint read to EOF",
+        "frontmatter alias verified as name: udoc",
+        "diff read back"
+      ],
+      "limits": [
+        "No task docs were updated and no changelog was generated."
+      ],
+      "path": ".claude/skills/update-docs/SKILL.md",
+      "changed": true,
+      "baseline_sha256": "f8bd0446a27ea961472f83376479176f5d18795737fcf795a8e33763d3c3989f",
+      "candidate_sha256": "56938297ecc9fd0f1e226a4f05ab1129d34c1797f6478594712208828163ef67",
+      "baseline_lines": 98,
+      "candidate_lines": 99
+    },
+    {
+      "skill": "update-setup",
+      "disposition": "migrated",
+      "findings": [
+        {
+          "excerpt": "python3 .claude/skills/update-setup/scripts/update_setup.py --help",
+          "request": "Run copied-workflow updater from a plugin in another repository.",
+          "classification": "conflict",
+          "consequence": "The cwd-relative script may be missing or refer to a different local version.",
+          "replacement": "Resolve the helper beside the loaded skill and pass target --local-root before the subcommand.",
+          "preserved": "Deterministic status engine, exact path approvals, conflict selection, disabled files and local state ownership.",
+          "validation": "Helper --help confirms CLI order; all four existing helper tests passed.",
+          "source_locator": ".claude/skills/update-setup/SKILL.md:42",
+          "source": ".claude/skills/update-setup/SKILL.md",
+          "excerpt_kind": "exact baseline excerpt"
+        },
+        {
+          "excerpt": "update workflows, update skills, check for updates",
+          "request": "Upgrade a managed plugin or update unrelated project skills.",
+          "classification": "hypothesis",
+          "consequence": "Broad selection can route a managed installation update into a copied-file mutation workflow.",
+          "replacement": "Select only upstream claudops copied-workflow adoption; installed upgrades route to host plugin management.",
+          "preserved": "No plugin cache writes, no implicit publication or settings mutation.",
+          "validation": "Static selection walkthrough; installed manager operation is outside this migration.",
+          "source_locator": ".claude/skills/update-setup/SKILL.md:7",
+          "source": ".claude/skills/update-setup/SKILL.md",
+          "excerpt_kind": "exact baseline excerpt"
+        }
+      ],
+      "checks": [
+        "Complete entrypoint and helper command implementation read",
+        "Existing helper suite: 4 passed",
+        "No update-helper code changes"
+      ],
+      "limits": [
+        "Upstream apply helper retains pre-existing behavior; no live target update performed."
+      ],
+      "path": ".claude/skills/update-setup/SKILL.md",
+      "changed": true,
+      "baseline_sha256": "6007a2237dc8e55576b77afa84b1e10ea758b6fa4b6622169f883cd0a26ab235",
+      "candidate_sha256": "dee73dab9f5a22526ac5ec1adf5a30bfefa04d8f46de119f46dae628947ebd1d",
+      "baseline_lines": 189,
+      "candidate_lines": 197
+    },
+    {
+      "skill": "vp",
+      "disposition": "migrated",
+      "findings": [
+        {
+          "excerpt": "After playground is created: open ...",
+          "request": "Treat the generated playground as a review artifact and finish only after an explicit approval/change/rejection sidecar outcome.",
+          "classification": "hypothesis",
+          "consequence": "Opening the HTML could be mistaken for approval or readiness for technical decomposition before the user's decision.",
+          "replacement": "Explicitly continue to the approval gate, retain the iterative loop, and require the corresponding sidecar before completion; approval authorizes only the documented handoff unless implementation was separately requested.",
+          "preserved": "Task discovery, quick prototype labeling, UI/backend templates, required states, open command, approval options, rejection stop, and sidecar format remain.",
+          "validation": "Read back the 214-line entrypoint and all three linked references; paths exist; inventory.py returned 0 errors; git diff --check passed.",
+          "source_locator": "Gate 2 after playground creation; Gate 3; Completion",
+          "source": ".claude/skills/vp/SKILL.md",
+          "excerpt_kind": "paraphrase of referenced instruction"
+        }
+      ],
+      "checks": [
+        "Full entrypoint read in chunks and linked templates/tips read",
+        "Bash/Skill/AskUserQuestion flags preserved",
+        "Static diff and reference validation passed"
+      ],
+      "limits": [
+        "No playground was generated or opened",
+        "No user approval state was exercised"
+      ],
+      "path": ".claude/skills/vp/SKILL.md",
+      "changed": true,
+      "baseline_sha256": "3f4db6d7a1b76f13281a716fc36eb00eb2be454618a66c12b2a23cdca11c75f8",
+      "candidate_sha256": "2f382a6aef1d4a7b59aee550fe200a1900f2b886ef30e81f5c64871e8c0f0cfd",
+      "baseline_lines": 204,
+      "candidate_lines": 214
+    },
+    {
+      "skill": "zoom-out",
+      "disposition": "preserved",
+      "findings": [],
+      "checks": [
+        "Entrypoint read fully.",
+        "Narrow explicit trigger, disable-model-invocation policy, read-only output, and vocabulary pointers preserved.",
+        "Frontmatter validated."
+      ],
+      "limits": [
+        "No codebase map was generated."
+      ],
+      "path": ".claude/skills/zoom-out/SKILL.md",
+      "changed": false,
+      "baseline_sha256": "938574dc0e61d48add058195ced441af205269591a22fe1f92ca1457982549f2",
+      "candidate_sha256": "938574dc0e61d48add058195ced441af205269591a22fe1f92ca1457982549f2",
+      "baseline_lines": 23,
+      "candidate_lines": 23
+    }
+  ],
+  "independent_instruction_review": {
+    "scope": [
+      "dev-server",
+      "ubiquitous-language",
+      "cc-linear",
+      "product",
+      "setup",
+      "finisher",
+      "tdd"
+    ],
+    "findings": 4,
+    "resolution": "All four findings resolved; independent reviewer re-read the four final entrypoints and confirmed no remaining mismatch."
+  }
+}

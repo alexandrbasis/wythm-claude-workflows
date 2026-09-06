@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "claudops",
+  "displayName": "Claudops",
+  "version": "1.0.0",
+  "description": "Workflow skills and review agents for planning, implementation, review, and delivery.",
+  "author": {
+    "name": "Alex Basis"
+  },
+  "homepage": "https://github.com/alexandrbasis/claudops",
+  "repository": "https://github.com/alexandrbasis/claudops",
+  "license": "MIT",
+  "keywords": [
+    "workflow",
+    "claude-code",
+    "software-development"
+  ]
+}

@@ -1,0 +1,31 @@
+name: Plugin validation
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install validation dependencies
+        run: python -m pip install --requirement requirements-dev.txt
+      - name: Run plugin unit tests
+        run: python -m unittest discover --start-directory tests --verbose
+      - name: Run workflow updater tests
+        run: python -m unittest discover --start-directory .claude/skills/update-setup/tests --verbose
+      - name: Build both plugin artifacts
+        run: python scripts/build_plugins.py --source .claude --out "$RUNNER_TEMP/claudops-dist"
+      - name: Validate both plugin artifacts
+        run: python scripts/validate_plugins.py --source .claude --out "$RUNNER_TEMP/claudops-dist"
+      - name: Check generated artifacts are reproducible
+        run: python scripts/build_plugins.py --check --source .claude --out "$RUNNER_TEMP/claudops-dist"

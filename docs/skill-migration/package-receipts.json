@@ -1,0 +1,30 @@
+{
+  "tests": {
+    "bootstrap": 8,
+    "packaging": 8,
+    "path_boundaries": 7,
+    "updater": 4,
+    "total_passed": 27
+  },
+  "build": {
+    "skills": 40,
+    "claude_agents": 18,
+    "claude_validation": "PASS",
+    "agent_validation": "PASS",
+    "reproducible_bytes_and_executable_modes": "PASS"
+  },
+  "archives": [
+    {
+      "path": "dist/archives/claudops-claude-1.0.0.zip",
+      "sha256": "da8618384564f775622bde956a73863047500954b3b45ea93a5248a4864b9212",
+      "bytes": 569669,
+      "matches_final_build": true
+    },
+    {
+      "path": "dist/archives/claudops-agent-plugins-1.0.0.zip",
+      "sha256": "dcb50e12bb3133bdb57afbf7a84b4552f4de58af079b8647d2fcd159650fd1a2",
+      "bytes": 518924,
+      "matches_final_build": true
+    }
+  ]
+}

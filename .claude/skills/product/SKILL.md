@@ -1,7 +1,8 @@
 ---
 name: product
 description: >-
-  Create JTBD or PRD product documentation through an interactive interview process.
+  Create a JTBD or PRD that records the user problem, evidence, scope, and measurable outcome
+  through an interactive product interview.
   Use when asked to 'create JTBD', 'write a PRD', 'product requirements', 'jobs to be done',
   'product documentation', 'product spec', or when a feature needs formal product-level
   documentation before technical planning. Conducts research, interviews, and pressure-tests
@@ -16,14 +17,14 @@ allowed-tools: Read, Write, Edit, Grep, Glob, AskUserQuestion, Task, Skill
 > **Announcement**: Begin with: "I'm using the **product** skill for product documentation creation."
 
 ## Objective
-Create best-in-class JTBD or PRD documents through a structured interview, mandatory research, and pressure-testing process. The output should be a standalone document that any team member can read and understand without extra verbal context.
+Create standalone JTBD or PRD documents through a structured interview, evidence-aware research, and pressure-testing process. The output should be readable without extra verbal context.
 
 ## Guidelines
 - Use `AskUserQuestion` for clarifications — structured options reduce ambiguity and keep the interview auditable. Skip it only when the user has already unambiguously answered in prior turns.
 - Ask non-obvious, thought-provoking questions. If the user's answer sounds confident but vague ("users want it faster"), name the gap ("faster than what, measured how?") rather than accepting it.
 - Focus on user progress and context, not features or demographics. A job statement is about the progress a user wants to make, not a feature request.
 - Use the templates as output contracts throughout the interview — the interview gathers exactly what the template needs.
-- Research is required for both JTBD and PRD. The template's "Research Findings" section must have cited sources because product decisions without evidence are assumptions, and downstream `/ct` and `/vp` inherit those assumptions silently.
+- Research is required when a JTBD or PRD makes external, current, competitive, or benchmark claims. Cite every such claim in "Research Findings"; when the document is grounded entirely in supplied product evidence, record why no external lookup was needed instead of researching by default.
 - Do not include time estimates in any output.
 
 **Context management.** This workflow runs long (design-exploration + research + interview + grill + write + validators). If compaction happens mid-flow:
@@ -44,13 +45,13 @@ Do not stop early due to token-budget worries — the parent harness handles com
 - `[feature]` only → `AskUserQuestion`: "Which document type?" Options: "JTBD — Jobs-to-be-Done analysis" / "PRD — Product Requirements Document"
 - No argument → `AskUserQuestion`: "What feature?" + free-text option, then ask document type
 
-**Quick mode**: When `quick` prefix is detected, skip Steps 1-4 (skip design-exploration, research, interview, and grill). Go directly to Step 5 (document writing): read the template, fill from the user's prompt and any linked context, and mark each unknown inline as `[NEEDS CLARIFICATION: <question>]`. Then run Step 6 (Cross-AI Validation) as usual — validation catches gaps that the skipped interview would have caught. Present output with: "Quick mode used — N clarifications remain. For deeper product thinking, run the full `/product` flow."
+**Quick mode**: When `quick` prefix is detected, skip Steps 1-4 (skip design-exploration, research, interview, and grill). Go directly to Step 5 (document writing): read the template, fill from the user's prompt and any linked context, and mark each unknown inline as `[NEEDS CLARIFICATION: <question>]`. In the template's **Research Findings** section, either cite supplied evidence by its prompt or document source, or record `No external lookup: quick mode is limited to supplied evidence` with the reason and mark external claims as `[NEEDS CLARIFICATION: ...]`. This records the research decision without launching research or asking a new question. Then run Step 6 (Cross-AI Validation) as usual — validation catches gaps that the skipped interview would have caught. Present output with: "Quick mode used — N clarifications remain. For deeper product thinking, run the full `/product` flow."
 
 ### Step 0: Load the Output Shape
 
 Before asking questions, read the templates to understand the expected structure:
-1. Read `.claude/docs/templates/JTBD-template.md`
-2. Read `.claude/docs/templates/PRD-template.md`
+1. Read the selected `.claude/docs/templates/JTBD-template.md` or `.claude/docs/templates/PRD-template.md`
+2. If the selected output is a PRD and a companion JTBD may be created, also read `.claude/docs/templates/JTBD-template.md`
 
 Treat the templates as **output contracts** — the interview gathers exactly the information needed to fill them clearly.
 
@@ -60,7 +61,9 @@ Treat the templates as **output contracts** — the interview gathers exactly th
 
 ### Step 1: Context Gathering & Design Exploration
 
-**Invoke the `design-exploration` skill** to ground product documentation in codebase reality.
+When the product decision changes or extends an existing project, invoke the `design-exploration`
+skill to ground product documentation in codebase reality. For a greenfield or product-only
+question, keep the context at product level and record that no codebase fit was needed.
 
 When invoking, ask it to return:
 - Key codebase findings and current fit for the feature area
@@ -74,7 +77,12 @@ For product documentation, prefer fit, constraints, and risks over implementatio
 
 ### Step 2: Research
 
-Fill the "Research Findings" section of the template with cited sources. The research doesn't have to be exhaustive — two or three high-quality references per claim is enough. Use quick lookups by default; only escalate to `comprehensive-researcher` when findings would materially change the job statement, scope, or requirements.
+When external evidence affects the job statement, scope, requirements, metrics, or a current
+claim, fill the "Research Findings" section with cited sources. The research doesn't have to be
+exhaustive — two or three high-quality references per claim is enough. Use quick lookups by
+default; only escalate to `comprehensive-researcher` when findings would materially change the
+job statement, scope, or requirements. If no external evidence is needed, state that decision
+and its basis in the document rather than creating a placeholder research round.
 
 **Quick lookups** (Exa MCP tools directly):
 - Competitor approaches to the same job/problem
@@ -154,7 +162,7 @@ Drive the conversation section-by-section toward filling the template. Batch que
 - What business rules or constraints apply?
 
 **Modules & Interfaces** (PRD only — fills the `Modules & Interfaces` section of `PRD-template.md`):
-- Which deep modules are touched or introduced? Use `architecture-language/LANGUAGE.md` vocabulary.
+- Which deep modules are touched or introduced? Use `.claude/skills/architecture-language/LANGUAGE.md` vocabulary.
 - For each module, what does its **interface** guarantee — invariants, ordering, error modes — not just type signatures?
 - Where do the seams live, and what sits behind them?
 - If a port + adapter pattern is proposed, are there genuinely two adapters (e.g. production + test)? One adapter = hypothetical seam.
@@ -211,7 +219,7 @@ If any remain unclear, continue the interview.
    - JTBD output: `product-docs/JTBD/JTBD-[feature-name].md`
    - PRD output: `product-docs/PRD/PRD-[feature-name].md`
 4. **For PRD without prior JTBD**: Write a companion `JTBD-[feature-name].md` whenever the interview produced a clear job statement, at least one answer per Four Force (push/pull/anxiety/habit), and a named primary user. If any of those are missing, note it in the PRD's "Related JTBD" section and skip the JTBD write — don't stub a thin JTBD.
-5. **If any required section cannot be filled clearly**, continue the interview instead of writing placeholder content
+5. **If any required section is blank**, continue the interview instead of writing placeholder content; keep explicit `[NEEDS CLARIFICATION: ...]` markers when the user accepted an unresolved question
 6. **Present summary** to user for confirmation
 
 ### Step 6: Cross-AI Validation
@@ -235,6 +243,14 @@ Format output per `.claude/docs/templates/cross-ai-protocol.md` (comparison tabl
 **If validation fails:** `AskUserQuestion`: "Revise document" / "Override and proceed" / "Abandon"
 
 **Skip conditions:** No CLI available, or user explicitly skips.
+
+## Completion
+
+Product documentation is complete when the selected JTBD or PRD exists at its canonical path,
+required sections are filled or explicitly marked for clarification, the relevant research
+decision and citations are recorded, and cross-AI validation is appended when available and not
+skipped. For a PRD, create the companion JTBD only when the stated evidence requirements are
+met. An interview summary or validation preview does not replace the document write.
 
 ## Output
 - JTBD: `product-docs/JTBD/JTBD-[feature-name].md`

@@ -80,8 +80,8 @@ implementation steps.
 - **Exit:** gaps are resolved or explicitly captured as decisions/blockers.
 
 ### GATE 2 — Explore the codebase
-Launch **2–3 Explore agents in a single turn** (fan out in the same batch — don't sequence), each with
-a mandate:
+Launch **2–3 scoped Explore workers in a single turn** (fan out in the same batch — don't sequence)
+when the host provides that worker role, each with a mandate:
 1. **Architecture & patterns** — closest similar feature/module/workflow, relevant data models or
    persisted state, reusable shared abstractions/utilities/base patterns.
 2. **Change surface** — files/dirs to modify; nearby API surfaces, contracts, background jobs, events,
@@ -94,6 +94,7 @@ loading/empty/error/success/accessibility states; existing visual/system constra
 (or another design helper) when visual uncertainty blocks planning; include analytics coverage when the
 change touches a tracked user-facing flow.
 
+If the host cannot dispatch that role, perform the same three passes directly and record that fallback.
 Return a short findings summary: existing patterns, likely files/dirs, integration points, constraints.
 - **Exit:** the plan can be grounded in real codebase evidence, not guesses.
 
@@ -137,12 +138,18 @@ Required review by complexity:
 | Complexity | Signal | Required review |
 |------------|--------|-----------------|
 | Simple | 1–2 focused steps | `plan-reviewer` agent |
-| Medium | 3–5 steps, multiple touchpoints | `plan-reviewer` + `senior-architecture-reviewer` |
-| Complex | 6+ steps, architecture/cross-system risk | `plan-reviewer` + `senior-architecture-reviewer` + cross-AI validation |
+| Medium | 3–5 steps, multiple touchpoints | `plan-reviewer` + a plan-capable architecture review |
+| Complex | 6+ steps, architecture/cross-system risk | `plan-reviewer` + a plan-capable architecture review + cross-AI validation |
 
-> Reviewer agents follow a coverage-then-filter pattern — surface every issue (severity + confidence),
-> then filter in a separate pass. Don't instruct them to report "only important" findings; 4.7 obeys
-> that literally and recall drops.
+Use reviewers that accept a plan and its supporting context. The repository's
+`senior-architecture-reviewer` is defined for completed implementations and git-history checks;
+do not dispatch it for this gate unless its input contract explicitly supports plan-only review. If
+no plan-capable architecture reviewer is configured, perform that pass from the decomposition and
+record the fallback; do not fabricate implementation evidence.
+
+> Reviewers follow a coverage-then-filter pattern: surface every issue with severity and confidence,
+> then filter in a separate pass. Keep low-confidence items labeled until verification; do not
+> pre-filter during discovery.
 
 For **Complex** plans, cross-AI validation is part of the required path — follow
 `.claude/docs/templates/cross-ai-protocol.md` if present. Optional adjuncts: `/analyze` when source

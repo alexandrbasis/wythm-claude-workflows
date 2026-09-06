@@ -1,9 +1,9 @@
 ---
 name: setup
 description: >-
-  Configure workflow for your codebase. Run after cloning .claude/ into your repo.
-  Use when asked to 'setup', 'configure workflow', 'initialize .claude', 'setup wizard',
-  'configure for my project', or when the codebase has unconfigured {{PLACEHOLDER}} variables.
+  Configure claudops for a specific repository after copying the workflow or installing
+  the plugin. Use for first setup, requested reconfiguration, or unresolved project
+  placeholders in claudops files.
 allowed-tools:
   - Read
   - Glob
@@ -16,318 +16,88 @@ allowed-tools:
   - TodoWrite
 ---
 
-# Setup Wizard
+# Configure claudops for a project
 
-> **Announcement**: "Running the **setup wizard** to configure this workflow for your codebase."
+Configure the requested repository's workflow using values evidenced in that repository
+and confirmed by the user. A plugin is a read-only template source; project configuration
+belongs in the target repository's `.claude/` directory.
 
-> Context will be automatically compacted during long runs. Do not stop early due to token concerns. If you need to, write interim state (files touched, placeholders filled) to a TodoWrite list so it survives compaction.
+## 1. Establish the target and existing configuration
 
-Configure all workflow skills, agents, and hooks to match the target codebase's tech stack, structure, and conventions. This skill reads the codebase, detects patterns, confirms with the user, then fills in `{{PLACEHOLDER}}` variables across all workflow files.
+Resolve the requested repository and workspace in a monorepo. Inspect existing `.claude/`
+files before preparing changes. For a re-run, determine whether the request means specific
+values or a full reconfiguration; ask only when that scope is unclear. Preserve local
+content outside the selected configuration regions.
 
-## When to Run
+When loaded from a plugin and project templates are missing, use the script adjacent to
+this loaded skill, `scripts/bootstrap_project.py`. Resolve its absolute path from the
+skill location; keep the target repository as the working directory:
 
-- First time after cloning `.claude/` into a new repo
-- When switching to a different project
-- When `{{PLACEHOLDER}}` variables are visible in skill/agent files
-- When the user says "setup", "configure", or "initialize"
-
-## Process
-
-### Phase 1: Codebase Discovery (parallel agents, same turn)
-
-Spawn all 3 Explore subagents in a single turn — do not run them sequentially. The three scans (tech stack, project structure, commands) have no dependencies between them, so batching them saves wall-clock time.
-
-**Agent 1 — Tech Stack Detection:**
-```
-Detect the project's technology stack by examining:
-- package.json / go.mod / pyproject.toml / Gemfile / Cargo.toml / pom.xml
-- Import patterns in source files (framework detection)
-- ORM/database config files (prisma/, alembic/, db/migrate/, etc.)
-- Auth configuration (firebase config, auth0, clerk, passport setup)
-- Test configuration (jest.config, pytest.ini, vitest.config, .rspec)
-- CI/CD files (.github/workflows/, .gitlab-ci.yml, Jenkinsfile)
-
-Return a structured report:
-- Language: [TypeScript/Python/Go/Ruby/Java/Rust/etc.]
-- Framework: [NestJS/Express/Next.js/Django/FastAPI/Rails/Gin/Spring/etc.]
-- ORM: [Prisma/TypeORM/Drizzle/SQLAlchemy/GORM/ActiveRecord/etc.] or "none"
-- Auth: [Firebase JWT/Auth0/Clerk/Passport/custom JWT/etc.] or "none detected"
-- Test framework: [Jest/Vitest/pytest/RSpec/go test/JUnit/etc.]
-- Package manager: [npm/yarn/pnpm/pip/poetry/bundler/cargo/etc.]
-- CI system: [GitHub Actions/GitLab CI/etc.] or "none detected"
+```bash
+python3 "/absolute/path/to/loaded/setup/scripts/bootstrap_project.py" --project "/absolute/project"
 ```
 
-**Agent 2 — Project Structure Detection:**
-```
-Map the project's directory structure:
-- Is this a monorepo? (multiple package.json, workspaces, nx.json, turbo.json)
-- Source directories (src/, app/, lib/, cmd/, backend/src/, etc.)
-- Test directories (tests/, __tests__/, test/, spec/, *_test.go, etc.)
-- Documentation directories (docs/, doc/, documentation/)
-- Config files (tsconfig.json, pyproject.toml, go.mod, etc.)
-- Schema/migration files (prisma/schema.prisma, db/schema.rb, alembic/, etc.)
-- Architecture docs (any file describing project structure or conventions)
+Review its `add` and `preserved` lists. An authorized first setup includes copying these
+missing workflow templates; run the same command with `--apply` and read back the result.
+The script preserves existing files and excludes settings, secrets and runtime state.
+It does not configure or activate hooks. If existing files are older or customized,
+use `update-setup` for those changes rather than overwriting them during bootstrap.
 
-Return a structured report:
-- Monorepo: yes/no (if yes, list workspace names and paths)
-- Source dir(s): [paths]
-- Test dir(s): [paths]
-- Docs dir: [path] or "none"
-- Config files: [list]
-- Schema path: [path] or "N/A"
-- Architecture docs found: [paths] or "none"
-```
+With a copied `.claude/` installation, configure the existing local files directly.
+Completion: the target is explicit and the local files to configure are identified.
 
-**Agent 3 — Commands & Conventions Detection:**
-```
-Detect the project's standard commands and conventions:
-- Read package.json scripts / Makefile / pyproject.toml scripts / taskfile.yml
-- Identify: test command, lint command, build command, format command, typecheck command, coverage command
-- Check for existing .claude/ or .cursor/ configuration
-- Read any architecture docs found to understand patterns (DDD, MVC, hexagonal, etc.)
-- Detect architecture layers from directory structure (controllers/, services/, models/, etc.)
+## 2. Detect and confirm values
 
-Return a structured report:
-- Test command: [command]
-- Lint command: [command] or "none"
-- Build command: [command] or "none"
-- Format command: [command] or "none"
-- Typecheck command: [command] or "none"
-- Coverage command: [command] or "none"
-- Architecture pattern: [description] or "not detected"
-- Layer structure: [description of layers and their responsibilities]
-- Layer rules: [dependency direction, encapsulation rules]
-- Existing .claude/: yes/no (if yes, list what's configured)
-```
+Read [discovery outputs](references/discovery.md) for the categories relevant to this
+setup: stack, paths, commands, architecture and any additional project-specific category.
+Use independent scouts when that improves coverage; a small repository can be inspected
+directly. Cite the source for each detected value and label unknowns. Obtain command
+values from project configuration instead of guessing a language's usual defaults.
 
-### Phase 2: User Confirmation (Interactive)
+Present one reviewable set covering every detected category, including uncertainty and
+current-versus-proposed values on reconfiguration. Confirm the values together; request
+corrections for unresolved decisions. Values already approved for this scope remain
+approved. Do not invent values for unknown placeholders.
 
-Present discovery results and confirm with user. Use `AskUserQuestion` for **every detection category** returned by Phase 1 — the four rounds below are the minimum, not the maximum. If Phase 1 surfaced additional categories (e.g. container runtime, IaC tool, custom tool registry), add matching rounds.
+Completion: each value to substitute has evidence and confirmation; unresolved values
+are recorded separately.
 
-**Round 1 — Tech Stack:**
-```
-question: "We detected the following tech stack. Is this correct?"
-options:
-  - "Yes, this is correct"
-  - "Let me correct some values" (then ask for corrections)
-```
-Show: Language, Framework, ORM, Auth, Test framework, Package manager
+## 3. Configure local workflow files
 
-**Round 2 — Project Structure:**
-```
-question: "We detected this project structure. Correct?"
-options:
-  - "Yes, correct"
-  - "Let me adjust paths"
-```
-Show: Monorepo status, Source/Test/Docs dirs, Schema path
+Apply the confirmed values through the authorized set without repeated per-file or
+per-batch approval. Fill `coding-conventions/SKILL.md` and `review-conventions/SKILL.md`
+first, then relevant skill and agent Markdown. Before each file, give a compact path and
+substitution summary. Preserve user-authored text outside the selected regions.
 
-**Round 3 — Commands:**
-```
-question: "These are the detected commands. Correct?"
-options:
-  - "Yes, correct"
-  - "Let me fix some commands"
-```
-Show: All detected commands (test, lint, build, format, typecheck, coverage)
+Search for actual `{{UPPERCASE_VARIABLE}}` occurrences rather than any double brace.
+Replace only confirmed variables. For multi-line layers and rules, use the confirmed
+architecture; if none exists, say that no project-specific architecture rule is configured.
+Keep unknown placeholders intact with a follow-up list. Documentation examples explaining
+placeholder syntax are not unresolved project settings.
 
-**Round 4 — Architecture:**
-```
-question: "This is the detected architecture pattern. Correct?"
-options:
-  - "Yes, correct"
-  - "Let me describe the architecture"
-  - "No specific architecture pattern"
-```
-Show: Architecture pattern, layer structure, layer rules
+For hook configuration, read [hook values and activation](references/hooks.md). Configure
+only hooks applicable to the detected stack. Validate Python literals and shell quoting.
+Show the exact `.claude/settings.json` JSON diff, preserving every existing setting and
+matcher, and obtain approval before activation. A previously approved exact diff may be
+applied directly. Copying templates does not approve auto-commit or other hook side effects.
 
-### Phase 3: Apply Configuration
+When a concrete architecture is confirmed, update
+`code-analysis/references/project-checks.md` with checks for the detected source paths.
+For disabling skills, list candidate names and reasons, let the user select the exact set,
+then show the final set for confirmation. Rename only that set's `SKILL.md` files to
+`SKILL.md.disabled`; keep every other skill enabled. Absence of a tool alone does not
+approve disabling its skill.
 
-After confirmation, fill in all `{{PLACEHOLDER}}` variables **directly in the files** across the workflow. No intermediate config files — the wizard edits skills, agents, and hooks in-place.
+## 4. Verify the destination
 
-**Step 1: Fill convention skills**
+Read back changed local files and verify substitutions against the confirmed values.
+Check remaining project placeholders across skills, agents and hooks. Parse any modified
+JSON; syntax-check changed Python/shell hooks before activation. Confirm each configured
+hook path exists and each selected matcher references the intended file. Report hooks as
+active only when the settings read-back proves they are wired; runtime success needs an
+actual invocation.
 
-Update `coding-conventions/SKILL.md` and `review-conventions/SKILL.md` — these are the most important files as they're preloaded into all review agents and the developer agent via `skills:` frontmatter.
-
-Replace ALL `{{VARIABLE}}` placeholders with detected values. For multi-line sections (`{{LAYERS}}`, `{{LAYER_RULES}}`), generate complete, well-structured content based on detection results.
-
-**Step 2: Fill remaining skills and agents**
-
-Scan every `.md` file under `.claude/skills/` and `.claude/agents/` for remaining `{{PLACEHOLDER}}` patterns. For each match:
-
-1. Read the file
-2. Identify all `{{VARIABLE}}` placeholders
-3. If the placeholder name appears in the confirmed Phase-2 values, substitute it. If the name is unknown (not confirmed), leave it intact and add the file to a "needs follow-up" list shown at the end. Do not invent values.
-4. Show the user a brief summary: "Updated [filename]: replaced X placeholders"
-
-Ask user confirmation every 5 files: "Continue applying to next batch?"
-
-**Step 3: Fill hook scripts**
-
-Scan `.sh` and `.py` files in `.claude/hooks/` for `{{PLACEHOLDER}}` patterns and replace with confirmed values. Hook scripts use `{{VARIABLE}}` syntax — Python hooks use Python literal syntax (lists, tuples), shell hooks use plain strings.
-
-**Hook placeholder mapping** — derive each value from Phase 1 detection results:
-
-| Hook File | Placeholder | How to Fill |
-|---|---|---|
-| **lint-on-write.py** | `{{LINT_TARGETS}}` | Python list of source dirs, e.g. `["src"]` or `["backend", "frontend"]` |
-| | `{{LINT_EXTENSIONS}}` | Python tuple of extensions, e.g. `(".ts", ".tsx")` or `(".py",)` |
-| | `{{SKIP_PATTERNS}}` | Python tuple of path substrings to skip, e.g. `("node_modules", "dist/", "prisma/migrations")` |
-| | `{{FORMAT_CMD}}` | Python list for formatter, e.g. `["npx", "prettier", "--write"]` or `["npx", "eslint", "--fix"]`. If no formatter detected, set to `[]` |
-| **ts-typecheck-on-write.py** | `{{TYPECHECK_TARGET}}` | Directory with tsconfig.json relative to project root. `"."` for root-level tsconfig, or subdir like `"backend"` |
-| | `{{TYPECHECK_CMD}}` | Python list, e.g. `["npx", "tsc", "--noEmit"]` |
-| | `{{TYPECHECK_EXTENSIONS}}` | Python tuple, e.g. `(".ts", ".tsx")` |
-| **test-after-edit.py** | `{{TEST_CMD_LIST}}` | Python list form of test command, e.g. `["npm", "run", "test:silent"]` or `["pytest", "-q"]` |
-| | `{{SOURCE_DIRS}}` | Python list of watched dirs, e.g. `["src"]` or `["backend/src", "lib"]` |
-| | `{{SOURCE_EXTENSIONS}}` | Python tuple matching language, e.g. `(".ts", ".tsx")` or `(".py",)` |
-| **bash-guard.sh** | `{{PROTECTED_DIRS}}` | Pipe-separated dir names, e.g. `node_modules\|src\|dist` |
-| | `{{DB_DANGER_PATTERN}}` | Regex for destructive DB commands based on ORM. Prisma: `prisma migrate reset\|prisma db push --force-reset`. Django: `migrate --run-syncdb\|flush`. Empty if no ORM. |
-| | `{{DB_SAFE_CMD}}` | Safe alternative, e.g. `prisma migrate dev` or `python manage.py migrate` |
-| | `{{DB_MIGRATE_PATTERN}}` | Regex for migration commands. Prisma: `prisma migrate`. Django: `manage.py migrate`. Empty if no ORM. |
-| | `{{DB_MIGRATE_SAFE_FLAG}}` | Safety flag. Prisma: `--create-only`. Django: `--plan`. Empty if no ORM. |
-| | `{{TEST_SILENT_PATTERN}}` | Regex matching test commands, e.g. `npm run test\|npm test`. Empty to disable enforcement. |
-| | `{{TEST_SILENT_SUFFIX}}` | Suffix to enforce, e.g. `:silent` or ` --quiet` |
-| **file-guard.sh** | `{{PROTECTED_FILE_PATTERN}}` | Regex for files needing special workflow, empty if none |
-| | `{{PROTECTED_FILE_MESSAGE}}` | Block message, empty if none |
-| | `{{CORE_LAYER_PATH}}` | Path substring for core/domain layer based on architecture. DDD: `/domain/`. Clean arch: `/core/`. Empty if no clear domain layer. |
-| | `{{CORE_FORBIDDEN_IMPORTS}}` | Regex for forbidden imports in core layer, e.g. `from.*infrastructure\|from.*@prisma`. Empty if no core layer. |
-| | `{{INTERFACE_NAMING_ENABLED}}` | `true` or `false` — enable only if codebase uses I-prefix convention |
-| | `{{INTERFACE_PATH_FILTER}}` | Path filter for naming enforcement, e.g. `/src/` |
-| | `{{CONSOLE_LOG_BLOCKED}}` | `true` or `false` — enable only if project uses a structured logger |
-| | `{{CONSOLE_LOG_PATH_FILTER}}` | Path filter, e.g. `/src/` |
-| | `{{CONSOLE_LOG_ALTERNATIVE}}` | Alternative message, e.g. `Use the Logger service instead of console.log` |
-| **analytics-reminder.sh** | `{{SCREEN_FILE_PATTERN}}` | Regex for screen/page files. React Native: `/(app\|screens)/.*\.tsx$`. Next.js: `/app/.*/page\.tsx$`. Empty to disable. |
-| | `{{ANALYTICS_REMINDER_MESSAGE}}` | Reminder text, or empty to disable |
-| **stop-guard.sh** | `{{STOP_TEST_CMD}}` | Shell test command string, e.g. `cd backend && npm run test:ci 2>&1 \| tail -20` |
-| | `{{STOP_BUILD_CMD}}` | Shell build command string, e.g. `cd backend && npx tsc --noEmit 2>&1 \| tail -20` |
-| | `{{CODE_CHANGE_PATTERN}}` | Egrep regex selecting "real code" diffs. Reminder is suppressed when no diff matches. Examples — single Node app: `\.(ts\|tsx\|js\|jsx)$`; backend monorepo: `^backend/.*\.(ts\|tsx\|prisma)$`; python: `\.py$`. Empty falls back to `.*` (always remind). |
-| | `{{WIKI_PATHS}}` | Space-separated path prefixes that trigger the wiki reminder, e.g. `docs/adr docs/architecture src`. Empty = always remind (when `VERIFY_WIKI=true`). Set `VERIFY_WIKI=false` in the file to disable entirely. |
-| **test-before-pr.sh** | `{{BACKEND_PATH_FILTER}}` | Egrep regex matched against changed paths for scope 1. Single-app projects: `.*`. Monorepo backend: `^backend/`. Empty disables the scope. |
-| | `{{BACKEND_TEST_CMD}}` | Test command for scope 1, run from project root via `eval`. Single-app: `npm run test:silent`. Monorepo: `cd backend && npm run test:silent`. Empty = skip tests. |
-| | `{{BACKEND_BUILD_CMD}}` | Build/typecheck for scope 1, e.g. `npx tsc --noEmit` or `cd backend && npx tsc --noEmit`. Empty = skip build. |
-| | `{{MOBILE_PATH_FILTER}}` | Path filter for scope 2 (mobile/frontend). Set all three MOBILE_* values to empty to disable the second scope on single-app projects. |
-| | `{{MOBILE_TEST_CMD}}` | Test command for scope 2, e.g. `cd mobile-app && npm test -- --silent`. Empty = skip tests. |
-| | `{{MOBILE_BUILD_CMD}}` | Build/typecheck for scope 2, e.g. `cd mobile-app && npx tsc --noEmit`. Empty = skip build. |
-
-**Important**: For Python hook files, placeholders are replaced with Python literals (no quotes around lists/tuples). For shell hook files, values go inside existing double quotes. When a value should be empty/disabled, use empty string `""` for shell or `[]`/`()` for Python.
-
-**Step 4: Wire hooks into settings.json**
-
-Why this needs a preview: `settings.json` is user-owned; stomping existing matchers silently is worse than a slower workflow. Before writing, show the user the exact JSON diff (existing matchers + the additions) and ask "Apply this settings.json update?" via AskUserQuestion. Only write on "Apply". Group additions by event and matcher:
-
-**PreToolUse — Bash matcher** (add to existing or create):
-1. `bash-guard.sh` — blocks `rm -rf`, force-push, destructive DB commands
-2. `test-before-pr.sh` (timeout: 300) — blocks `gh pr create` unless tests + build pass for each affected scope
-
-**PreToolUse — Write|Edit matcher** (add to existing or create):
-3. `file-guard.sh` — architecture layer boundary enforcement
-
-**PostToolUse — Write|Edit matcher** (create new):
-4. `lint-on-write.py` — auto-format after file edits
-5. `ts-typecheck-on-write.py` (timeout: 60) — run tsc after TS edits
-6. `test-after-edit.py` (timeout: 120) — run tests after source edits (has 30s cooldown)
-7. `analytics-reminder.sh` — remind about analytics for new screens/pages
-
-**Stop** (add to existing or create):
-8. `stop-guard.sh` — verification checklist before stopping (once per 24h)
-9. `auto-commit-on-stop.sh` — WIP auto-commit on session end
-
-**Wiring rules:**
-- Add to **existing** matcher arrays when the event+matcher already exists in settings.json
-- Create new matcher entries when they don't exist
-- Preserve all existing hooks (like `pre-commit-validation.py`, `command-logger.py`, `sensitive-file-guard.py`, `read-counter.py`, `cost-tracker.py`)
-- Set `timeout` for hooks that run external commands (typecheck, test, PR gate)
-
-Example — existing `settings.json` has:
-  "PreToolUse": [{"matcher": "Bash", "hooks": [{"type": "command", "command": "existing.sh"}]}]
-
-Adding `bash-guard.sh` and `test-before-pr.sh` should produce:
-  "PreToolUse": [{"matcher": "Bash", "hooks": [
-    {"type": "command", "command": "existing.sh"},
-    {"type": "command", "command": ".claude/hooks/bash-guard.sh"},
-    {"type": "command", "command": ".claude/hooks/test-before-pr.sh", "timeout": 300}
-  ]}]
-
-**Step 5: Generate architecture checks**
-
-If the codebase has a clear architecture pattern (DDD, MVC, etc.), generate `code-analysis/references/project-checks.md` with architecture-specific grep commands tailored to the detected source directory and patterns.
-
-**Step 6: Prune irrelevant skills**
-
-Based on detected tech stack, identify skills that are not applicable to this project. For each irrelevant skill, ask the user whether to disable it.
-
-Irrelevant skill detection rules:
-- `fci` (Fix CI) — skip if no CI config detected
-- `cc-linear` — skip if no Linear integration detected
-- `codex-cli` — skip if user doesn't use Codex
-- `cursor-cli` — skip if user doesn't use Cursor
-- `antigravity-cli` — skip if user doesn't use Antigravity CLI (agy)
-- `parallelization` — skip if project is too small (< 5 source files)
-
-Gate: only rename skills the user explicitly selected in the multi-select below. Never disable a skill that wasn't in the returned selection set, even if detection flagged it as irrelevant. Before renaming, print the final list of skills to be disabled and wait for a plain "yes" confirmation.
-
-To disable an approved skill: rename `SKILL.md` to `SKILL.md.disabled` in that skill's directory. This preserves the file for re-enabling later.
-
-Present as a single AskUserQuestion with multiSelect:
-```
-question: "These skills may not be relevant to your project. Which ones should we disable?"
-options: [list of detected irrelevant skills with reasons]
-multiSelect: true
-```
-
-### Phase 4: Verification
-
-After all files are updated:
-
-1. Run: `grep -r '{{' .claude/skills/ .claude/agents/ .claude/hooks/ --include='*.md' --include='*.sh' --include='*.py' | head -30`
-2. If any `{{PLACEHOLDER}}` variables remain, report them to the user
-3. Show a summary of all changes made (skills, agents, AND hooks)
-
-## Output
-
-Print a completion summary:
-```
-Setup complete!
-
-Tech stack: [LANGUAGE] + [FRAMEWORK] + [ORM]
-Architecture: [ARCHITECTURE]
-Files configured: X skills, Y agents, Z hooks
-Skills disabled: [list or "none"]
-
-Hooks wired (active in settings.json):
-  PreToolUse:Bash
-  ├── bash-guard.sh             — blocks rm -rf, force-push, destructive DB
-  └── test-before-pr.sh         — tests + build before gh pr create
-  PreToolUse:Write|Edit
-  └── file-guard.sh             — architecture layer enforcement
-  PostToolUse:Write|Edit
-  ├── lint-on-write.py          — auto-format after edits
-  ├── ts-typecheck-on-write.py  — tsc after TS edits
-  ├── test-after-edit.py        — tests after source edits (30s cooldown)
-  └── analytics-reminder.sh     — analytics reminder for new screens
-  Stop
-  ├── stop-guard.sh             — verification checklist (once/24h)
-  └── auto-commit-on-stop.sh    — WIP auto-commit on session end
-
-Next steps:
-- Run /sr to test the code review pipeline
-- Run /ct to test task decomposition
-- Edit .claude/skills/coding-conventions/SKILL.md to fine-tune conventions
-```
-
-## Re-running Setup
-
-If the user runs `/setup` again on an already-configured repo:
-1. Grep for `{{` in `.claude/` — if none found, the workflow is already configured
-2. Ask: "This workflow is already configured. What would you like to do?"
-   - "Reconfigure everything" — re-detect codebase, show current vs. new values, confirm changes, overwrite
-   - "Update specific values" — ask which variables to change, edit only those files
-   - "Cancel"
-
-## Constraints
-
-- Only modify text inside `{{PLACEHOLDER}}` regions. Content the user wrote outside those regions is theirs — leaving it intact is how the wizard stays idempotent and safe to re-run.
-- Before writing to a file, print a one-line summary (`path — N placeholders replaced: NAME1, NAME2, …`) so the user can stop the wizard if a substitution looks wrong. For `settings.json`, show the JSON diff, not just the summary.
-- All values are written directly into files — no intermediate config files
-- Support monorepos by asking which workspace to configure (or configure all)
-- If architecture is not detected, leave architecture sections with helpful generic content rather than empty placeholders
+Finish with the configured repository, file counts, unresolved values, disabled skills,
+and verified hook state. Distinguish copied, configured, wired and exercised components.
+If a Claude session needs to reload newly materialized agents, say so; do not start an
+unrequested implementation or review workflow just to test setup.

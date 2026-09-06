@@ -113,6 +113,9 @@ If the feature involves entity creation, the prototype must show where the entit
 open [TASK_DIRECTORY]/playground-[feature-name].html
 ```
 
+Treat the opened playground as a review artifact, not approval. Continue to GATE 3 and obtain
+the user's explicit decision before describing the design as approved or handing it to `/ct`.
+
 ---
 
 ## GATE 3: User Approval
@@ -202,3 +205,10 @@ Visual prototype approved for [feature-name]:
 Next steps:
 → Create tech plan: /ct [feature-name]
 ```
+
+## Completion
+
+The prototype workflow is complete only after the playground exists, the user has selected
+Approve, Request Changes, or Reject, and the corresponding loop or `vp-approval.md` sidecar
+has been written. Approval authorizes the documented prototype handoff; it does not authorize
+implementation unless that action was also requested.

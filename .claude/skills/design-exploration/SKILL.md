@@ -32,7 +32,11 @@ Typically invoked by `/brainstorm` or `/nf`, but can also run standalone when so
 
 ### Step 1: Parallel Context Gathering
 
-Spawn 2–3 Explore agents in the **same turn** (single message with multiple tool calls) so they run concurrently. The scan angles below are independent — do not sequentialize them. Use a faster model unless the task clearly needs deeper reasoning. See `references/exploration-checklist.md` for a generic checklist and adapt it to the actual project layout.
+Use `references/exploration-checklist.md` as a menu, selecting only the feature-type
+checklist items that affect the caller's decision. When two or more scan angles are
+independent and the caller needs broad coverage, spawn 2–3 Explore agents in the same turn
+so they run concurrently. For a narrow question, use one focused scan; do not fan out just
+to satisfy a fixed count. Use a faster model unless the task clearly needs deeper reasoning.
 
 Common scan angles:
 1. **Closest prior art**: similar features, modules, screens, services, or flows
@@ -81,7 +85,7 @@ For each approach:
 
 Once the user picks an approach (or you have a clear winner):
 
-1. Present all sections in a single structured response (each section 200–300 words, clearly labeled).
+1. Present all relevant sections in a single structured response, clearly labeled. Keep each section to the evidence needed for the caller's decision; expand only where a trade-off or risk needs support.
 2. End with: "Reply `continue` to proceed, or `revise: <section name>` to iterate on a specific section." Do not pause between sections.
 3. Cover only the areas that materially affect the caller's decision:
    - Where the feature fits in the current product or architecture
@@ -109,4 +113,4 @@ When this skill completes, it returns to the caller:
 - **Follow existing conventions**: New code should look like it belongs in the codebase
 - **Caller-sensitive depth**: Tune depth to the caller's goal instead of always pushing into implementation detail
 - **Multiple choice preferred**: Use `AskUserQuestion` with options when clarifying
-- **Parallel exploration**: Always launch Explore agents simultaneously, not sequentially
+- **Parallel exploration**: Launch independent Explore scans simultaneously when fan-out is justified; keep narrow questions focused

@@ -2,9 +2,9 @@
 name: antigravity-cli
 description: >-
   Run Google Antigravity CLI (agy) for web-grounded research, cross-AI review, or validation.
-  Use when asked for 'ask antigravity', 'antigravity review', 'agy search', 'use antigravity',
-  or when you need Google Search grounding or a different AI perspective.
-  NOT for interactive conversations (driven one-shot only).
+  Use when a request needs Antigravity's Google Search grounding or a distinct cross-AI
+  perspective, or when a caller explicitly delegates to agy. Do not select it for an
+  ordinary review or research request that does not need those capabilities. One-shot only.
 allowed-tools:
   - Bash
   - Read
@@ -31,10 +31,10 @@ official sources to update commands and reference files:
 
 The most authoritative source is the local binary itself — run `agy --help` and `agy changelog`.
 
-Use `WebFetch` or `mcp__exa__web_search_exa` to check for updates when:
+Use `WebFetch` or `mcp__exa__web_search_exa` to check for updates only when:
 - An `agy` command fails with an unknown flag error
-- The user mentions an antigravity feature not covered here
-- It has been a while since the skill was last updated
+- The user asks about an Antigravity feature not covered here
+- The user explicitly asks to verify this skill against upstream documentation
 
 > **Last verified**: 2026-05-22 (agy v1.0.1, print mode, default-model routing). Flags and output format confirmed empirically via `agy --help` and live one-shot calls.
 
@@ -155,6 +155,10 @@ There is no `-m` flag for one-shot mode. The model is whatever was last persiste
 ### One-Shot Only
 
 `agy -p` runs non-interactively and starts a fresh conversation each invocation. No follow-up questions, no conversation state. Craft your prompt to be complete and self-contained.
+
+After the command completes, read the captured result and report what it established. A
+one-shot review or research result is evidence for the caller; it does not authorize edits,
+shell work, or publication by Antigravity.
 
 ### Timeout
 

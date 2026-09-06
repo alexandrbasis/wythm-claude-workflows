@@ -1,11 +1,9 @@
 ---
 name: update-setup
 description: >-
-  Pull upstream workflow changes from claudops into a local .claude/ folder.
-  Uses a deterministic scan/report/apply engine, asks for approval before writes,
-  and only touches upstream-tracked workflow files. Use when asked to update setup,
-  pull workflow changes, sync claude config, update workflows, update skills,
-  check for updates, or update-setup.
+  Inspect or apply upstream claudops changes to a project's copied .claude/ workflow.
+  Use for claudops update checks, selected upstream adoption, or conflicts with local
+  workflow customizations. Installed plugin upgrades use the host's plugin manager.
 allowed-tools:
   - Read
   - Glob
@@ -18,29 +16,38 @@ allowed-tools:
 
 # Update Setup
 
-> **Announcement**: "Checking for upstream workflow updates from **claudops**..."
-
 Sync local `.claude/` workflow files with upstream claudops. The skill is
 upstream-driven: local-only user files are ignored unless they are explicitly tracked in
 the update manifest.
 
-## Hard Rules
+## Scope and authority
 
 - Start with the deterministic script. Do not classify diffs manually.
-- Ask for explicit approval before applying updates, refreshing disabled files, deleting
-  removed upstream files, branch creation, commit, push, or PR creation.
+- A check-only request ends at the report. Before applying updates, refreshing disabled
+  files or deleting removed upstream files, establish approval for the exact paths and
+  operations. Reuse approval already granted for that selection. Branch creation, commit,
+  push and PR creation require their own authorized scope; they are not update prerequisites.
 - Never update `.claude/settings.json`, `.claude/settings.local.json`, `CLAUDE.md`,
   hook logs, `.gitkeep`, or local-only `*.local.*` files through this skill.
 - Use LLM judgment only to explain conflicts and help the user choose a strategy after
   the script has produced exact statuses and diffs.
 
-## Script
+## Resolve the script and target
 
-Use:
+Resolve `scripts/update_setup.py` relative to this loaded skill, including when it is
+inside a plugin. Keep the consuming repository as the working directory. Set these
+shell variables to the actual resolved paths for the commands below:
 
 ```bash
-python3 .claude/skills/update-setup/scripts/update_setup.py --help
+CLAUDOPS_UPDATE_SCRIPT="/absolute/path/to/loaded/update-setup/scripts/update_setup.py"
+CLAUDOPS_TARGET="/absolute/path/to/target-repository"
+python3 "$CLAUDOPS_UPDATE_SCRIPT" --help
 ```
+
+The script's `--local-root` is a global option and belongs before `scan`, `apply`, or
+`verify`. Its local state belongs to the target repository; never point it at a managed
+plugin cache. An installed plugin upgrade is a separate operation through the host's
+plugin manager. Read the installed plugin's identifier before constructing that command.
 
 The script writes adoption state to:
 
@@ -68,14 +75,14 @@ Skipped scope:
 Create a deterministic report:
 
 ```bash
-python3 .claude/skills/update-setup/scripts/update_setup.py scan \
+python3 "$CLAUDOPS_UPDATE_SCRIPT" --local-root "$CLAUDOPS_TARGET" scan \
   --output .claudops-update-report.json
 ```
 
 For local testing against an existing upstream clone:
 
 ```bash
-python3 .claude/skills/update-setup/scripts/update_setup.py scan \
+python3 "$CLAUDOPS_UPDATE_SCRIPT" --local-root "$CLAUDOPS_TARGET" scan \
   --upstream-root /tmp/claudops-upstream-sync \
   --commit "$(git -C /tmp/claudops-upstream-sync rev-parse HEAD)" \
   --output .claudops-update-report.json
@@ -86,7 +93,7 @@ python3 .claude/skills/update-setup/scripts/update_setup.py scan \
 Render the report:
 
 ```bash
-python3 .claude/skills/update-setup/scripts/update_setup.py report \
+python3 "$CLAUDOPS_UPDATE_SCRIPT" --local-root "$CLAUDOPS_TARGET" report \
   --report .claudops-update-report.json
 ```
 
@@ -103,10 +110,10 @@ Explain statuses:
 If only `unchanged` and `placeholder_only` entries exist, report that the setup is up to
 date and stop.
 
-### 3. Ask for Approval
+### 3. Resolve the selection
 
-Ask which exact paths to update, refresh, or delete. Paths are relative to `.claude/`.
-Convert approval into a selection JSON file:
+Present the exact paths and operations for approval unless that selection is already
+authorized. Paths are relative to `.claude/`. Convert the approved selection into JSON:
 
 ```json
 {
@@ -134,26 +141,26 @@ Rules:
 After approval:
 
 ```bash
-python3 .claude/skills/update-setup/scripts/update_setup.py apply \
+python3 "$CLAUDOPS_UPDATE_SCRIPT" --local-root "$CLAUDOPS_TARGET" apply \
   --report .claudops-update-report.json \
   --selection /path/to/selection.json
 ```
 
-The apply step updates selected files and refreshes the lock manifest.
+The apply step updates selected files and refreshes the target repository's lock manifest.
+Use the source clone and local files from the reviewed scan. If either changes before
+application, rerun the scan and resolve any changed selection before writing.
 
 ### 5. Verify
 
 Run:
 
 ```bash
-python3 .claude/skills/update-setup/scripts/update_setup.py verify
+python3 "$CLAUDOPS_UPDATE_SCRIPT" --local-root "$CLAUDOPS_TARGET" verify
 ```
 
-When changing this skill itself, also run:
-
-```bash
-python3 .claude/skills/update-setup/tests/test_update_setup.py
-```
+When changing this helper or its command contract, run the `tests/test_update_setup.py`
+file adjacent to the loaded skill. A report or successful script exit alone does not
+prove the selected files were adopted: read back the result counts and destination hashes.
 
 ## Conflict Handling
 
@@ -182,8 +189,9 @@ After applying selected updates:
 ## Edge Cases
 
 - Clone failure: report the git error and stop.
-- Missing `.claude/`: tell the user to clone the workflow repo first or run `/setup`.
-- More than five `conflicting` files: warn this is a major update and suggest reviewing
-  upstream commits before applying.
+- Missing `.claude/`: route an authorized first configuration to `setup`; it can materialize
+  the bundled templates. A check-only request reports that there is no copied workflow.
+- Conflicts: show the affected paths and material changes. Group related conflicts for
+  review; the file count does not determine their severity.
 - Binary files: the script may copy them, but conflict explanation should avoid trying to
   summarize binary content.

@@ -147,9 +147,13 @@ criteria, and stop exploring once you have the context for the current step.
 2. **Commit (permission gate)**:
    - Ask permission **before** any git write (`commit`, branch create/switch, stash apply/drop,
      `push`, `rebase`, `merge`). Read-only inspection (`git status`, `git log`) is fine.
-   - Conventional commits with issue reference: code + tests `feat(scope): [summary]` + `Refs:
-     TEAM-123`; docs-only `docs(scope): update [doc name]` + `Refs: TEAM-123`. Tightly coupled doc
-     changes may share the code commit.
+   - Reuse explicit authorization already granted in the current task/session when it covers the
+     exact operation and scope; ask only for a new operation, destination, or unclear boundary.
+   - Conventional commits with issue reference: `feat(scope): [summary]` + `Refs: TEAM-123`;
+     docs-only `docs(scope): update [doc name]` + `Refs: TEAM-123`. Keep the RED-before-GREEN
+     evidence in the task document. A code-plus-tests commit is acceptable when repository review
+     policy permits it; when that policy requires test and implementation chronology, use separate
+     approved commits. Never manufacture commit history after the work.
 
 #### Self-verification (after each step)
 Verify your claims across **every** file and test touched in the step — not just the first:
@@ -164,7 +168,9 @@ Verify your claims across **every** file and test touched in the step — not ju
 
 ### Cleanup pass
 If the diff accumulated obvious slop, run a focused cleanup before the final quality gate:
-1. Invoke `/simplify` or do a targeted manual cleanup on changed files.
+1. Use the repository's available code-simplifier agent when one is discoverable, or do a targeted
+   manual cleanup on changed files. The cleanup is limited to debug logs, commented-out code,
+   redundant defensive checks, and dead imports; do not assume a `/simplify` skill exists.
 2. Re-run the relevant tests after any cleanup.
 3. Commit cleanup changes separately only with approval.
 

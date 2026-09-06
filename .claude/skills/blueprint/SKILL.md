@@ -1,8 +1,8 @@
 ---
 name: blueprint
 description: >-
-  Turn a one-line objective into a multi-session implementation plan with cold-start briefs.
-  Use when asked to 'blueprint', 'multi-session plan', 'long-term plan', 'construction plan',
+  Turn a one-line objective into a bounded multi-session implementation plan with cold-start
+  briefs. Use when asked to 'blueprint', 'multi-session plan', 'long-term plan', 'construction plan',
   'break into sessions', 'plan across sessions', 'multi-step project plan', 'session plan',
   or when a feature is too large for a single Claude session. Produces a plan where each step
   can be executed independently by a fresh agent with no prior context.
@@ -48,7 +48,10 @@ Context may be compacted mid-plan. If you sense the window tightening, write the
 3. Identify existing patterns to follow
 4. List unknowns and risks
 
-When the objective spans multiple codebase areas (e.g., backend + mobile + infra), spawn one Agent subagent per area in the same turn rather than reading sequentially. Each subagent returns its findings; you synthesize.
+When the objective spans independent codebase areas (e.g., backend + mobile + infra), you may
+spawn one Agent subagent per area in the same turn and synthesize the findings. Use this fan-out
+only when the areas can be explored independently and the caller has the required agent access;
+otherwise inspect the smallest relevant set in one pass.
 
 ### Phase 2: Design (create the dependency DAG)
 1. Break the objective into 3-8 implementation steps
@@ -82,8 +85,8 @@ For each step, produce:
 ### Acceptance Criteria
 - [ ] [Criterion 1 — testable/verifiable]
 - [ ] [Criterion 2]
-- [ ] All tests pass: `[specific test command]`
-- [ ] Type check passes: `{{TYPECHECK_CMD}}`
+- [ ] Relevant tests pass: `[specific test command]` or `Not applicable — plan artifact`
+- [ ] Type check passes: `[specific command]` or `Not applicable — plan artifact`
 
 ### Estimated Complexity
 [S / M / L] — [Brief justification]
@@ -102,6 +105,12 @@ After listing, verify against the checklist:
 3. **Ordering**: Are dependencies correctly captured? No circular dependencies?
 4. **Gaps**: Are there implicit steps (migrations, config changes, env setup) that should be explicit?
 5. **Rollback**: If step N fails, does it break steps 1..N-1?
+
+Finish the review before writing the final plan. A plan is complete when each step has detail
+appropriate to its horizon: steps executable next have self-contained cold-start briefs; later
+steps have a bounded objective, dependencies, scope, and acceptance/verification criteria that
+are sufficient for later refinement; and the review's risks, open questions, and rollback
+implications are recorded.
 
 ## Output
 
@@ -149,4 +158,4 @@ Step 1 ─── Step 2 ─── Step 4
 - **Cold-start briefs are self-contained** — a fresh agent reads only its step's brief and can begin work. If you find yourself about to reference "see Step 2", inline the information instead.
 - **Keep steps focused** — each step should be completable in a single session (1-3 hours of agent work)
 - **Plan to the level each step needs right now** — Steps 1–2 (starting soon) get full cold-start briefs. Steps 3+ get a one-paragraph objective and can be refined later. Stop adding detail once the next executor has enough to start.
-- **Output is a plan document, not code edits.** The deliverable is the blueprint file; `/si` executes each step in a later session. If the user asks you to "also start on step 1", respond with the plan first and offer to hand off to `/si` afterward.
+- **Output is a plan document, not code edits.** The deliverable is the blueprint file; `/si` executes each step in a later session. If the user explicitly authorized implementation in the same request, continue to the authorized `/si` handoff after saving the plan; otherwise stop at the saved plan and state the separate handoff.

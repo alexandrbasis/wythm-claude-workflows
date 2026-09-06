@@ -49,7 +49,11 @@ sequential is the safe choice.
 
 Before spawning any workers, verify:
 
-1. **Clean working tree**: `git status` must show no uncommitted changes. If dirty, ask the user to commit or stash first — parallel workers in worktrees branch from HEAD, so uncommitted changes would be lost.
+1. **Classify working-tree changes**: inspect `git status` before dispatch. If task files or required
+   inputs are dirty, do not send them to workers branched from `HEAD`; fall back to sequential
+   in-place execution or ask the user to preserve the changes. If only unrelated files are dirty,
+   leave them untouched and proceed with isolated workers. Never require an unrelated commit or
+   stash solely to use this optimization.
 2. **Task document exists**: The task doc must be readable and have identifiable work items.
 3. **Independence verified**: Confirm selected items don't share files. Quick check: list the expected file paths for each item and look for overlaps.
 
@@ -134,7 +138,10 @@ git merge <worktree_branch> --no-ff -m "feat(scope): implement criterion N"
 
 ### 4) Run validation
 
-After all patches are applied, run the project's quality checks. Detect the project area from the task:
+After all patches are applied, run the project's quality checks. Detect the project area and its
+working directory from the task and repository scripts before running commands; replace every
+placeholder and keep each package invocation in its own explicit cwd. Do not claim validation from
+an unresolved root-level command.
 
 **Project verification:**
 ```bash

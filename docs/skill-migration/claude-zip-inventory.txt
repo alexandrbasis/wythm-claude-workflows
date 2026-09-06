@@ -1,0 +1,77 @@
+Claudops (claudops) 1.0.0
+  Description: Workflow skills and review agents for planning, implementation, review, and delivery.
+  Source: claudops@inline
+
+Component inventory
+  Skills (40)  analyze, antigravity-cli, architecture-language, blueprint, brainstorm, cc-linear, code-analysis, codex-cli, coding-conventions, ct, cursor-cli, dbg, deep-research, design-exploration, dev-server, fci, finisher, git-guardrails, grill-me, improve-codebase-architecture, nf, parallelization, ph, prc, product, qa, quick, review-conventions, rip, sbs, setup, si, sr, tdd, triage-issue, ubiquitous-language, udoc, update-setup, vp, zoom-out
+  Agents (18)  comprehensive-researcher, structural-quality-reviewer, automated-quality-gate, task-splitter, docs-updater, spec-compliance-reviewer, task-decomposer, security-code-reviewer, senior-architecture-reviewer, developer-agent, documentation-accuracy-reviewer, performance-reviewer, integration-test-runner, code-quality-reviewer, changelog-generator, create-pr-agent, test-coverage-reviewer, plan-reviewer
+  Hooks (0)
+  MCP servers (0)
+  LSP servers (0)
+
+Projected token cost
+  Always-on:   ~5,321 tok   added to every session
+
+Per-component (rounded)
+  component                        always-on  on-invoke
+  rip                                   ~100      ~1.2k
+  dev-server                            ~230      ~2.2k
+  udoc                                   ~70        ~1k
+  codex-cli                             ~110      ~2.2k
+  fci                                    ~60      ~1.5k
+  triage-issue                          ~100      ~1.5k
+  brainstorm                            ~130        ~2k
+  nf                                    ~130      ~1.9k
+  ubiquitous-language                   ~110      ~1.8k
+  cc-linear                             ~230      ~1.9k
+  ct                                    ~110        ~3k
+  design-exploration                    ~100      ~1.4k
+  deep-research                         ~100      ~1.5k
+  update-setup                           ~70      ~1.7k
+  dbg                                   ~140      ~1.6k
+  setup                                  ~50      ~1.3k
+  improve-codebase-architecture         ~100      ~1.4k
+  quick                                  ~90      ~1.4k
+  qa                                    ~110      ~1.6k
+  product                               ~130      ~4.1k
+  architecture-language                  ~80       ~510
+  code-analysis                         ~110      ~1.9k
+  vp                                    ~190      ~2.2k
+  coding-conventions                     ~30       ~910
+  zoom-out                               ~70       ~350
+  sr                                     ~90      ~3.3k
+  ph                                     ~80      ~1.7k
+  si                                    ~140      ~3.1k
+  git-guardrails                         ~80        ~1k
+  antigravity-cli                        ~90      ~2.4k
+  sbs                                   ~170      ~2.8k
+  prc                                    ~80      ~1.3k
+  analyze                               ~120      ~1.6k
+  parallelization                        ~90      ~2.1k
+  review-conventions                     ~30        ~1k
+  cursor-cli                            ~130      ~1.8k
+  tdd                                    ~90        ~2k
+  grill-me                               ~50       ~920
+  finisher                              ~160      ~4.8k
+  blueprint                             ~120      ~1.7k
+  comprehensive-researcher               ~90       ~770
+  structural-quality-reviewer           ~100      ~1.6k
+  automated-quality-gate                 ~90      ~1.7k
+  task-splitter                          ~50      ~1.8k
+  docs-updater                           ~20       ~790
+  spec-compliance-reviewer               ~50      ~1.5k
+  task-decomposer                        ~60      ~1.9k
+  security-code-reviewer                 ~60      ~1.3k
+  senior-architecture-reviewer           ~90      ~2.2k
+  developer-agent                        ~90      ~2.2k
+  documentation-accuracy-reviewer        ~50      ~1.1k
+  performance-reviewer                   ~70      ~1.1k
+  integration-test-runner                ~40      ~2.4k
+  code-quality-reviewer                  ~40      ~1.3k
+  changelog-generator                    ~30      ~1.1k
+  create-pr-agent                        ~60      ~2.3k
+  test-coverage-reviewer                 ~50        ~1k
+  plan-reviewer                          ~50      ~1.3k
+
+  On-invoke cost is paid each time a skill or agent fires.
+  Token counts are estimates and may differ from actual usage.

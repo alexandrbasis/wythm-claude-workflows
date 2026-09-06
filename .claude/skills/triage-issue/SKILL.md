@@ -16,6 +16,10 @@ allowed-tools: [Read, Grep, Glob, Bash, Task, Skill, AskUserQuestion]
 
 Investigate a reported problem, find the root cause, and create a tracker issue with a TDD fix plan. **This skill does NOT apply the fix** — it produces a durable, grabbable issue that `/si` or another agent can pick up later.
 
+The request to triage and file authorizes one issue write in the resolved tracker destination.
+If the user asks for diagnosis or a draft only, choose the "Skip — output the body only" path
+and do not create an issue. Resolve the tracker and repository/team before creating anything.
+
 ## Process
 
 ### 1. Capture the problem
@@ -50,7 +54,7 @@ Load `product-docs/UBIQUITOUS_LANGUAGE.md` if it exists — use its terms in the
 Based on investigation, determine:
 
 - The minimal change needed to fix the root cause
-- Which modules/interfaces are affected (use `architecture-language/LANGUAGE.md` vocabulary — module, interface, seam)
+- Which modules/interfaces are affected (use `.claude/skills/architecture-language/LANGUAGE.md` vocabulary — module, interface, seam)
 - What behaviors need to be verified via tests
 - Whether this is a regression, missing feature, or design flaw
 
@@ -73,7 +77,7 @@ Rules:
 
 If this repo uses Linear (look for `cc-linear` config / Linear references in recent issues / `LINEAR_TEAM_ID` in env), invoke `/cc-linear` to file the issue. Otherwise use `gh issue create`.
 
-If unclear, ask once: `AskUserQuestion`: "File via Linear or GitHub Issues?" Options: "Linear" / "GitHub" / "Skip — output the body only".
+If unclear, ask once: `AskUserQuestion`: "File via Linear or GitHub Issues?" Options: "Linear" / "GitHub" / "Skip — output the body only". Keep that destination for the issue and do not silently switch trackers.
 
 ### 6. Create the issue
 
@@ -125,6 +129,12 @@ Pick up with `/si <this issue>` to implement.
 ```
 
 After creating the issue, print the issue URL and a one-line summary of the root cause.
+
+## Completion
+
+The triage is complete when the root cause, behavior-level TDD plan, acceptance criteria, and
+handoff are present in the issue body and a URL is printed. In body-only mode, return the same
+complete body and label it unfiled. A diagnosis or proposed plan alone is not a created issue.
 
 ## Scope boundaries
 

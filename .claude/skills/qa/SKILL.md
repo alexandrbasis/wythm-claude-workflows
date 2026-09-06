@@ -16,6 +16,11 @@ allowed-tools: [Read, Grep, Glob, Bash, Task, Skill, AskUserQuestion]
 
 Run an interactive QA session. The user describes problems they're encountering. You clarify lightly, explore the codebase for context, and file tracker issues that are durable, user-focused, and use the project's domain language. **No fixes applied.**
 
+A request to run QA or file the reported bugs authorizes issue creation in the tracker selected
+for this session. If the user asks only for an audit, summary, or draft bodies, stop before the
+tracker write. Resolve the repository/team destination before the first issue and keep it fixed
+for the session.
+
 ## Pick the tracker once, at the start
 
 Detect Linear (look for `cc-linear` config / `LINEAR_TEAM_ID` / Linear references in recent issues) vs GitHub Issues. If ambiguous, ask once: `AskUserQuestion`: "File via Linear or GitHub Issues for this session?" — then keep that choice for the whole session.
@@ -59,7 +64,7 @@ Before filing, decide whether this is a **single issue** or a **breakdown** into
 
 ### 4. File the issue(s)
 
-Use `gh issue create` or invoke `/cc-linear` (whichever was picked at the start). **Do NOT ask the user to review first** — file and share URLs.
+Use `gh issue create` or invoke `/cc-linear` (whichever was picked at the start). **Do NOT ask the user to review first** — file and share URLs. If the create operation fails, report the failure and do not claim that an issue was filed.
 
 #### Single-issue template
 
@@ -143,3 +148,9 @@ Keep going until the user says they're done. Each issue is independent — don't
 | `/dbg` | Interactive single-bug debug, may fix | Fixed bug or hypothesis |
 | `/triage-issue` | Single bug → root cause + TDD plan, no fix | One tracker issue |
 | `/qa` | Multiple bugs reported conversationally, no fix | Multiple tracker issues, possibly with blocker links |
+
+## Completion
+
+For each reported bug, finish with either the created issue URL and its blocker relationships,
+or an explicit creation failure. Keep asking for the next issue until the user says the session
+is done; a code exploration or drafted issue body is not a filed issue.

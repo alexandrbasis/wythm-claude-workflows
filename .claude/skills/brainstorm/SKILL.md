@@ -1,7 +1,7 @@
 ---
 name: brainstorm
 description: >-
-  Collaborative brainstorming session on any topic — project-related or general.
+  Compare options and clarify a decision through a collaborative brainstorming session.
   Use when asked to 'brainstorm', 'let's brainstorm', 'explore ideas', 'think through',
   'brainstorm about [topic]', 'what are our options for', 'let's think about',
   'pros and cons of', 'help me decide', or 'weigh the options'.
@@ -59,10 +59,13 @@ Brainstorms vary widely in scope. Quickly assess what kind of session this is �
 
 ### Step 2: Context Gathering (Adaptive)
 
-Context gathering is not a blocking gate, but for project-related topics you must ground the conversation in real code before proposing options. At minimum, read `CLAUDE.md` and skim the 1–2 files most directly named in the topic before Step 3. Pull in more context as specific areas become relevant. For general (non-project) topics, skip this step entirely.
+Context gathering is not a blocking gate. For a project-related topic, inspect `CLAUDE.md`
+and only the files needed for the named area before proposing options; if the topic does not
+identify a code area, ask for that context or keep the discussion at product level. Pull in
+more context as a specific branch requires it. For general topics, skip this step entirely.
 
 **For project-related topics:**
-- If the topic clearly touches existing code, invoke the `design-exploration` skill to scan the codebase
+- If the topic clearly touches existing code and codebase evidence affects the choice, invoke the `design-exploration` skill to scan the relevant area
 - If the scope is unclear, start with the brainstorm conversation and invoke design-exploration later when specific areas of the codebase become relevant
 
 **For general topics:**
@@ -95,9 +98,9 @@ The core of the brainstorm. Adapt the depth to the calibration from Step 1.
 Present ideas in tight, self-contained sections sized to the calibration from Step 1 — shorter for Quick Decision, longer for Deep Dive. Pause to validate understanding between sections. Be ready to pivot if direction changes.
 
 **Completion signals** — the brainstorm is "done" when:
-- For Quick Decision: user has enough info to decide
-- For Exploration: all major angles have been discussed and user confirms
-- For Deep Dive: all question categories explored, user has no more "what about..." questions
+- For Quick Decision: a recommendation, alternatives, and trade-offs are stated and the user has enough information to choose or defer
+- For Exploration: the major decision angles are covered, conclusions and unresolved questions are captured, and the user confirms
+- For Deep Dive: each selected question category is covered, remaining uncertainty is explicit, and the user has no more material "what about..." questions
 
 ### Step 4: Research (When Needed)
 

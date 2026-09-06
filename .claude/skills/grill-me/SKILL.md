@@ -64,3 +64,7 @@ without editing):
 - Hidden assumptions uncovered
 - Wording fixes or ambiguity reductions
 - Remaining risks or blockers
+
+Return this summary after the stop condition is met. Keep the review read-only unless the
+caller explicitly authorizes editing the reviewed artifact; a recommendation or a completed
+question round is not itself permission to change the plan.

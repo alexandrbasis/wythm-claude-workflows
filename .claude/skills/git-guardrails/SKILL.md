@@ -29,9 +29,9 @@ Add the following entry to the `Bash`-matcher hooks array in `.claude/settings.j
 
 Place it first in the array for fail-fast (so dangerous commands are rejected before logging/validation hooks fire). Remove the DISABLED banner at the top of the script.
 
-## What's blocked
+## What's blocked when wired
 
-Active out of the box (no configuration needed):
+Once the hook is wired, it blocks these operations without additional configuration:
 
 - `git push` — any variant. The user pushes manually after reviewing the diff/PR.
 - `git branch -D` / `git branch --delete -f` — force-delete branches discards unmerged work.
@@ -46,6 +46,9 @@ Already covered by the sibling `bash-guard.sh` (universal rules, always-active s
 - `curl | sh` / `wget | bash`
 
 When blocked, Claude sees `BLOCKED: …` on stderr with exit 2 and stops — the user runs the command manually if intended.
+
+This skill documents and verifies the optional hook; do not change `settings.json`, enable the
+hook, or remove a pattern unless the user explicitly requests that configuration change.
 
 ## Verify it's wired
 

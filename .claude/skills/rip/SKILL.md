@@ -1,7 +1,7 @@
 ---
 name: rip
 description: >-
-  Review implementation plan for business value alignment. Use when asked to
+  Review a technical implementation plan for business-value alignment and scope fit. Use when asked to
   'review my plan', 'walk through implementation', 'check plan against PRD',
   'review technical decomposition', or 'is my plan aligned with requirements'.
   NOT for code review (use /sr), NOT for creating tasks (use /ct),
@@ -29,7 +29,7 @@ Before responding:
    - Risks or dependencies identified?
    - Each step ties to a user-facing outcome?
 4. Determine business value of each step
-5. If plan is ambiguous or missing context — use AskUserQuestion to clarify before proceeding
+5. If an ambiguity or missing context would change the review, use AskUserQuestion to clarify; otherwise state the review assumption and continue.
 
 Record mismatches (extra features, missed requirements, logic conflicts) for discussion. Frame each as **facts + question** rather than a verdict — the plan author knows the product context you don't, and a question invites a fix instead of a defense.
 
@@ -45,7 +45,7 @@ Record mismatches (extra features, missed requirements, logic conflicts) for dis
 **Warnings (include uncertain ones with confidence tag):**
 - [Problem] — contradicts [source]
 
-Ready for first step?
+Begin the walkthrough after the overview unless a material ambiguity needs user input.
 ```
 
 ### Phase 2: Walkthrough
@@ -129,3 +129,10 @@ Questions? Next?
 | Create implementation plan | `/ct` |
 | Analyze code architecture | `/code-analysis` |
 | Create/update PRD or JTBD | `/product` |
+
+## Completion
+
+The review is complete when every plan step has been walked through, each material mismatch
+or uncertainty is recorded with a confidence tag and a question, and the summary self-check is
+present. This is a read-only review; a warning or a user checkpoint does not authorize plan or
+code edits.

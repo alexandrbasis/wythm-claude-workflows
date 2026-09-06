@@ -60,16 +60,22 @@ RIGHT (vertical):
 
 Before writing any code:
 
-- [ ] Confirm with user what interface changes are needed
-- [ ] Confirm with user which behaviors to test (prioritize)
+- [ ] Use the approved task/decomposition as the authority for interface changes and test priorities
+      when this skill is invoked from `/si` or `/si-quick`; ask only about missing or materially
+      changed decisions
+- [ ] If no approved task/decomposition exists, confirm with the user what interface changes and
+      behavior priorities are needed
 - [ ] Identify opportunities for [deep modules](deep-modules.md) (small interface, deep implementation)
 - [ ] Design interfaces for [testability](interface-design.md)
 - [ ] List the behaviors to test (not implementation steps)
-- [ ] Get user approval on the plan
+- [ ] Get user approval on the plan when no approved task/decomposition exists or a material decision changed
 
 Ask: "What should the public interface look like? Which behaviors are most important to test?"
+Use that question only when the invoking workflow has not already answered it.
 
-**You can't test everything.** Confirm with the user exactly which behaviors matter most. Focus testing effort on critical paths and complex logic, not every possible edge case.
+**You can't test everything.** When an approved task/decomposition already sets priorities, use
+those priorities. Otherwise confirm with the user which behaviors matter most before coding. Focus
+testing effort on critical paths and complex logic, not every possible edge case.
 
 ### 2. Tracer bullet
 
@@ -124,7 +130,10 @@ After all tests pass, look for [refactor candidates](refactoring.md):
 
 - `/si` and `/si-quick` defer to this skill for the canonical TDD discipline.
 - `developer-agent` enforces vertical slicing during implementation.
-- `senior-architecture-reviewer` verifies TDD compliance via git history (test commits precede implementation commits).
+- Reviewers may use git history as supporting evidence when available, but commit chronology alone
+  cannot prove that RED was observed. Report chronology as unverifiable when history is absent or
+  when tests and implementation were intentionally coupled under repository policy; the behavioral
+  RED-before-GREEN invariant still applies.
 
 ## Common Rationalizations
 

@@ -112,16 +112,19 @@ Present failures to user. Work with user to resolve, or revert changes if needed
 1. Stage changed files with `git add` (specific files only)
 2. **Ask user permission** before committing
 3. Create a focused commit: `fix: address PR review feedback`
-4. Push to update the PR
+4. Ask for explicit push authorization unless the user's request already authorizes pushing, then push to update the PR
 
 ### Step 2: Reply to Comments
 
-For each addressed comment:
-- Reply with a brief description of what was done (1-2 sentences)
-- Use `gh api repos/{owner}/{repo}/pulls/comments/{comment_id}/replies -f body="..."` to reply
+Prepare a reply draft for each addressed comment:
+- Describe what was done in 1–2 sentences
+- Include the target comment and the verification result
+
+Send replies only when the user explicitly requested reviewer communication or approves the prepared
+reply set. A code-fix request alone authorizes the local change, not external messages.
 
 For skipped comments:
-- Reply explaining why respectfully
+- Draft a respectful explanation; send it under the same explicit communication gate
 
 **Error — gh API reply fails:**
 Report the error and suggest manual reply via GitHub UI.

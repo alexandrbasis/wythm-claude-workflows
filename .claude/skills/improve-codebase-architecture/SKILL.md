@@ -1,12 +1,11 @@
 ---
 name: improve-codebase-architecture
 description: >-
-  Find deepening opportunities in a codebase — refactors that turn shallow
-  modules into deep ones for better testability and AI-navigability. Use when
-  the user wants to improve architecture, find refactoring opportunities,
-  consolidate tightly-coupled modules, or make a codebase more testable.
-  NOT for code review before merge (use /sr). NOT for spec/requirement gaps
-  (use /ct). Reads but does not write code.
+  Explore a codebase for architectural deepening opportunities: refactors that turn
+  shallow modules into deeper ones with better testability and locality. Use when the
+  user explicitly asks for architecture improvement, refactoring opportunities, or
+  coupled-module analysis. Do not use for pre-merge review (use /sr) or spec gaps (use
+  /ct). Read-only; it does not write code.
 allowed-tools: [Read, Grep, Glob, Bash, Task, Skill]
 ---
 
@@ -30,16 +29,18 @@ Key principles (full list in `architecture-language/LANGUAGE.md`):
 
 ### 1. Explore
 
-Read existing context first:
+Read only the context relevant to the target area:
 
-- `product-docs/UBIQUITOUS_LANGUAGE.md` — domain terms (use them when naming candidates)
-- `product-docs/PRD/*.md` and `product-docs/JTBD/*.md` — which features are load-bearing
-- Any active `tasks/task-*/tech-decomposition-*.md` — recent decisions in the area
-- `CLAUDE.md` and `{{DOCS_DIR}}/project-structure.md` — architecture conventions
+- If `product-docs/UBIQUITOUS_LANGUAGE.md` exists, use it for candidate names.
+- Read PRD, JTBD, or active task decomposition documents only when they cover the target
+  area or a decision needed to assess it.
+- Read `CLAUDE.md`, `AGENTS.md`, or a project-structure document only when discovered and
+  relevant to the architecture under review.
 
 If any of these are missing, proceed silently — don't flag absence or suggest creating them upfront.
 
-Then use the `Explore` agent (subagent_type=Explore) to walk the codebase. Don't follow rigid heuristics — explore organically and note where you experience friction:
+Then use the `Explore` agent (subagent_type=Explore) to walk the codebase. Note where you
+experience friction rather than scanning unrelated areas:
 
 - Where does understanding one concept require bouncing between many small modules?
 - Where are modules **shallow** — interface nearly as complex as the implementation?
@@ -69,9 +70,15 @@ Once the user picks a candidate, drop into a grilling conversation (invoke `/gri
 
 Side effects happen inline as decisions crystallize:
 
-- **Naming a deepened module after a concept not in `UBIQUITOUS_LANGUAGE.md`?** Add the term via `/ubiquitous-language` right there.
+- **Naming a deepened module after a concept not in `UBIQUITOUS_LANGUAGE.md`?** If the
+  caller authorized glossary updates, add the term via `/ubiquitous-language`; otherwise
+  report the proposed term for a separately authorized update.
 - **Want to explore alternative interfaces for the deepened module?** See [INTERFACE-DESIGN.md](INTERFACE-DESIGN.md).
-- **User rejects the candidate with a load-bearing reason?** Note it in the relevant `tasks/` doc or `product-docs/` so future architecture passes don't re-suggest the same thing. Skip ephemeral reasons ("not worth it right now") and self-evident ones.
+- **User rejects the candidate with a load-bearing reason?** If the caller authorized a
+  durable documentation update, note it in the relevant `tasks/` doc or `product-docs/` so
+  future architecture passes don't re-suggest it; otherwise report the reason for a
+  separately authorized update. Skip ephemeral reasons ("not worth it right now") and
+  self-evident ones.
 
 ### 4. Output
 
