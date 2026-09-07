@@ -24,6 +24,11 @@ The investigate-then-fix ordering exists because guessed fixes mask
 bugs that reappear in production; logged-and-verified fixes do not.
 Instrument, reproduce, analyze, confirm, and only then edit.
 
+Resolve the task with `../setup/references/task-context.md` before instrumentation. Keep the
+project-relative debug log for runtime evidence, link it (and any bug report) from the selected task
+record, and record the root cause, verification result, current state, and next action there. A
+standalone read-only diagnosis may return a proposed path without creating a task file.
+
 ## Configuration
 
 ### Log Path
@@ -123,16 +128,19 @@ Ask user to reproduce again. Compare pre-fix vs post-fix logs:
 - Confirm the bug is resolved with log evidence
 
 ### Step 8: Bug Report (if warranted)
-For non-trivial bugs (logic errors, race conditions, architectural issues), create a bug report:
+For non-trivial bugs (logic errors, race conditions, architectural issues), create a bug report only
+when it has an independent review/tracker purpose; otherwise keep the root cause in the selected task
+record:
 - Template: `.claude/docs/templates/bug-report-template.md`
-- Output: `tasks/task-YYYY-MM-DD-[bug-name]/bug-report-[bug-name].md`
+- Output: `<resolved-task-root>/bug-report-[bug-name].md` (preserve an existing legacy path)
 
 Skip for trivial fixes (typos, missing imports, config errors) — a good commit message suffices.
 
 ### Step 9: Cleanup + Summary
 After verified success:
 - Remove all `#region dbg` / `#endregion` instrumentation blocks
-- Summarize: root cause, fix applied, and verification result (1–3 lines)
+- Summarize root cause, fix applied, verification result, linked artifacts, and next action in the
+  selected task record (1–3 lines in the user-facing response).
 
 ## Scope Boundaries
 

@@ -7,29 +7,23 @@ description: "Internal reference skill — coding standards and patterns for dev
 
 Shared knowledge preloaded into developer agents. Follow these when implementing features.
 
-## Tech Stack
+## Project context
 
-- **Framework**: {{FRAMEWORK}}
-- **ORM**: {{ORM}}
-- **Auth**: {{AUTH}}
-- **Testing**: {{TEST_FRAMEWORK}} — `{{TEST_CMD}}`
-- **Language**: {{LANGUAGE}}
-- **Architecture**: {{ARCHITECTURE}}
-- **Docs reference**: `{{DOCS_DIR}}`
-
-## Architecture Layers
-
-{{LAYERS}}
-
-{{LAYER_RULES}}
+This is a portable reference, not a generated project profile. Before making a
+project-specific choice, read an applicable `CLAUDOPS.md` and inspect the
+repository's manifests, source layout, CI configuration, and existing code.
+Use the project's own framework, language, layers, test runner, and commands;
+unknown values stay explicit until evidence is available. Do not treat
+`{{...}}` markers as commands or fill them with guesses. Preserve existing
+local conventions when no profile is present.
 
 ## Code Style
 
 - Match the project's existing type/interface conventions — new code should look
   like it was written by the same person as the surrounding code.
-- Use proper types instead of `any`. `any` hides type errors that only surface at
-  runtime, which is the failure mode our type system exists to prevent.
-- Drop the `_` prefix on unused vars unless the project's lint config requires it.
+- Preserve the project's type and naming conventions. Apply language-specific
+  rules (including `any`, underscore prefixes, or equivalent) only when the
+  language tooling or local style establishes them.
 - Route secrets through config providers only — never hardcoded, never logged
   (logs ship to observability tools; hardcoded secrets leak via git history).
 - Keep DTOs aligned with API schemas and the tech-decomposition's acceptance
@@ -40,10 +34,10 @@ Shared knowledge preloaded into developer agents. Follow these when implementing
 ## Testing
 
 - **TDD**: RED → GREEN → REFACTOR — vertical slices only (one RED→GREEN per behavior). Canonical: `.claude/skills/tdd/SKILL.md`.
-- Run tests: `{{TEST_CMD}}`
-- Lint: `{{LINT_CMD}}`
-- Types: `{{TYPECHECK_CMD}}`
-- Test patterns reference: `{{TEST_DIR}}`
+- Discover test, lint, and type-check commands from the project manifest, CI,
+  profile, or documented scripts. If a check has no supported command, report
+  it as unavailable rather than executing a placeholder.
+- Find test files from the repository's actual layout and naming patterns.
 - Arrange-Act-Assert pattern, descriptive test names
 - Proper mocking of data-access layer in unit tests
 
@@ -51,6 +45,8 @@ Shared knowledge preloaded into developer agents. Follow these when implementing
 
 - Start by reading the task document — it's the source of truth for what to build,
   and implementation choices should flow from it rather than from prior assumptions.
+- Resolve the task through `../setup/references/task-context.md` when this is a
+  task-attached run; standalone implementation guidance does not create a synthetic task.
 - Write the minimum code that makes the tests pass and the acceptance criteria
   hold. Don't add features, abstractions, or cleanup that weren't asked for.
 - Bug fixes don't need surrounding refactors — fix the bug, leave the rest.

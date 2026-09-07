@@ -2,6 +2,12 @@
 
 Detailed commands for project-specific code analysis. Read this when analyzing the project codebase.
 
+These blocks are templates, not executable defaults. Resolve every path, extension,
+configuration file and command from the repository, CI or project profile before running
+anything; never execute a literal `{{...}}` token. If a value cannot be evidenced, skip
+that check and record the reason in the report. Adapt language-specific filters to the
+detected stack.
+
 ## Generic Codebase Metrics
 
 These checks work for any project.

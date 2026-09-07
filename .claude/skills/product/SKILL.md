@@ -14,7 +14,11 @@ allowed-tools: Read, Write, Edit, Grep, Glob, AskUserQuestion, Task, Skill
 
 # Product Documentation
 
-> **Announcement**: Begin with: "I'm using the **product** skill for product documentation creation."
+## Shared task context
+For a feature-related request, resolve the repository and any linked task with
+[`../setup/references/task-context.md`](../setup/references/task-context.md). Product docs are
+long-lived repo-level inputs; link them from the task record rather than copying them into a task.
+Create/update a task record only when the product work is part of an active feature objective.
 
 ## Objective
 Create standalone JTBD or PRD documents through a structured interview, evidence-aware research, and pressure-testing process. The output should be readable without extra verbal context.
@@ -57,7 +61,7 @@ Treat the templates as **output contracts** — the interview gathers exactly th
 
 **For PRD**: Check whether an existing JTBD already exists in `product-docs/JTBD/JTBD-*[feature-name]*.md`. If it does, load it as input context — the PRD builds on the JTBD.
 
-**Load shared glossary**: If `product-docs/UBIQUITOUS_LANGUAGE.md` exists, read it and use its terms verbatim during the interview. If a domain term in this conversation conflicts with the glossary, flag the conflict immediately rather than silently drifting. If the glossary is missing or thin and new domain terms come up, plan to invoke `/ubiquitous-language` after the grill round (Step 4 → Step 5 transition).
+**Load shared glossary**: If `product-docs/UBIQUITOUS_LANGUAGE.md` exists, read it and use its terms verbatim during the interview. If a domain term in this conversation conflicts with the glossary, flag the conflict immediately rather than silently drifting. If the glossary is missing or thin and new domain terms come up, propose the terms and update only after explicit authorization.
 
 ### Step 1: Context Gathering & Design Exploration
 
@@ -73,7 +77,8 @@ When invoking, ask it to return:
 
 For product documentation, prefer fit, constraints, and risks over implementation decomposition.
 
-**Checkpoint:** Present findings summary. `AskUserQuestion`: "Does this context align with what you're building?" Options: "Yes, continue" / "I have corrections" / "Skip codebase context"
+Record only material corrections or constraints in the task context; continue without a checkpoint
+when the evidence does not change the product direction.
 
 ### Step 2: Research
 
@@ -99,7 +104,8 @@ Only when findings materially affect the job statement, scope boundaries, or req
 **JTBD research focus**: switching behavior, competitive alternatives being "hired" today, outcome benchmarks, user job patterns
 **PRD research focus**: how similar products solve this problem (with specific examples), feature specifications, success metrics benchmarks, UX patterns
 
-**Checkpoint:** Present research summary. `AskUserQuestion`: "Key findings reviewed. Ready for interview?" Options: "Continue to interview" / "Research a specific topic further"
+If research was run, summarize the decision-changing findings before the interview; ask a follow-up
+only when a missing source would change the product decision.
 
 ### Step 3: Deep-Dive Interview
 
@@ -170,7 +176,11 @@ Drive the conversation section-by-section toward filling the template. Batch que
 
 ---
 
-Aim for 3-5 rounds total per document. After round 5, present what's still unclear and ask the user: "continue interviewing" / "mark unknowns and proceed to grill". Use `AskUserQuestion` with multiple-choice options when there are clear alternatives — it's faster than free-text for both sides. Challenge assumptions: when an answer is confident but under-specified, name the gap ("You said X — how would that work for case Y?") instead of accepting at face value.
+Use as few interview rounds as needed to fill material product decisions. When a remaining answer
+would change scope or success criteria, ask; otherwise mark the uncertainty and continue to grill.
+Use `AskUserQuestion` with multiple-choice options when there are clear alternatives. Challenge
+confident but under-specified answers by naming the gap ("You said X — how would that work for case
+Y?").
 
 ### Step 4: "Grill Me" Challenge Round
 
@@ -197,7 +207,11 @@ Aim for 3-5 rounds total per document. After round 5, present what's still uncle
 **After the grill session completes:**
 Incorporate findings. Tighten unclear wording, scope boundaries, hidden assumptions.
 
-**Update shared glossary** (before writing the doc): if the grill or interview surfaced new domain terms, ambiguous synonyms, or sharpened a fuzzy term, invoke `/ubiquitous-language` to update `product-docs/UBIQUITOUS_LANGUAGE.md`. The PRD/JTBD then uses canonical terms — and downstream `/ct` and `/si` inherit the same vocabulary.
+**Shared glossary** (before writing the doc): if the grill or interview surfaced new domain terms,
+ambiguous synonyms, or a sharpened fuzzy term, load `/ubiquitous-language`; update
+`product-docs/UBIQUITOUS_LANGUAGE.md` only when authorized, otherwise record the proposed terms in
+the task context. The PRD/JTBD uses canonical terms when available, and downstream `/ct` and `/si`
+inherit the linked glossary.
 
 **Checkpoint:** `AskUserQuestion`: "How should we proceed?" Options: "Proceed to document writing" / "Revisit based on grill findings" / "Cut scope based on findings"
 
@@ -228,9 +242,12 @@ The skill initialization step loads each validator's CLI contract, so invented C
 
 Two phases — initialization (sequential), then review (parallel):
 
-Phase 1 — Initialization. Invoke `/codex-cli`, then `/antigravity-cli`, then `/cursor-cli` in separate turns. Each skill loads its CLI contract into runtime state, so they must run serially.
+Phase 1 — Initialization. Use only the configured validator skills that are available. If a
+validator requires initialization, initialize it before its review; otherwise continue with the
+available set. A missing optional validator is recorded as skipped.
 
-Phase 2 — Review. In a single assistant turn, dispatch all three validator runs as parallel tool calls. The three reviews are independent — sequential execution only adds latency. If one validator is unavailable, dispatch the other two anyway.
+Phase 2 — Review. Dispatch available independent validator runs in parallel. If none are available,
+record `SKIPPED` with the reason; do not block the product document or claim validation passed.
 
 Format output per `.claude/docs/templates/cross-ai-protocol.md` (comparison table, validation, verdict).
 
@@ -251,6 +268,9 @@ required sections are filled or explicitly marked for clarification, the relevan
 decision and citations are recorded, and cross-AI validation is appended when available and not
 skipped. For a PRD, create the companion JTBD only when the stated evidence requirements are
 met. An interview summary or validation preview does not replace the document write.
+
+If this product document belongs to an active task, update the resolved task record with the
+document link, evidence/validation status, and next action; do not copy the PRD/JTBD contents there.
 
 ## Output
 - JTBD: `product-docs/JTBD/JTBD-[feature-name].md`

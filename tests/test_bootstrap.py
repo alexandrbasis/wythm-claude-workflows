@@ -1,8 +1,10 @@
 """Exercise setup's project boundary using disposable source and target trees."""
 
 import importlib.util
+from contextlib import chdir
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 
@@ -96,6 +98,22 @@ class BootstrapTests(unittest.TestCase):
         path.write_text("template")
         bootstrap_project.bootstrap(source, self.project, True)
         self.assertEqual((self.project / ".claude/skills/example/SKILL.md").read_text(), "template")
+
+    def test_template_root_uses_source_or_bundle_independently_of_consuming_cwd(self):
+        source_script = self.source / "skills/setup/scripts/bootstrap_project.py"
+        source_script.parent.mkdir(parents=True)
+        source_script.write_text("# source fixture\n")
+        bundled_setup = self.root / "package/skills/setup"
+        bundled_script = bundled_setup / "scripts/bootstrap_project.py"
+        bundled_script.parent.mkdir(parents=True)
+        bundled_script.write_text("# package fixture\n")
+        bundled_source = bundled_setup / "assets/workflow/.claude"
+        bundled_source.mkdir(parents=True)
+        for script, expected in ((source_script, self.source), (bundled_script, bundled_source)):
+            with self.subTest(script=script), chdir(self.project):
+                with patch.object(bootstrap_project, "__file__", str(script)):
+                    self.assertEqual(bootstrap_project.template_root(), expected.resolve())
+        self.assertFalse((self.project / ".claude").exists())
 
 
 if __name__ == "__main__":

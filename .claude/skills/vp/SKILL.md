@@ -15,7 +15,11 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Skill, AskUserQuestion
 
 # Visual Prototype Command
 
-> **Announcement**: Begin with: "I'm using the **vp** skill for visual prototype creation."
+## Shared task context
+Resolve the repository and task with
+[`../setup/references/task-context.md`](../setup/references/task-context.md). Reuse the linked
+discovery/plan and task entrypoint; create the prototype only when visual validation is useful or
+explicitly requested. Link the playground and approval sidecar from the task record.
 
 ## Purpose
 
@@ -35,9 +39,9 @@ Works for both UI-facing tasks (mobile/web screen mockups) and backend tasks (ar
 
 ## GATE 0: Task Discovery
 
-1. **Locate task directory:**
-   - If argument provided: match against `tasks/task-YYYY-MM-DD-*[argument]*/`
-   - If no argument: list recent task directories, ask user to select
+1. **Locate task directory:** use the shared resolver. An explicit path or linked task is
+   authoritative; if several scoped candidates remain, ask the user rather than selecting by
+   recency.
 
 2. **Check for discovery document:**
    - Look for `discovery-[feature-name].md` in task directory
@@ -175,9 +179,9 @@ Write approval status to a **separate sidecar file** (keeps the discovery doc cl
 
 ## Output
 
-**Files created:**
-- `tasks/task-YYYY-MM-DD-[feature-name]/playground-[feature-name].html` (new)
-- `tasks/task-YYYY-MM-DD-[feature-name]/vp-approval.md` (new)
+**Files created in the resolved task directory:**
+- `playground-[feature-name].html` (new or revised)
+- `vp-approval.md` (new or revised)
 
 **Next step:** run `/ct` to create technical decomposition based on the approved visual prototype.
 
@@ -199,8 +203,8 @@ After visual prototype is approved, present to the user:
 
 ```
 Visual prototype approved for [feature-name]:
-- Playground: tasks/task-YYYY-MM-DD-[feature-name]/playground-[feature-name].html
-- Approval: tasks/task-YYYY-MM-DD-[feature-name]/vp-approval.md
+- Playground: [resolved task]/playground-[feature-name].html
+- Approval: [resolved task]/vp-approval.md
 
 Next steps:
 → Create tech plan: /ct [feature-name]
@@ -210,5 +214,6 @@ Next steps:
 
 The prototype workflow is complete only after the playground exists, the user has selected
 Approve, Request Changes, or Reject, and the corresponding loop or `vp-approval.md` sidecar
-has been written. Approval authorizes the documented prototype handoff; it does not authorize
+has been written. Update the resolved task record with the artifact link, revision decision and
+next action. Approval authorizes the documented prototype handoff; it does not authorize
 implementation unless that action was also requested.

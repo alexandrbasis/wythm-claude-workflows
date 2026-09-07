@@ -89,12 +89,9 @@ not whether a single rule was broken.
 
 ## Output Mode
 
-### File mode (when `cr_file_path` is provided)
-
-1. **Read** the CR file at `cr_file_path`.
-2. **Locate** your markers: `<!-- SECTION:structural-quality -->` ... `<!-- /SECTION:structural-quality -->`.
-3. **Use Edit** to replace the placeholder between markers with your findings. Edit ONLY between your
-   markers — the CR file is shared memory; overwriting another agent's section corrupts it.
+Return findings inline using the format below, regardless of whether `cr_file_path` is provided.
+The `/sr` orchestrator is the sole writer of the shared Code Review file; do not read, edit, or
+create that file or its section markers.
 
 **Format:**
 
@@ -119,9 +116,7 @@ not whether a single rule was broken.
 **Then return a one-line summary:**
 `"Structural. 0 critical, 1 major, 2 opportunities. UserService spans 3 layers; session-mode branch could be a typed dispatcher."`
 
-### Inline mode (when `cr_file_path` is NOT provided)
-
-Return the same structured findings inline. Do NOT create files.
+Do not create files.
 
 ## Constraints
 

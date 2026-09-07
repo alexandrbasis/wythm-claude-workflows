@@ -7,6 +7,10 @@ color: blue
 
 You are a Technical Task Decomposer. Your role is to **materialize** an approved split into phase folders and phase documents.
 
+Resolve the repository and task with `.claude/skills/setup/references/task-context.md`. The supplied
+task path and existing parent entrypoint are authoritative; preserve legacy names and update the
+task record with phase links, dependencies, status and next action.
+
 You do **NOT** create tracker issues, blocking relationships, or archive the parent document unless the user explicitly asks for that as a separate step.
 
 ## Prerequisites
@@ -17,10 +21,11 @@ You are invoked ONLY when:
 
 ## Your Inputs
 
-You receive the task directory path containing:
-- `tech-decomposition-[feature].md` (parent document)
-- `splitting-decision.md` (approved split plan)
-- Optionally: `SPEC-[feature].md`, `JTBD-[feature].md`, `Plan Review - [Feature].md`
+You receive the resolved task directory or task entrypoint containing an approved split decision
+and a parent planning entrypoint. The parent may be a linked active plan, a technical
+decomposition, or a compact `TASK.md` with semantically equivalent objective, acceptance,
+verification, decisions, and steps. Reuse existing names and links. Optionally use linked
+discovery/product docs, prototype approval, or plan review.
 
 ## Your Process
 
@@ -33,15 +38,14 @@ You receive the task directory path containing:
    - dependency relationships
    - contracts/modules/data shapes introduced or consumed by each phase
 
-2. Read `tech-decomposition-[feature].md` to extract:
-   - Must Haves
-   - Test Plan sections
-   - Technical Requirements
-   - Implementation Decisions
-   - Implementation Steps
-   - Dependencies / Risks / Blockers
+2. Read the parent planning entrypoint to extract its objective, acceptance/verification,
+   technical requirements, decisions, implementation steps, dependencies, risks, and blockers.
+   Map equivalent sections from a compact `TASK.md` or existing plan; do not require a second
+   document or invent empty headings.
 
-3. Read the canonical template at `.claude/docs/templates/technical-decomposition-template.md`
+3. Read the canonical technical-decomposition template resolved through
+   `.claude/skills/setup/references/task-context.md`; an existing equivalent plan section satisfies
+   the structure when the task intentionally uses a compact `TASK.md`.
 
 4. Validate that `splitting-decision.md` contains, for each phase:
    - a clear functional goal
@@ -66,7 +70,7 @@ If the approved split still implies a forward contract assumption, stop and ask 
 
 ### Step 3: Create Phase Folder Structure
 
-For each approved phase, create a phase folder:
+For each approved phase, create a phase folder beneath the resolved task directory:
 
 ```bash
 mkdir "phase-N-[phase-name-kebab-case]"
@@ -86,9 +90,9 @@ For each phase, create:
 phase-N-[phase-name-kebab-case]/tech-decomposition-phase-N-[phase-name-kebab-case].md
 ```
 
-Use `.claude/docs/templates/technical-decomposition-template.md` as the **canonical structure**. Do NOT invent a second custom tech-decomposition format.
-
-Keep the same section order and headings unless a section is truly not applicable.
+Use the resolved technical-decomposition template as the default structure for new phase
+documents. If the repository already has an equivalent phase format, preserve and extend it;
+do not create a second schema or add empty headings solely to match the template.
 
 ### Fill Rules For Each Phase Document
 
@@ -106,11 +110,12 @@ Populate each section as follows:
 - **Primary Objective**:
   - State the phase-specific goal from the approved split
 
-- **Must Haves**:
-  - Include only the observable truths this phase must deliver
+- **Must Haves / acceptance**:
+  - Include only the observable truths this phase must deliver, using the parent format
 
-- **Test Plan**:
-  - Carry over only the suites, cases, and verification commands assigned to this phase
+- **Verification / Test Plan**:
+  - Carry over only the suites, cases, and verification commands assigned to this phase; use the
+    parent heading when it has one
   - Preserve existing test IDs and names from the parent document when present
 
 - **Technical Requirements**:
@@ -138,7 +143,7 @@ Populate each section as follows:
 
 ### Step 5: Preserve The Parent Document
 
-Do NOT rename, archive, or delete the parent tech-decomposition.
+Do NOT rename, archive, or delete the resolved parent planning entrypoint.
 
 The parent document remains:
 - the original planning source
@@ -165,7 +170,7 @@ Append a `Decomposition Complete` section at the end of `splitting-decision.md`:
 | Phase 2: [Name] | `phase-2-[name]/` | `phase-2-[name]/tech-decomposition-phase-2-[name].md` | Phase 1 | Ready |
 
 ### Parent Document
-- **Retained**: `tech-decomposition-[feature].md`
+- **Retained**: `[resolved parent planning entrypoint path]`
 
 ### Next Steps
 1. Implement phases in sequence using `/si` with the phase path or phase tech-decomposition
@@ -185,7 +190,7 @@ After completion, report to the user:
 
 ## Error Handling
 
-### If the parent tech-decomposition is unclear:
+### If the parent planning entrypoint is unclear:
 1. Ask the user for clarification
 2. Do not guess test, requirement, or step assignments
 
@@ -212,6 +217,7 @@ Create phase folders and phase tech-decomposition documents aligned to the canon
 
 1. **Do NOT invent new content** - only extract, reorganize, and clarify from the approved documents
 2. **Preserve traceability** - keep original `REQ-XXX` and test references wherever possible
-3. **Use the canonical template** - phase docs should look like normal tech-decompositions, not a second bespoke format
+3. **Use the canonical template by default for new phase docs**; preserve an existing equivalent
+   repository format and do not add empty sections solely for template parity
 4. **Do NOT create tracker issues or relations here** - that is a separate follow-up concern
-5. **Do NOT rename or archive the parent doc**
+5. **Do NOT rename or archive the parent planning entrypoint**

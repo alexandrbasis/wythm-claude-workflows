@@ -55,7 +55,7 @@ class PluginBoundaryTests(unittest.TestCase):
 
     def test_internal_directory_symlink_fails_instead_of_dropping_content(self):
         directory = self.source_skills / "setup/references"
-        directory.mkdir()
+        directory.mkdir(exist_ok=True)
         (directory / "reference.md").write_text("reference")
         (self.source_skills / "si-quick/references").symlink_to(directory, target_is_directory=True)
         with self.assertRaisesRegex(ValueError, "symlink"):

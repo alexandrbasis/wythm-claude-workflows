@@ -16,6 +16,12 @@ allowed-tools: [Read, Grep, Glob, Bash, Task, Skill, AskUserQuestion]
 
 Run an interactive QA session. The user describes problems they're encountering. You clarify lightly, explore the codebase for context, and file tracker issues that are durable, user-focused, and use the project's domain language. **No fixes applied.**
 
+Resolve the task with `../setup/references/task-context.md` before the first issue. Reuse an existing
+task or create the minimum record in the configured root; for an audit/draft-only request, return the
+proposed path without writing. Link each issue, evidence, current state, and next action from the
+session/task record. The user's explicit QA request remains the authorization for tracker writes in
+the selected destination.
+
 A request to run QA or file the reported bugs authorizes issue creation in the tracker selected
 for this session. If the user asks only for an audit, summary, or draft bodies, stop before the
 tracker write. Resolve the repository/team destination before the first issue and keep it fixed
@@ -39,7 +45,7 @@ Do NOT over-interview. If the description is clear enough to file, move on.
 
 ### 2. Explore the codebase in the background
 
-While the user describes the next issue, kick off an `Agent` (subagent_type=Explore) for the previous one. Goal is **not** to fix — it's to:
+While the user describes the next issue, optionally kick off an `Agent` (subagent_type=Explore) for the previous one. Goal is **not** to fix — it's to:
 
 - Learn the domain language used in that area (cross-check with `product-docs/UBIQUITOUS_LANGUAGE.md` if it exists)
 - Understand what the feature is supposed to do
@@ -135,7 +141,8 @@ When creating a breakdown:
 - **Reproduction steps are mandatory** — if you can't determine them, ask the user once
 - **Keep it concise** — a developer should be able to read the issue in 30 seconds
 
-After filing, print all issue URLs (with blocker relationships summarized) and ask: "Next issue, or are we done?"
+After filing, link each issue URL (with blocker relationships summarized) from the selected task record,
+then ask: "Next issue, or are we done?"
 
 ### 6. Continue the session
 

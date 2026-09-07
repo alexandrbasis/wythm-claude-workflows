@@ -16,9 +16,11 @@ allowed-tools:
 
 # Design Exploration
 
-> **Announcement**: Begin with: "I'm using the **design-exploration** skill for pre-implementation design exploration."
-
 Gather codebase context and explore design approaches before implementation. This skill bridges the gap between "we have an idea" and "we have a concrete direction" by grounding proposals in what actually exists in the codebase.
+
+When this supports a task, use [`../setup/references/task-context.md`](../setup/references/task-context.md)
+to resolve the repository, linked task and applicable local instructions. Return findings to the
+caller; the caller records them once in the task context instead of creating a parallel artifact.
 
 ## When This Skill Runs
 
@@ -32,11 +34,11 @@ Typically invoked by `/brainstorm` or `/nf`, but can also run standalone when so
 
 ### Step 1: Parallel Context Gathering
 
-Use `references/exploration-checklist.md` as a menu, selecting only the feature-type
-checklist items that affect the caller's decision. When two or more scan angles are
-independent and the caller needs broad coverage, spawn 2–3 Explore agents in the same turn
-so they run concurrently. For a narrow question, use one focused scan; do not fan out just
-to satisfy a fixed count. Use a faster model unless the task clearly needs deeper reasoning.
+Use `references/exploration-checklist.md` as a menu, selecting only the feature-type checklist
+items that affect the caller's decision. Use one focused scan by default; fan out independent
+angles only when broad coverage materially changes the decision and the host provides the worker.
+Do not fan out to satisfy a fixed count. Use a faster model unless the task clearly needs deeper
+reasoning.
 
 Common scan angles:
 1. **Closest prior art**: similar features, modules, screens, services, or flows
@@ -85,15 +87,17 @@ For each approach:
 
 Once the user picks an approach (or you have a clear winner):
 
-1. Present all relevant sections in a single structured response, clearly labeled. Keep each section to the evidence needed for the caller's decision; expand only where a trade-off or risk needs support.
-2. End with: "Reply `continue` to proceed, or `revise: <section name>` to iterate on a specific section." Do not pause between sections.
-3. Cover only the areas that materially affect the caller's decision:
+Present one compact, clearly labeled summary covering only the areas that materially affect the
+caller's decision:
    - Where the feature fits in the current product or architecture
    - How the user flow or system flow would likely work
    - Which data, state, or contracts are affected
    - What constraints or dependencies shape the design
    - What risks, open questions, or irreversible choices remain
    - Implementation-heavy details only if they materially affect discovery or planning
+
+Ask for revision only when a specific unresolved choice blocks the caller; otherwise return the
+summary without an artificial continue loop.
 
 When invoked from `/nf`, stop short of full tech decomposition. The goal is to clarify direction, not to write the implementation plan.
 

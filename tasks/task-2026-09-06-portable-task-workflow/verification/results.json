@@ -1,0 +1,45 @@
+{
+  "baseline": "32cfafa49e4ea55e2c19fc7466044edd4a87cdf2",
+  "source_fingerprint": "e342ecfc0f4bf238ce8472f5c1a3be676520c2173ebd03c328416d93858f5286",
+  "plugin_tests": {
+    "count": 25,
+    "result": "PASS",
+    "command": "python -m unittest discover --start-directory tests --quiet",
+    "log": "plugin-tests.log"
+  },
+  "updater_tests": {
+    "count": 4,
+    "result": "PASS",
+    "command": "python -m unittest discover --start-directory .claude/skills/update-setup/tests --quiet",
+    "log": "updater-tests.log"
+  },
+  "package_build": {
+    "result": "PASS",
+    "skills": 40,
+    "agents": 18,
+    "formats": [
+      "Claude plugin",
+      "Agent Plugins v1"
+    ],
+    "receipt": "build.json"
+  },
+  "package_validation": {
+    "result": "PASS",
+    "receipt": "validation.json"
+  },
+  "reproducible_build": {
+    "command": "python scripts/build_plugins.py --out dist --check",
+    "result": "PASS"
+  },
+  "diff_check": "PASS",
+  "independent_review": "Two findings resolved: source resource fallback and tests of emitted pointers; reviewer read-back confirmed.",
+  "behavior_model": "gpt-5.6-luna, xhigh",
+  "behavior_limit": "Synthetic fixtures only. Discovery resume is partial due to automated approval rejection; this is not a passed consistency check. No model-efficiency benchmark or host installation was performed.",
+  "human_review": {
+    "opened": true,
+    "completed": false,
+    "observed_comments": 0,
+    "limitation": "Two attached Roughdraft watchers exited with UND_ERR_HEADERS_TIMEOUT, without Done Reviewing. File reread after failure."
+  },
+  "behavior_snapshot_note": "Setup and legacy used an earlier packaged snapshot with byte-identical setup and si entrypoints; shared context was refined afterward. Discovery resume used the final build."
+}

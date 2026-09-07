@@ -20,7 +20,13 @@ description: >
 
 > Prefix the first response in a session with a one-line tag: `[cc-linear]`.
 
-Interact with Linear via `.claude/scripts/linear-api.sh` — a direct `curl` wrapper over Linear's GraphQL API. Each command is atomic and deterministic.
+Interact with Linear via the configured `linear-api.sh` wrapper — a direct `curl` wrapper
+over Linear's GraphQL API. Resolve the wrapper from the active project override or the
+loaded skill/package; do not assume that a plugin is copied into the target repository.
+Read `../setup/references/task-context.md` when the operation advances a task. A
+standalone lookup or explicitly requested Linear operation does not create a fake task.
+The relative `.claude/scripts/linear-api.sh` paths in examples describe a copied
+workflow; substitute the resolved wrapper path before execution.
 
 ## Commands
 
@@ -49,7 +55,7 @@ description or comment longer than one line or containing quotes.
 ```bash
 .claude/scripts/linear-api.sh add-label TEAM-66 "Bug"
 .claude/scripts/linear-api.sh remove-label TEAM-66 "Bug"
-.claude/scripts/linear-api.sh assign TEAM-66 "Alexander Basis"
+.claude/scripts/linear-api.sh assign TEAM-66 "<configured-user>"
 .claude/scripts/linear-api.sh add-relation TEAM-66 TEAM-67 "blocks"
 .claude/scripts/linear-api.sh link-pr TEAM-66 "https://github.com/org/repo/pull/123"
 ```
@@ -115,10 +121,13 @@ read-back.
 
 | Setting | Value |
 |---------|-------|
-| Team Key | `LINEAR_TEAM_KEY` or default `TEAM` |
+| Team Key | Explicit `LINEAR_TEAM_KEY` or a read-only discovered team confirmed before mutation |
 | API Key | `LINEAR_API_KEY` env var |
 
-### Task States (in order)
+The legacy wrapper may retain a `TEAM` fallback for compatibility; the skill must not
+use that fallback for a visible mutation without resolving and confirming the destination.
+
+### Example states (query the configured workspace before mutation)
 
 ```
 Backlog → Todo → In Progress → In Review → Done | Canceled | Duplicate
@@ -173,7 +182,9 @@ user agrees or when the outer skill explicitly delegates to you.
 | `/sr` | After code review passes | `update-status` → "In Review" or "Done" |
 | PR creation | After `gh pr create` | `link-pr` + `update-status` → "In Review" |
 
-Don't force these — suggest them when the context is clear (e.g., a TEAM-* ID is visible in the task doc or branch name).
+Don't force these — suggest them when the context is clear (e.g., a TEAM-* ID is visible
+in the resolved task or branch). Record issue ID/URL, mutation receipt and matching
+read-back in that task when one exists; standalone operations return their own receipt.
 
 ## Error Recovery
 

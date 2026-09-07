@@ -23,6 +23,10 @@ allowed-tools: Bash, Monitor, Read, Glob
 
 Start the project's dev server and watch its output for errors. The user says "start dev" and you handle detection, startup, and monitoring — they only hear from you when something breaks.
 
+When a server supports a task, resolve `../setup/references/task-context.md` and record
+the command, port, monitor/session identifier and verification result there. A standalone
+server start uses session state only and does not create a task.
+
 ## Workflow
 
 ### 1. Detect the stack
@@ -132,7 +136,11 @@ Set the Monitor `description` to something specific: `"Next.js dev :3000"` or `"
 "No error in the Monitor" ≠ "the app works." After the dev command announces readiness, confirm the server is reachable before handing control back to the user:
 
 1. **HTTP probe** — `curl -sS -o /dev/null -w "%{http_code}\n" http://localhost:<port>` with a 5s timeout. Expect 2xx/3xx. Non-2xx, connection refused, or timeout → investigate.
-2. **UI smoke check (frontend projects)** — when the project is a frontend framework (Next.js, Vite, Remix, Astro, SvelteKit, Nuxt, Angular, Gatsby, Expo web), invoke the `browser-use` skill to load the root URL, take a screenshot, and check for a visible error overlay (Next.js red box, Vite overlay, React error boundary fallback). Report what you see.
+2. **UI smoke check (frontend projects)** — when a browser capability is available and
+the project is a frontend framework (Next.js, Vite, Remix, Astro, SvelteKit, Nuxt,
+Angular, Gatsby, Expo web), use it to load the root URL, take a screenshot, and check
+for a visible error overlay. If the capability is unavailable, keep the HTTP probe,
+record UI smoke as skipped with that reason, and do not claim the UI was verified.
 3. **Backend-only projects** — if there's a known health/root route (`/health`, `/api/health`, `/`), `curl` it and show the status code. Otherwise one HTTP probe is enough.
 
 If verification fails, surface it with the same classification as §4 (build/runtime/dependency/port) — don't just re-announce success.
@@ -148,9 +156,9 @@ When a Monitor notification fires, surface *everything* the filter caught — do
 
 ### 5. Stopping
 
-When the user says "stop", "kill it", "shut down", or similar:
-- `TaskStop` the Monitor
-- Confirm stopped
+When the user says "stop", "kill it", "shut down", or similar, use the host's available
+monitor/session stop operation and confirm the exact server is stopped. If no stop
+capability is available, report that blocker instead of claiming it stopped.
 
 ## Edge cases
 

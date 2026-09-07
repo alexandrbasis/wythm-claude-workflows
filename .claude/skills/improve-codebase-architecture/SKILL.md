@@ -15,9 +15,14 @@ allowed-tools: [Read, Grep, Glob, Bash, Task, Skill]
 
 Surface architectural friction and propose **deepening opportunities** — refactors that turn shallow modules into deep ones. The aim is testability and AI-navigability.
 
+For a task-linked review, resolve the repository and active task with
+[`../setup/references/task-context.md`](../setup/references/task-context.md), then read only the
+linked product/plan context relevant to the target area. This remains read-only; an accepted
+candidate is handed to `/ct` rather than mutating the task implicitly.
+
 ## Vocabulary
 
-This skill uses the canonical architecture vocabulary in `.claude/skills/architecture-language/LANGUAGE.md`. Load it before suggesting candidates. Use the terms exactly — **module**, **interface**, **seam**, **adapter**, **depth**, **leverage**, **locality**. Don't drift into "component", "service", "API", or "boundary".
+This skill uses the canonical architecture vocabulary in `.claude/skills/architecture-language/LANGUAGE.md`. Load it before suggesting candidates. Use **module**, **interface**, **seam**, **adapter**, **depth**, **leverage**, and **locality** for architectural claims, while retaining established project terms such as `service` or `API` when they carry specific meaning; state the mapping when needed.
 
 Key principles (full list in `architecture-language/LANGUAGE.md`):
 

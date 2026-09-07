@@ -60,14 +60,9 @@ When `changed_files` is NOT provided, fall back to full codebase review.
 
 ## Output Mode
 
-### File mode (when `cr_file_path` is provided)
-
-Write your findings directly to the Code Review file:
-
-1. **Read** the CR file at the provided `cr_file_path`
-2. **Locate** your section markers: `<!-- SECTION:code-quality -->` ... `<!-- /SECTION:code-quality -->`
-3. **Use the Edit tool** to replace the placeholder text between markers with your findings
-4. **Do NOT** edit anything outside your section markers
+Return findings inline using the format below, regardless of whether `cr_file_path` is provided.
+The `/sr` orchestrator is the sole writer of the shared Code Review file; do not read, edit, or
+create that file or its section markers.
 
 **Write this format:**
 
@@ -89,14 +84,7 @@ Write your findings directly to the Code Review file:
 - [INFO] **Observation**: Good practice noted or minor suggestion
 ```
 
-**Then return ONLY a short summary:**
-`"Clean. 0 critical, 0 major, 0 minor. Code is well-structured."`
-or
-`"Findings. 0 critical, 1 major, 2 minor. Port JSDoc contradicts implementation."`
-
-### Inline mode (when `cr_file_path` is NOT provided)
-
-Return findings inline using the same markdown format above.
+Include the detailed findings and a short summary for the orchestrator.
 
 ## Coverage & Consolidation
 

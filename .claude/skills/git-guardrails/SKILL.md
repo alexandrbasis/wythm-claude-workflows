@@ -16,9 +16,15 @@ disable-model-invocation: true
 
 This skill manages the git-safety hook at `.claude/hooks/guards/git-guardrails.sh`.
 
+The plugin does not wire a project hook. Resolve the target repository and its local
+settings through `../setup/references/task-context.md` before any requested change;
+never edit the installed plugin copy. A status check is standalone and creates no task;
+when a task owns the guard change, save settings read-back and smoke-test receipts there.
+
 ## Re-enable
 
-Add the following entry to the `Bash`-matcher hooks array in `.claude/settings.json` under `hooks.PreToolUse`:
+Add the following entry to the target repository's `Bash`-matcher hooks array in its
+`.claude/settings.json` under `hooks.PreToolUse`:
 
 ```json
 {

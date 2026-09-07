@@ -1,9 +1,8 @@
 ---
 name: udoc
 description: >-
-  Update documentation and generate changelog after task implementation. Use when
-  asked to 'update docs', 'generate changelog', 'sync documentation with code',
-  or when a task is complete and docs need updating.
+  Update documentation for a completed implementation and, when the repository
+  uses one or the user requests it, update its changelog.
   NOT for creating new product docs (use /product).
 argument-hint: [task-path]
 ---
@@ -12,88 +11,82 @@ argument-hint: [task-path]
 
 > **Announcement**: Begin with: "I'm using the **udoc** skill for documentation update and changelog."
 
-## PRIMARY OBJECTIVE
-Generate documentation updates and changelog entries from a completed task implementation.
+## Objective
 
-## CONTEXT
-Use when:
-- Task implementation is complete (before or after PR/merge)
-- Documentation needs updating to reflect code changes
-- Changelog entry needed for the task
+Synchronize documentation with an implemented change. A changelog is a
+repository convention, not a required output of every run.
 
-## WORKFLOW
+## Workflow
 
-### STEP 1: Resolve Task Path
+### 1. Resolve the task
 
-1. Parse `$ARGUMENTS` for a task directory path
-2. If not provided — Ask: "Which task to update docs for? Provide task directory path (e.g., `tasks/task-2026-02-09-feature-name/`)."
-   (Don't guess — picking the wrong task would generate a misleading
-   changelog that may end up in the repo history.)
-3. Validate: find `tech-decomposition-*.md` inside the task directory
-4. If not found — error with available task directories
+Read `../setup/references/task-context.md` and resolve an explicit path, then
+the current task, then the repository's configured convention. A supplied file
+outside `tasks/` remains authoritative. If no task is resolved, ask for the
+task path; do not create a product task just to hold documentation work.
 
-### STEP 2: Update Docs + Generate Changelog (parallel subagents)
+Validate the resolved task record or a legacy
+`tech-decomposition-*.md` in its directory. Keep the task record's objective,
+status, changed documentation, and observed result current when the run is
+task-attached.
 
-Spawn both subagents in the same turn — they operate on the same task
-document and do not depend on each other's output:
+### 2. Discover the documentation policy
 
-- **docs-updater** — "Review the task document at [TASK_DOCUMENT_PATH] and update all relevant documentation files based on the implemented changes. Return a summary of what documentation was updated."
-- **changelog-generator** — "Generate a changelog entry based on the task document at [TASK_DOCUMENT_PATH] covering the main feature implementation. The docs-updater runs in parallel; its updates will be included in the same commit."
+Read an applicable `CLAUDOPS.md`, repository profile, manifests, and existing
+documentation before choosing paths. Update the repository's established docs
+locations and format. For changelogs:
 
-Do not default to sequential. When calls have no dependencies, batch them in one turn.
+- update an existing changelog convention when the task affects it;
+- use a path explicitly configured by the repository or requested by the user;
+- skip changelog generation when no convention exists and the user did not ask
+  for one;
+- never create `docs/changelogs/` merely because this skill was invoked.
 
-Capture both outputs: the summary of documentation changes and the changelog entry.
+Record the decision and skipped outputs in the task evidence when applicable.
 
-### STEP 3: Offer Commit (user-gated)
+### 3. Update documentation
 
-1. Show user what changed:
-   - `git diff --stat` for modified files
-   - Brief summary from both agents
-2. Ask: "Commit these documentation and changelog updates?"
-   (This skill may run before a PR is opened; the user may want to
-   squash docs into the feature commit rather than create a separate
-   docs commit.)
-3. If approved:
-   ```bash
-   # Stage exactly the files the two subagents reported touching.
-   # Do not use `git add -A` (may pull in secrets) and do not assume
-   # everything lives under docs/ — changelog-generator writes to
-   # docs/changelogs/, but docs-updater may touch README.md,
-   # product-docs/, or other locations.
+Use an available documentation-updater agent when the host exposes one and its
+scope matches the task. A changelog-generator is optional and runs only after
+the policy above selects a changelog target. If an agent is unavailable, do
+the bounded work directly or report the blocked capability; the skill does not
+require two agents or invent a replacement agent.
 
-   git add <files listed in docs-updater summary> \
-           docs/changelogs/YYYY-MM-DD/changelog.md
-   git commit -m "docs: update documentation and changelog
+Give every worker the resolved task path, selected documentation paths, and
+write scope. Read each target before editing and preserve its format. Capture
+changed paths and verification output.
 
-   - Documentation updates: [DOCS_SUMMARY]
-   - Changelog entry: [CHANGELOG_SUMMARY]
+### 4. Commit only within the caller's authorization
 
-   Generated by docs-updater and changelog-generator agents."
-   ```
-4. If on a feature branch, ask separately whether to push. Approval to commit does not authorize
-   publication or other external writes.
+Show the exact changed paths and a diff summary. Commit only when the caller
+authorized that exact scope, reusing an earlier authorization for the same
+operation rather than asking again. Stage explicit reported paths; do not use
+`git add -A`. Push is a separate external operation and requires an explicit
+request unless the caller already authorized push for this exact scope. Do not
+repeat an approval question after its authorization is already recorded.
 
-### STEP 4: Summary
+### 5. Report
 
-Report to user:
-```
-Documentation updated!
+Report documentation paths, changelog path or the reason it was skipped, task
+evidence location, verification, and commit/push state. Distinguish completed,
+unavailable, and intentionally skipped outputs.
 
-**Docs**: [list of updated files]
-**Changelog**: docs/changelogs/YYYY-MM-DD/changelog.md
-**Committed**: Yes/No
-```
+## Failure handling
 
-## ERROR HANDLING
+- **Task not found**: list available task locations from the configured
+  convention, without assuming `tasks/`.
+- **No documentation change**: report that the current docs already match or
+  that no affected documentation was identified.
+- **Agent unavailable**: continue directly when the scope is clear; otherwise
+  report the missing capability and stop before writing broad changes.
+- **Policy unknown**: preserve existing docs and skip a changelog unless the
+  user explicitly selects its location.
 
-- **Task not found**: List available task directories under `tasks/`
-- **No changes detected**: Inform user, suggest checking if docs are already up to date
-- **Agent fails**: Report which agent failed, suggest running manually
+## Success criteria
 
-## SUCCESS CRITERIA
-
-- [ ] Task document found and analyzed
-- [ ] Documentation updated for affected files
-- [ ] Changelog entry created under `docs/changelogs/YYYY-MM-DD/` using today's date (the date the docs update runs, not the task creation or completion date)
-- [ ] User informed of all changes
-- [ ] Changes committed only with user approval
+- [ ] Task resolved when the run is task-attached
+- [ ] Repository documentation policy and paths were discovered
+- [ ] Only affected documentation was updated
+- [ ] Changelog updated only when configured or explicitly requested
+- [ ] Task evidence records changed paths and verification when applicable
+- [ ] Commit/push performed only within existing authorization

@@ -1,216 +1,97 @@
 ---
 name: si
 description: >-
-  Implements a feature from a technical decomposition using TDD, keeping the task document updated
-  and handing off cleanly to review. Use when starting, continuing, or resuming implementation from a
-  tech-decomposition or task directory. Trigger: 'implement this task', 'start implementation',
-  'continue/resume implementation', 'build from the tech decomposition', or after /ct produces a
-  decomposition. NOT for creating the plan (/ct), feature discovery (/nf), small untracked changes
-  (/si-quick or /quick), or code review (/sr).
+  Implement or resume a ready task, from a compact task record or a technical decomposition,
+  with behavior-first tests and durable verification. Use for requested implementation;
+  discovery belongs to /nf, planning to /ct, and independent review to /sr.
 argument-hint: [task-directory | tech-decomposition-path]
 allowed-tools: [Agent, AskUserQuestion, Edit, Read, Write, Bash, Glob, Grep, Skill, TodoWrite]
 ---
 
-# Start Implementation Command
+# Implement a task
 
-> **Announcement**: Begin with: "I'm using the **si** skill for structured TDD implementation."
+Deliver the requested behavior and leave enough verified task state for review or the
+next session. A compact task and a formal decomposition use the same implementation
+contract; scale documentation and delegation to the work.
 
-## Quick start
-`/si tasks/task-2026-05-31-streak-freeze` → validate doc (STEP 1) → spec-verification gate (STEP 1.5)
-→ branch + status (STEP 2) → TDD implement, per-step verify + journal (STEP 3) → cleanup (STEP 4) →
-PR + handoff to `/sr` (STEP 5).
+## 1. Resolve the task and readiness
 
-## Primary objective
-Implement from a technical decomposition with TDD, lightweight task-document updates, and a clean
-handoff into review.
+Read [shared task context](../setup/references/task-context.md). Reuse the explicit or
+established task and follow its active phase/plan pointers. If none exists, create the
+minimum record before starting. Preserve the repository's filenames and status vocabulary.
 
-## Constraints
-- Follow the active tech-decomposition / task document as the source of truth.
-- Document lifecycle: `Technical Review` → `In Progress` → `Implementation Complete`.
-- **TDD discipline** is canonical from `.claude/skills/tdd/SKILL.md` — vertical slices only (one
-  RED→GREEN per behavior). Horizontal slicing (all tests, then all code) is forbidden.
-- **LLM limitations awareness**: consult `.claude/docs/references/llm-mental-model.md` in "brittle
-  zones" (counting, long lists, visual properties) and add explicit verification steps there.
-- Domain terminology is canonical from `product-docs/UBIQUITOUS_LANGUAGE.md` (if present) — use its
-  terms verbatim in code identifiers, commit messages, and test names.
-- Context is compacted automatically. Don't stop early over token concerns — persist progress to the
-  task document after each step so a fresh window can resume from the same state.
+Read the objective, acceptance criteria, constraints, relevant decisions, planned changes
+and verification approach. Equivalent sections in any language satisfy this contract.
+Populate missing structural information from the authorized request and repository
+evidence; do not stop merely because a particular heading or `tech-decomposition-*.md`
+is absent. A known, bounded fix can keep its short plan in the existing task record.
 
----
+When behavior or scope is materially unresolved, save the question/blocker and resolve
+it before dependent implementation. Use `/nf` or `/ct` when actual discovery or planning
+is needed. A task status or a PR description alone does not invent an approved spec.
 
-## STEP 1: Task Validation
-1. **Validate document**:
-   - Confirm task exists (direct `tech-decomposition-*.md` path OR task directory containing one).
-   - Confirm required sections exist: `Primary Objective`, `Must Haves`, `Test Plan`, and
-     `Implementation Steps`.
-   - Confirm task status is appropriate — ask before proceeding if unclear.
-   - Confirm requirements and steps are specific enough to implement without guessing.
-   - If the document is missing core structure, stop and ask the user to clarify.
+## 2. Establish the change boundary
 
----
+Inspect the relevant code, tests, project instructions and working-tree state. Record
+which files/packages the work affects and how to verify the outcome. Preserve unrelated
+user changes. Use an isolated branch/worktree when warranted and authorized; an already
+selected working directory does not need another checkout by default.
 
-## STEP 1.5: Spec Verification Gate
-> **Purpose**: prevent the #1 incident type — partial implementation of specs — by creating a
-> countable, verifiable contract before any code is written.
+Reuse authorization for the same operation and scope. Commit, push, PR, merge and
+tracker writes follow their actual authorization boundary; an implementation request
+alone does not authorize publication. Do not manufacture test/implementation commit
+history or reset shared work to recreate a test-first sequence.
 
-1. **Extract / generate the checklist**: read the task document's `## Verification Checklist`. If
-   absent, generate it now — one `VC-NNN` entry per discrete verifiable item from every requirement,
-   test case, and must-have. Format, type catalog, and per-type verification recipes live in
-   **`references/verification-gate.md`** — read it now.
-2. **Count and announce**: "Verification Checklist contains N items. All N must be checked before
-   implementation is complete."
-3. **Map VC entries to steps**: for each implementation step, list the VC entries it covers. Flag any
-   uncovered entry immediately and assign it to a step.
-4. **Per-step verification** (during STEP 3): re-read the step's VC entries from the task document
-   (don't rely on memory), verify each in the real code using the recipes, and mark `- [x]` only when
-   confirmed. If an entry can't be verified, flag it and implement before moving on.
-5. **Final verification** (before STEP 4): count checked vs total. If checked < total, list every
-   unchecked entry and implement it. Announce "Verification: X/Y items checked. [PASS/FAIL]" — **FAIL
-   blocks cleanup/review.**
+## 3. Implement and retain evidence
 
----
+Follow [TDD](../tdd/SKILL.md) for behavior changes: one failing behavior test, verify the
+failure's cause, implement, then refactor within scope. Use the agreed test strategy;
+documentation, formatting and other non-behavior changes use appropriate validation
+without artificial tests. Existing project testing requirements remain in force.
 
-## STEP 2: Setup
-1. **Update task status** to "In Progress" with timestamp.
-2. **Create feature branch** (permission gate) if needed: `feature/team-[ID]-[slug]` or the repo
-   convention.
-3. **Update `Tracking`** with the branch name once it exists.
+Keep one acceptance-to-evidence mapping in the task's existing checklist or test plan.
+Reuse requirement IDs and existing verification rows; do not generate parallel REQ,
+TEST and VC ledgers for the same facts. Each required behavior must have an observed
+test, check or artifact before it is marked complete.
 
----
+Read [verification recipes](references/verification-gate.md) for exact-count, enumerated,
+visual or other brittle requirements. Read [implementation checklists](references/implementation-checklists.md)
+when changes involve entity mutations, async interactions or material deviations from the
+plan. Preserve post-action visibility, error handling and data/state consistency checks
+where they apply. Use the repository's canonical domain terms.
 
-## STEP 3: Implementation
+Implement the full agreed scope. After a meaningful completed step, update its evidence,
+actual progress and next action. Record material deviations and their rationale once;
+new product scope requires a decision, not silent expansion. Save progress before a long
+pause and resume from those files after compaction.
 
-### Parallelization
-When two or more steps meet the criteria below, spawn all eligible developer-agent workers in a single
-assistant message via `.claude/skills/parallelization/SKILL.md`. Don't default to sequential — if the
-task document has wave annotations or independent modules, parallel is the expected path. Sequential is
-the fallback when independence is unclear.
+For independently useful work with disjoint ownership, read [parallelization](../parallelization/SKILL.md).
+Use supported workers only when delegation helps; otherwise work directly. Pass the task,
+owned paths, constraints and expected result to each worker. One orchestrator consolidates
+shared documents and verifies the combined result.
 
-**Wave detection**: if the task document has wave annotations (e.g., `— **Wave 1**`, `— **Wave 2**`),
-group steps by wave and run all same-wave steps in parallel before advancing. Otherwise use the matrix
-below.
+## 4. Verify completion
 
-- **Parallelize when**: steps modify different modules/dirs with no shared state; independent test
-  suites; steps annotated with the same wave number.
-- **Do NOT when**: steps touch the same files or depend on a prior step's output; database migrations
-  (order matters); steps that share test fixtures or DB state.
+Remove temporary instrumentation, dead imports and other residue introduced by this task.
+Run the checks required by the change and project policy from their owning package;
+resolve commands from configuration or CI. Record command, working directory, outcome
+and relevant revision/artifact. Reuse valid evidence for unchanged code; rerun affected
+checks after subsequent edits. A skipped or blocked check is not a pass.
 
-**Worker doc-edit rule**: in parallel mode, workers do not edit the task document or other shared
-files. Workers return their checkbox diffs (and any deviations) in their final message; the
-orchestrator consolidates all document updates once after the wave merges.
+Check every acceptance item against evidence, including enumerated fields/options and
+cross-surface behavior where specified. Missing required evidence prevents claiming
+implementation complete. A partial result may be reviewed as a draft with its gaps named.
+For non-trivial decisions, try to find a counterexample before handoff; unresolved
+substantive findings remain blockers or explicitly accepted limitations.
 
-### Sequential Mode
+## 5. Hand off the actual result
 
-#### Before each step
-1. **Announce**: "Starting Step [N]: [Description]".
-2. **Review**: acceptance criteria, tests, artifacts for this step.
+Update the task's implementation status and link code/verification evidence, deviations
+and known follow-ups. A separate completion document is unnecessary when the task already
+contains these facts. Completing a phase does not complete its parent feature.
 
-#### During implementation (TDD)
-1. **Stay in scope**: implement what the step asks, nothing more. No new abstractions, adjacent
-   refactors, or defensive handling for impossible cases — surrounding cleanup belongs in STEP 4.
-2. **Follow the agreed Test Plan** from the task document.
-3. **RED before GREEN**: each new behavior starts with a failing test that fails for the right reason.
-4. **One behavior per cycle**: keep each RED → GREEN → REFACTOR loop narrow.
-5. **No retroactive tests**: if implementation got ahead of the test, stop and return to RED. If
-   fixing that would revert shared or user-authored work, ask first instead of deleting blindly.
-6. **Update docs during code changes**.
-7. **Use repo-appropriate verification commands** from the task doc or package scripts — quiet variant
-   for routine loops, full output when debugging a failure.
-8. **Verification gate**: the tests named for the active step must pass before you mark it complete.
-
-For test-assertion anti-patterns (exact counts vs `> 0`), the mutation/async safety checklists, and
-the off-spec journal format, read **`references/implementation-checklists.md`**. Apply the
-mutation/async checklist whenever a step creates/updates/deletes entities or uses async callbacks.
-
-The task document is the source of truth — read the files it names, implement against its acceptance
-criteria, and stop exploring once you have the context for the current step.
-
-#### After each step
-1. **Update task document**:
-   - Mark step checkbox: `- [ ]` → `- [x]`.
-   - Update the step `**Tests**` field with command + result, or an explicit skip reason.
-   - Mark Test Plan checkboxes if applicable.
-   - Refresh `Tracking` / `Notes` if branch, risks, scope, or follow-ups changed.
-   - **Journal off-spec changes** under `## Deviations & Decisions` if this step diverged from the
-     plan (triggers + format in `references/implementation-checklists.md`). Skip if the step matched
-     the spec exactly.
-   - If the task doc already uses a per-step changelog, keep it updated; otherwise don't add a new
-     legacy field.
-   - **Parallel mode**: workers don't edit shared docs; the orchestrator updates once after merge and
-     merges worker-returned deviations into the journal.
-
-   ```markdown
-   - [x] Sub-step 3.1: Update CreateSessionUseCase logic
-     - **Tests**: `cd backend && npm run test:silent -- [test-filter]` - PASS
-   ```
-
-2. **Commit (permission gate)**:
-   - Ask permission **before** any git write (`commit`, branch create/switch, stash apply/drop,
-     `push`, `rebase`, `merge`). Read-only inspection (`git status`, `git log`) is fine.
-   - Reuse explicit authorization already granted in the current task/session when it covers the
-     exact operation and scope; ask only for a new operation, destination, or unclear boundary.
-   - Conventional commits with issue reference: `feat(scope): [summary]` + `Refs: TEAM-123`;
-     docs-only `docs(scope): update [doc name]` + `Refs: TEAM-123`. Keep the RED-before-GREEN
-     evidence in the task document. A code-plus-tests commit is acceptable when repository review
-     policy permits it; when that policy requires test and implementation chronology, use separate
-     approved commits. Never manufacture commit history after the work.
-
-#### Self-verification (after each step)
-Verify your claims across **every** file and test touched in the step — not just the first:
-1. Every file listed in the step exists on disk (`ls` each).
-2. Every test mentioned can be found and passes (run them).
-3. If a commit was claimed, verify with `git log -1 --oneline`.
-4. If a module or contract changed, run the relevant build, typecheck, or validation command.
-
----
-
-## STEP 4: Completion
-
-### Cleanup pass
-If the diff accumulated obvious slop, run a focused cleanup before the final quality gate:
-1. Use the repository's available code-simplifier agent when one is discoverable, or do a targeted
-   manual cleanup on changed files. The cleanup is limited to debug logs, commented-out code,
-   redundant defensive checks, and dead imports; do not assume a `/simplify` skill exists.
-2. Re-run the relevant tests after any cleanup.
-3. Commit cleanup changes separately only with approval.
-
----
-
-## STEP 5: Prepare for Code Review
-
-Before handoff, run a quick **doubt pass** on any non-trivial decision (new branching, a cross-boundary change, an invariant the compiler can't verify): try to *disprove* it, not confirm it. If you spawn a fresh-context reviewer to help, give it the artifact + contract — never your conclusion, which just gets rubber-stamped. Bound it to ~3 cycles; if substantive findings keep coming, the work isn't review-ready — say so instead of handing off. (`/grill-me` carries the full discipline.)
-
-1. **Permission gate**: push + PR require explicit user approval.
-2. **If approved, create PR**.
-3. **Hand off to `/sr`** once the task document status is `Implementation Complete` and review context
-   is ready.
-
-### Finalize task document
-1. **Update status** to "Implementation Complete" with timestamp.
-2. **Verify all checkboxes** are accurate.
-3. **Add or refresh the Completion Summary**: what changed; verification evidence (commands + results,
-   quality gate path/summary); deferred follow-ups or known skips; and a one-line **pointer** to
-   `## Deviations & Decisions` if it has entries (e.g., "See journal: 4 entries, 1 scope-expand, 2
-   tradeoffs, 1 unplanned decision"). Don't restate — point reviewers at it.
-
----
-
-## Common Rationalizations
-
-The shortcuts that feel reasonable mid-implementation and cost a re-do later:
-
-| Rationalization | Reality |
-|---|---|
-| "I'll write the test after the code" | Test-after isn't TDD — it's shaped to pass code you already wrote and won't catch a design flaw. Write the failing test first (STEP 3 / `/tdd` RED). |
-| "This step is obvious, I'll skip updating the task doc" | The next session and the reviewer read the doc, not your memory. Skipping a status/checkbox update breaks traceability (STEP 5). |
-| "Tests fail but it's unrelated — I'll fix it later" | A red suite blocks review. Fix it now, or record it explicitly as a known skip in the Completion Summary. |
-| "I'll mark it Implementation Complete now and verify later" | "Complete" without verification evidence is a claim, not a fact. Run the quality gate first, then set the status. |
-| "One big commit at the end is cleaner" | A large undifferentiated diff is unreviewable. Commit vertical slices as each acceptance criterion goes green. |
-
-## Red Flags
-
-- Writing implementation before a failing test exists for it.
-- 5+ files changed and the task document hasn't been touched once.
-- Status set to `Implementation Complete` but tests/build were never run this session.
-- An acceptance criterion checked off with no artifact (command output, test) backing it.
-- Pushing or opening a PR without the explicit approval gate in STEP 5.
+When independent review is requested or required, hand `/sr` the active task and actual
+review target. A local diff is valid review input; a pushed branch or PR is not a
+prerequisite. Perform commits, push or PR creation only within their granted scope and
+read back any action you claim. End with the result and the next action, distinguishing
+implemented, reviewed, merged and deployed states.

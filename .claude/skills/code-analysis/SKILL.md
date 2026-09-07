@@ -29,6 +29,10 @@ allowed-tools:
 
 Perform code analysis scoped to the depth tier in Step 1 (Quick / Standard / Deep). Stop as soon as you have enough evidence to fill the output template for that tier — do not expand scope beyond it. Since this runs in a forked context, be decisive: a focused 10-finding report beats a 40-finding report with filler.
 
+For a task-attached analysis, resolve the task and record the report/evidence links using
+`../setup/references/task-context.md`. A standalone overview returns its report without
+creating a synthetic task.
+
 ## Scope Boundaries
 
 This skill READS and REPORTS — it does not suggest code changes or write fixes.
@@ -64,19 +68,21 @@ find . -type f -name "*.ts" ! -path "*/node_modules/*" ! -path "*/dist/*" \
   | xargs wc -l | sort -rn | head -20
 ```
 
-Read project context dynamically — don't assume the stack:
+Read project context dynamically — don't assume the stack or commands:
 - Read a root `CLAUDE.md` or `AGENTS.md` only if one exists and applies to the target.
 - Inspect manifests that exist (`package.json`, `pyproject.toml`, `go.mod`, and similar)
   before choosing language-specific commands.
 - Read project architecture or test guidance only when discovery finds the relevant file.
 
 If any `{{VARIABLE}}` placeholder in this skill or in `references/project-checks.md` is
-still literal, resolve it by inspection (for example, discover `src/`, `lib/`, or `app/`)
-before running a command. Do not run a command containing an unresolved placeholder.
+still literal, resolve it from the repository, CI or project profile (for example,
+discover `src/`, `lib/`, or `app/`) before running a command. Do not run a command
+containing an unresolved placeholder; if evidence is unavailable, mark that check
+skipped with the reason.
 
-The command snippets below use TypeScript/JavaScript as examples. Adapt extensions and
-exclusions to the detected stack before running them; do not run a snippet unchanged when
-the repository uses another language.
+The command snippets below use TypeScript/JavaScript as examples. Adapt extensions,
+paths, exclusions and commands to detected manifests/CI before running them; do not run
+a snippet unchanged when the repository uses another language.
 
 ## 3. Architecture Analysis
 

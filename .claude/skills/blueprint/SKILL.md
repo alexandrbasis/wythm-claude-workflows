@@ -1,11 +1,11 @@
 ---
 name: blueprint
 description: >-
-  Turn a one-line objective into a bounded multi-session implementation plan with cold-start
+  Turn a one-line objective into a bounded staged implementation plan with cold-start
   briefs. Use when asked to 'blueprint', 'multi-session plan', 'long-term plan', 'construction plan',
   'break into sessions', 'plan across sessions', 'multi-step project plan', 'session plan',
-  or when a feature is too large for a single Claude session. Produces a plan where each step
-  can be executed independently by a fresh agent with no prior context.
+  or when work needs staged handoffs. Produces a plan where each step can be resumed
+  independently by a fresh agent with no prior context.
 argument-hint: "<objective>"
 allowed-tools:
   - Read
@@ -20,11 +20,16 @@ allowed-tools:
 
 # /blueprint — Multi-Session Construction Plan
 
-> **Announcement**: Begin with: "I'm using the **blueprint** skill to create a multi-session plan."
+## Shared task context
+Resolve the repository and task with
+[`../setup/references/task-context.md`](../setup/references/task-context.md) before drafting.
+Reuse a linked task and its existing plan entrypoint. This skill is an optional multi-session mode
+of the planning stage; it must not create a parallel task root when `/ct` already owns the plan.
 
 ## Purpose
 
-Large features can't be completed in a single Claude session. This skill decomposes a high-level objective into a sequenced plan where each step:
+Use this skill when an objective spans domains, handoffs, or dependencies that benefit from a
+sequenced plan. Decompose the objective so each step:
 1. Has a **cold-start context brief** — everything a fresh agent needs to execute without reading prior session history
 2. Has **explicit dependencies** — which steps must complete first
 3. Has **verification criteria** — how to confirm the step is done
@@ -36,7 +41,7 @@ Context may be compacted mid-plan. If you sense the window tightening, write the
 ## When to Use
 
 - Feature spans multiple domains (backend + mobile + infra)
-- Implementation will realistically take 3+ sessions
+- Work needs staged execution, handoffs, or independently verifiable milestones
 - Multiple developers/agents need to coordinate
 - User says "this is a big one" or "break this down for me"
 
@@ -54,10 +59,10 @@ only when the areas can be explored independently and the caller has the require
 otherwise inspect the smallest relevant set in one pass.
 
 ### Phase 2: Design (create the dependency DAG)
-1. Break the objective into 3-8 implementation steps
+1. Break the objective into behaviorally meaningful implementation steps
 2. Map dependencies between steps (which must come first?)
 3. Identify parallelizable steps (can run simultaneously)
-4. Estimate relative complexity (S/M/L) per step
+4. Record relative complexity only when it changes sequencing, ownership, or review depth
 
 ### Phase 3: Draft (write step documents)
 For each step, produce:
@@ -114,7 +119,9 @@ implications are recorded.
 
 ## Output
 
-Save the blueprint to: `docs/superpowers/plans/YYYY-MM-DD-<feature-slug>.md`
+Save the blueprint in the resolved task's existing plan convention. If no plan entrypoint exists,
+use `blueprint.md` beside `TASK.md` in the minimum task record. Preserve an existing
+`docs/superpowers/plans/` document when it is the linked task artifact.
 
 ```markdown
 # Blueprint: [Feature Name]
@@ -122,7 +129,7 @@ Save the blueprint to: `docs/superpowers/plans/YYYY-MM-DD-<feature-slug>.md`
 **Objective**: [The original one-line objective]
 **Created**: [Date]
 **Steps**: [N]
-**Estimated sessions**: [N]
+**Execution horizon (optional)**: [Describe only when useful for coordination]
 **Parallelizable steps**: [List]
 
 ## Dependency Graph
@@ -151,11 +158,12 @@ Step 1 ─── Step 2 ─── Step 4
 
 - Each step can be turned into a `/ct` task document for detailed decomposition
 - Steps can reference existing task docs in `tasks/` if they already exist
-- The blueprint itself is a living document — update it as steps complete
+- After writing, update the resolved task record with the blueprint link, current stage and next
+  action. Keep the blueprint as the source for its multi-session steps.
 
 ## Constraints
 
 - **Cold-start briefs are self-contained** — a fresh agent reads only its step's brief and can begin work. If you find yourself about to reference "see Step 2", inline the information instead.
-- **Keep steps focused** — each step should be completable in a single session (1-3 hours of agent work)
-- **Plan to the level each step needs right now** — Steps 1–2 (starting soon) get full cold-start briefs. Steps 3+ get a one-paragraph objective and can be refined later. Stop adding detail once the next executor has enough to start.
+- **Keep steps behaviorally bounded and resumable** — split when a step would be unsafe, vague, or impossible to verify as a unit; do not impose an elapsed-time target.
+- **Plan to the level each step needs right now** — the next executable step gets a full cold-start brief; later steps get enough objective, dependencies, scope, and verification to refine safely. Stop adding detail once the next executor has enough to start.
 - **Output is a plan document, not code edits.** The deliverable is the blueprint file; `/si` executes each step in a later session. If the user explicitly authorized implementation in the same request, continue to the authorized `/si` handoff after saving the plan; otherwise stop at the saved plan and state the separate handoff.

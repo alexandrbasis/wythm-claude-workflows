@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 import shutil
 import tempfile
 import unittest
@@ -38,7 +39,10 @@ class PluginBuildTests(unittest.TestCase):
         (self.root / "packaging" / "README.md").write_text("Package README.\n", encoding="utf-8")
         self._skill("si-quick", "quick", """Use `/si-quick` for a small task. See [the reference](../si-quick/reference.md).\n""", extra="disable-model-invocation: true\n")
         self._skill("update-docs", "udoc", "See `skills/update-docs/SKILL.md`.\n", extra="allowed-tools: Read, Write\n")
-        self._skill("setup", "setup", "Use the bundled setup body.\n")
+        self._skill("setup", "setup", "Read [task context](references/task-context.md).\n")
+        context = self.source_skills / "setup" / "references" / "task-context.md"
+        context.parent.mkdir()
+        context.write_text("Resolve an existing task before creating a record.\n", encoding="utf-8")
         (self.source_skills / "si-quick" / "reference.md").write_text("/update-docs\n", encoding="utf-8")
         script = self.source_skills / "si-quick" / "scripts" / "run.sh"
         script.parent.mkdir()
@@ -127,6 +131,37 @@ class PluginBuildTests(unittest.TestCase):
             self.assertTrue((artifact / "README.md").is_file())
             self.assertTrue((artifact / "LICENSE").is_file())
             self.assertTrue((artifact / "runtime-guidance.md").is_file())
+
+    def test_shared_context_and_legacy_resources_work_without_project_copy(self) -> None:
+        # Source-folder aliases change in packages, so shared references must resolve
+        # from an installed skill, independently of the consuming project's cwd.
+        template = self.source / "docs" / "templates" / "discovery-template.md"
+        template.parent.mkdir(parents=True)
+        template.write_text("Discovery fixture\n", encoding="utf-8")
+        project = self.root / "empty consuming project"
+        project.mkdir()
+        output = self.root / "dist"
+        build(self.source, output)
+        for kind in ("claude", "agent"):
+            artifact = output / kind / "claudops"
+            for skill in (artifact / "skills").iterdir():
+                text = (skill / "SKILL.md").read_text(encoding="utf-8")
+                pointer = re.search(r"(?:`|\]\()([^`\s)]*task-context\.md)", text)
+                self.assertIsNotNone(pointer, f"Missing task-context route in {skill.name}")
+                context = (skill / pointer.group(1)).resolve()
+                self.assertTrue(context.is_relative_to(artifact.resolve()))
+                self.assertEqual(context.read_bytes(),
+                                 (self.source_skills / "setup/references/task-context.md").read_bytes())
+            fallback = artifact / "skills/setup/assets/workflow/.claude/docs/templates/discovery-template.md"
+            self.assertEqual(fallback.read_bytes(), template.read_bytes())
+            if (artifact / "agents").exists():
+                for agent in (artifact / "agents").glob("*.md"):
+                    pointer = re.search(r"`([^`]*task-context\.md)`", agent.read_text(encoding="utf-8"))
+                    self.assertIsNotNone(pointer, f"Missing task-context route in {agent.name}")
+                    context = (agent.parent / pointer.group(1)).resolve()
+                    self.assertTrue(context.is_file())
+                    self.assertTrue(context.is_relative_to(artifact.resolve()))
+        self.assertEqual(list(project.iterdir()), [])
 
     def test_validation_schema_inventory_and_stale_detection(self) -> None:
         output = self.root / "dist"

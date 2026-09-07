@@ -14,7 +14,11 @@ allowed-tools: Read, Write, Edit, Grep, Glob, AskUserQuestion, Agent, Skill
 
 # Brainstorming Session
 
-> **Announcement**: Begin with: "I'm using the **brainstorm** skill for collaborative brainstorming."
+## Shared task context
+For a project-related topic, resolve the repository and any linked task with
+[`../setup/references/task-context.md`](../setup/references/task-context.md) before collecting
+context. General topics need no artificial task. Reuse existing brainstorm notes and record a
+feature-related result in the resolved task's artifact links and next action.
 
 ## Objective
 Conduct a collaborative brainstorming session through natural dialogue, exploration of options, and structured capture of insights. Brainstorms can be project-related or general — the skill adapts its depth and tooling accordingly.
@@ -29,16 +33,16 @@ Conduct a collaborative brainstorming session through natural dialogue, explorat
 
 **If no `[topic]` argument is provided:**
 1. Use `AskUserQuestion`: "What would you like to brainstorm about?"
-   - Search `docs/brainstorming/` for recent brainstorms as context
-   - Search `tasks/` for in-progress work that might spark ideas
+   - Use the repository's configured brainstorming and task roots for context
    - Include a free-text option
 2. Derive the topic slug from the user's response
 
 ## Resume Check
 
-Before starting a new session, check for existing drafts:
-1. Search for `docs/brainstorming/brainstorm-*-[topic-slug].md`
-2. If found:
+Before starting a new session, use the shared task resolver and inspect only the linked candidate
+entrypoint. For a standalone general topic, search the repository's configured brainstorming
+convention for `brainstorm-*-[topic-slug].md`.
+1. If a matching draft exists:
    - Read the existing document
    - `AskUserQuestion`: "Found an existing brainstorm on this topic."
      Options: "Continue from where we left off" / "Start fresh" / "Review and build on it"
@@ -129,7 +133,9 @@ After exploration is complete, create the brainstorm artifact. The format adapts
   - If yes: write a brief summary (skip the full template)
 
 **For Exploration / Deep Dive depth:**
-1. Create brainstorm notes: `docs/brainstorming/brainstorm-YYYY-MM-DD-[topic-slug].md`
+1. For a feature-related topic, create or update `brainstorm-[topic-slug].md` in the resolved task
+   convention. For a general topic, use the repository's configured `docs/brainstorming/`
+   convention. Link the artifact from `TASK.md` when a task exists.
 2. Use template: `.claude/docs/templates/brainstorm-template.md`
 3. Include:
    - Topic overview and type (project/general)

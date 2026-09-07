@@ -12,16 +12,20 @@ allowed-tools: Read, Grep, Glob, AskUserQuestion
 
 # Review Implementation Plan (RIP)
 
-> **Announcement**: Begin with: "I'm using the **rip** skill for implementation plan review."
-
 Step-by-step review of implementation plan. Focus: **business value** through technical understanding.
+
+Resolve the plan and related inputs with
+[`../setup/references/task-context.md`](../setup/references/task-context.md). This is an optional
+read-only walkthrough after planning; it does not create a second plan or task.
 
 ## Protocol
 
 ### Phase 1: Analysis
 
 Before responding:
-1. Read the plan completely. If the argument is a directory or ambiguous path, Glob for plan-shaped files (`tech-decomposition-*.md`, `*implementation-plan*.md`) before giving up.
+1. Read the resolved active plan completely. If the argument is a directory or ambiguous path, use
+   the task resolver and Glob for plan-shaped files (`tech-decomposition-*.md`, `*implementation-plan*.md`)
+   before asking the user to choose.
 2. Study related code (Grep, Read) — verify, don't assume. Never comment on a file you have not opened; if the plan names a file, read it before evaluating the step that touches it.
 3. Compare with PRD/business requirements — run alignment checklist:
    - Measurable outcomes/KPIs defined?
@@ -68,7 +72,6 @@ Default to a continuous walkthrough in one response (all steps, back-to-back) �
 - **Question:** [clarification]
 
 ---
-Questions? Next?
 ```
 
 ### Phase 3: Summary

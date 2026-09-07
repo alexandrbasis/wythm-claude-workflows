@@ -4,8 +4,8 @@ description: >-
   Compare a task's discovery or product requirements with its tech decomposition and
   report traceability gaps. Use when asked to 'analyze consistency', 'check alignment',
   'verify spec matches plan', 'traceability check', 'spec drift', 'are my docs aligned',
-  or after /ct completes to verify the plan covers the requirements. Also invoked
-  automatically as GATE 4 in /ct.
+  or after /ct completes to verify the plan covers the requirements. `/ct` may invoke this
+  check when traceability is material; otherwise it remains an explicit read-only command.
   NOT for code review (use /sr), NOT for code analysis (use /code-analysis),
   NOT for debugging (use /dbg).
 argument-hint: [task-directory]
@@ -14,13 +14,15 @@ allowed-tools: Read, Grep, Glob, AskUserQuestion
 
 # Analyze: Cross-Artifact Consistency Check
 
-> **Announcement**: Begin with: "I'm using the **analyze** skill for cross-artifact consistency checking."
-
 ## Purpose
 
 Verify that the tech decomposition OUTPUT of `/ct` is fully aligned with the spec INPUT (discovery/JTBD/PRD docs). Catches drift between what was specified and what was planned — BEFORE implementation begins.
 
 **This skill is read-only.** It reads and reports — no file writes, no agents, no code changes.
+
+Resolve the task and linked artifacts with
+[`../setup/references/task-context.md`](../setup/references/task-context.md). Inspect only the
+selected task's entrypoint and its linked sources; do not select a task by recency alone.
 
 ---
 
@@ -28,14 +30,16 @@ Verify that the tech decomposition OUTPUT of `/ct` is fully aligned with the spe
 
 Find the task directory and its documents:
 
-1. **If argument provided**: match against `tasks/task-*[argument]*/`
-2. **If no argument**: list recent task directories, ask user to select
+1. **If argument provided**: resolve it through the shared task contract, then inspect the matching
+   task/plan.
+2. **If no argument**: reuse the task established in the conversation, issue or branch; ask only
+   when no candidate exists or more than one remains plausible.
 
 **Required artifacts** (at least one spec + one plan):
 
 | Type | Files to look for |
 |------|-------------------|
-| **Spec** (input) | `discovery-*.md`, `JTBD-*.md` in task directory; `PRD-*.md` in `docs/product-docs/PRD/`; `JTBD-*.md` in `docs/product-docs/JTBD/` |
+| **Spec** (input) | `discovery-*.md`, `JTBD-*.md` in the task directory; linked PRD/JTBD paths, conventionally `product-docs/PRD/` and `product-docs/JTBD/` |
 | **Plan** (output) | `tech-decomposition-*.md` (or `phase-*/tech-decomposition-*.md` if split) |
 
 **If spec docs are missing**: Report "No spec documents found — cannot verify alignment. This task was created without /nf or /product documentation." Verdict: `SKIPPED`.

@@ -2,7 +2,7 @@
 
 **Date**: YYYY-MM-DD
 **Decision**: SPLIT RECOMMENDED
-**Task Directory**: [absolute path]
+**Task Context**: [resolved task directory and `TASK.md` or existing entrypoint]
 **Parent Tech Decomposition**: `tech-decomposition-[feature].md`
 
 ## Summary
@@ -38,7 +38,8 @@
 **Out Of Scope**: [What intentionally stays for later phases]
 **Behavioral Verification**: [How this phase can be tested without relying on later phases]
 
-[Repeat for each phase — aim for 2-5 phases]
+[Repeat for each phase. Choose the smallest number that preserves safe, behaviorally testable
+sequencing; do not split to satisfy a numeric target.]
 
 ## Sequencing Validation
 

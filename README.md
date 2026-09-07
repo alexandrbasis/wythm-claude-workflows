@@ -12,7 +12,7 @@
 
 ---
 
-A production-tested `.claude/` folder you drop into **any** codebase. Includes agents, skills, hooks, and a setup wizard that auto-configures everything to match your tech stack.
+Workflow skills for feature discovery, planning, implementation and review, available as a plugin or a repository-owned `.claude/` copy. Task stages share a durable record and adapt to the repository's existing conventions.
 
 Works with any language, framework, and architecture — TypeScript, Python, Go, Ruby, Java, and more.
 
@@ -29,7 +29,7 @@ The result: AI speed with human judgment. Full context at every step, no black-b
 
 ## Highlights
 
-- **`/setup` wizard** — auto-detects your tech stack, project structure, and commands, then configures all skills, agents, and hooks in one pass
+- **`/setup` wizard** — records necessary project choices; plugin workflows discover repository commands without copying all instructions
 - **`/update-setup`** — pulls upstream changes from claudops, shows a diff, lets you cherry-pick updates while preserving your local customizations
 - **18 specialized agents** — TDD, code review, task validation, research
 - **40 skills** — full dev lifecycle, dev server monitoring, and cross-AI helpers (Antigravity, Codex CLI, Cursor CLI)
@@ -110,7 +110,7 @@ skills:
   - coding-conventions   # preloaded into developer-agent
 ```
 
-The `/setup` wizard fills these convention skills with your project's tech stack, architecture rules, and commands. Every agent inherits them automatically.
+Plugin workflows read project instructions, command sources and optional `CLAUDOPS.md`. For repository-owned installations, `/setup` can configure the local convention skills; existing customizations remain authoritative.
 
 ---
 
@@ -167,11 +167,17 @@ For **Claude Code**, launch it in your target project with the built directory:
 claude --plugin-dir /absolute/path/to/claudops/dist/claude/claudops
 ```
 
-Run `/claudops:setup` once for that project, then `/claudops:ct`, `/claudops:si`,
-or `/claudops:sr`. The package contains all 40 skills and 18 agents. Setup creates
-missing project templates, preserves existing and disabled files, and asks you to
-review configuration values. It activates hooks only after approval of the exact
-settings change. Shared plugin files stay unchanged.
+Start `/claudops:nf`, `/claudops:ct`, `/claudops:si` or `/claudops:sr` in the target
+repository. The package contains all 40 skills and 18 agents. Setup is optional: use
+it for durable project choices or to maintain an explicitly requested local workflow
+copy. Shared plugin files stay unchanged, and hook activation requires its own
+authorized settings change.
+
+Each task stage resolves the same task entrypoint. Existing layouts and documents are
+reused; the fallback is `tasks/task-YYYY-MM-DD-<slug>/TASK.md`. A small task can keep its
+requirements, plan and verification in that one file. Discovery, prototypes, phase
+plans and reviews become separate linked artifacts when needed. See the
+[shared task contract](.claude/skills/setup/references/task-context.md).
 
 For **Agent Plugins v1**, use `dist/agent/claudops` with a compatible client.
 The portable package has `plugin.json` and all 40 skills; its format does not provide
@@ -204,8 +210,8 @@ cd /absolute/your-project
 
 The wizard will:
 1. **Inspect your codebase** for stack, structure, commands, and architecture
-2. **Confirm** detected values with you (framework, ORM, test/lint/build commands, architecture)
-3. **Apply confirmed values** to project files, reporting unresolved placeholders and previewing hook activation
+2. **Resolve** relevant settings from evidence and ask about material unknown choices
+3. **Apply** the requested local configuration, reporting unresolved values and previewing hook activation
 
 Configured values live in your local `.claude/` files. Unknown values remain visible for follow-up; a copied hook is not active until it is wired into settings.
 
@@ -248,7 +254,7 @@ code-quality + security + performance + test-coverage + documentation
 
 ### Task-driven flow
 ```
-/ct → /si → /sr → /prc → merge
+/nf → /vp (optional) → /ct (split when needed) → /si → /sr → /prc → authorized delivery
 ```
 
 ### Cross-AI

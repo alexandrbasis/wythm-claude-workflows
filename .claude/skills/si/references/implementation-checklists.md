@@ -10,9 +10,9 @@
   enumerated data.
 - **ALWAYS** assert exact values: `.toHaveLength(28)`, `.toEqual(["Corporation", "LLC", ...])`.
 - **ALWAYS** assert exact field counts when the spec enumerates fields.
-- When writing a test for a list/enum/options, the VC-checklist provides the exact expected count —
-  use it. If the test passes with `> 0` but the VC says 28 options, the test is WRONG even though
-  it's green.
+- When writing a test for a list/enum/options, use the exact expected set or count stated by the
+  requirement or existing evidence map. If the test passes with `> 0` but the requirement says 28
+  options, the test is WRONG even though it's green.
 
 ## Mutation & async safety checks
 

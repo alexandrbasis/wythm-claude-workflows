@@ -53,14 +53,9 @@ When `changed_files` is NOT provided, fall back to full codebase review.
 
 ## Output Mode
 
-### File mode (when `cr_file_path` is provided)
-
-Write your findings directly to the Code Review file:
-
-1. **Read** the CR file at the provided `cr_file_path`
-2. **Locate** your section markers: `<!-- SECTION:performance -->` ... `<!-- /SECTION:performance -->`
-3. **Use the Edit tool** to replace the placeholder text between markers with your findings
-4. **Do NOT** edit anything outside your section markers
+Return findings inline using the format below, regardless of whether `cr_file_path` is provided.
+The `/sr` orchestrator is the sole writer of the shared Code Review file; do not read, edit, or
+create that file or its section markers.
 
 **Write this format:**
 
@@ -83,14 +78,10 @@ If the diff shows no HIGH/MEDIUM-confidence performance concerns, write: *Review
 - [INFO] **Observation**: Performance note or optimization opportunity
 ```
 
-**Then return ONLY a short summary:**
+**Then return a short summary:**
 `"Clean. 0 critical, 0 major, 0 minor. No performance issues found."`
 or
 `"Findings. 0 critical, 1 major, 0 minor. N+1 query in WordService.findByUser()."`
-
-### Inline mode (when `cr_file_path` is NOT provided)
-
-Return findings inline using the same markdown format above.
 
 ## Confidence & Consolidation
 

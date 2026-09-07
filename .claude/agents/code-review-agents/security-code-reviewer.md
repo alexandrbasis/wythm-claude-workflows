@@ -56,14 +56,9 @@ When `changed_files` is NOT provided, fall back to full codebase review.
 
 ## Output Mode
 
-### File mode (when `cr_file_path` is provided)
-
-Write your findings directly to the Code Review file:
-
-1. **Read** the CR file at the provided `cr_file_path`
-2. **Locate** your section markers: `<!-- SECTION:security -->` ... `<!-- /SECTION:security -->`
-3. **Use the Edit tool** to replace the placeholder text between markers with your findings
-4. **Do NOT** edit anything outside your section markers
+Return findings inline using the format below, regardless of whether `cr_file_path` is provided.
+The `/sr` orchestrator is the sole writer of the shared Code Review file; do not read, edit, or
+create that file or its section markers.
 
 **Write this format:**
 
@@ -90,15 +85,11 @@ If after full coverage no issue meets even LOW confidence, write: *Reviewed; no 
 - [INFO] **Observation**: Positive security practice or minor note
 ```
 
-After writing to the CR file, return a one-line summary to the caller. Format:
+After the detailed findings, return a one-line summary to the caller. Format:
 - Clean: `"Clean. 0 critical, 0 major, 0 minor. No security issues found."`
 - With findings: `"Findings. <n> critical, <n> major, <n> minor. <short top-finding headline>."`
 
 The detailed findings live in the CR file; the summary is for the orchestrator's dashboard.
-
-### Inline mode (when `cr_file_path` is NOT provided)
-
-Return findings inline using the same markdown format above.
 
 ## Constraints
 

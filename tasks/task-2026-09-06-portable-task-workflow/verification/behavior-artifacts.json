@@ -1,0 +1,52 @@
+[
+  {
+    "case": "setup",
+    "fixture": "/private/tmp/claudops-behavior-setup-20260906",
+    "files": [
+      "AGENTS.md",
+      "CLAUDOPS.md",
+      "package.json"
+    ],
+    "sha256": {
+      "AGENTS.md": "027fe12e990d8d7fd7c775797e45c70c7196d42749c634bd58894c80b72cbc30",
+      "CLAUDOPS.md": "d18272adbe3fb116bb2e5ee1a11c7ed0ef9bd86c7b53777ac40a9edf72f65762",
+      "package.json": "026abcbf192d00baa34d968627b2872fb5a0d4f31833a32dc9c0cbe86f4837be"
+    },
+    "result": "PASS",
+    "snapshot": "fixtures/setup"
+  },
+  {
+    "case": "legacy",
+    "fixture": "/private/tmp/claudops-behavior-legacy-20260906",
+    "files": [
+      "AGENTS.md",
+      "greeting.py",
+      "tests/test_greeting.py",
+      "work-items/OPS-17/README.md"
+    ],
+    "sha256": {
+      "AGENTS.md": "f1441033dbdf053d343bda210a957750231b07804de248e4a4b3247309325b32",
+      "greeting.py": "9bb6db2ca3e423462eae12ce39588160c915558bf45f5d4e3c36cb2e8471c3b0",
+      "tests/test_greeting.py": "2b144555ea26127b59d38b90420efcb8acef6eb8adb8d355e5ed97f9c7ce38cd",
+      "work-items/OPS-17/README.md": "7228bd291d9f0adc1b888d31a5dfaad2ae87bac5324a32dde911670ae7aeb17b"
+    },
+    "result": "PASS",
+    "snapshot": "fixtures/legacy"
+  },
+  {
+    "case": "discovery-resume",
+    "fixture": "/private/tmp/claudops-behavior-new-task-20260906",
+    "snapshot": "fixtures/discovery-partial",
+    "result": "PARTIAL: task index updated; discovery still contains stale blocker after write rejection",
+    "files": [
+      "README.md",
+      "tasks/task-2026-09-06-product-list-csv-export/TASK.md",
+      "tasks/task-2026-09-06-product-list-csv-export/discovery-product-list-csv-export.md"
+    ],
+    "sha256": {
+      "README.md": "20dc0f51573d62d0d170cbb88c998ea81564f058c148a8c0c09c234b31ad54cb",
+      "tasks/task-2026-09-06-product-list-csv-export/TASK.md": "400c56cf90a8e5bdd3ec83e4055743c89e66435e4912bac09fcae625edcb61e6",
+      "tasks/task-2026-09-06-product-list-csv-export/discovery-product-list-csv-export.md": "ecf605fe54e4a7cd0613f38fa3f90401beddf956576a830675cc0e3f93bfd4c3"
+    }
+  }
+]

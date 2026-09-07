@@ -18,6 +18,11 @@ allowed-tools: Bash, Read, Edit, Glob, Grep, AskUserQuestion, TodoWrite
 
 Fetch, analyze, and address code review comments on the current PR. Present an action plan for user approval before implementing fixes, then commit and reply to reviewers.
 
+Resolve one task context with `../setup/references/task-context.md` before fetching comments. Reuse
+the linked task or create a minimum record in the configured task root. Record the comment inventory,
+approved decisions, verification, commit/PR links, and one next action there; do not
+create a second task just because the PR has a different artifact path.
+
 ## Related Skills
 
 - `/sr` — Initiate a code review (before merge). Use that skill to start a review, this skill to address the results.
@@ -45,6 +50,9 @@ Inform user: "No open PR found for branch `{branch}`. Verify the branch is pushe
 
 **Error — no comments found:**
 Inform user: "No review comments found on PR #{number}. Nothing to address." Stop execution.
+
+After resolving the PR, link its URL and snapshot to the task record. A missing task/spec does not
+invent requirements; it only limits claims in the action plan.
 
 ---
 
@@ -125,6 +133,9 @@ reply set. A code-fix request alone authorizes the local change, not external me
 
 For skipped comments:
 - Draft a respectful explanation; send it under the same explicit communication gate
+
+Append the final comment decisions, verification result, and reply status to the resolved task record
+before reporting completion. If replies were not authorized or sent, record them as drafts/pending.
 
 **Error — gh API reply fails:**
 Report the error and suggest manual reply via GitHub UI.

@@ -24,6 +24,10 @@ allowed-tools:
 
 Spawn scoped `developer-agent` workers in isolated git worktrees to implement independent work items simultaneously, then merge results back into the working tree.
 
+Resolve the task first with `../setup/references/task-context.md`. Use the selected task root and
+record the parallelization decision, worker results, validation evidence, and next action there. The
+orchestrator is the sole writer of shared task/review records.
+
 ## When to Parallelize
 
 Parallelization helps when a task has multiple acceptance criteria that are genuinely independent — different modules, different files, no shared state. The time savings are significant (N items in ~1x time instead of Nx time), but the merge overhead adds complexity. Use this decision matrix:
@@ -38,7 +42,8 @@ Parallelization helps when a task has multiple acceptance criteria that are genu
 | Steps share test fixtures or DB state | No — sequential |
 | Only 1 parallelizable item | No — not worth the overhead |
 
-**Max concurrency**: Spawn at most **4 workers** simultaneously. Beyond that, API throughput and context quality degrade.
+Keep the worker set small enough to review and merge. Four simultaneous workers is a practical
+ceiling; combine tiny adjacent work items instead of dispatching one worker per checklist row.
 
 If a scenario is not covered by the matrix, default to sequential and state
 your reasoning in one sentence before proceeding. Parallelization is an
@@ -54,16 +59,18 @@ Before spawning any workers, verify:
    in-place execution or ask the user to preserve the changes. If only unrelated files are dirty,
    leave them untouched and proceed with isolated workers. Never require an unrelated commit or
    stash solely to use this optimization.
-2. **Task document exists**: The task doc must be readable and have identifiable work items.
+2. **Task context exists**: the resolved record or linked plan must be readable and have identifiable
+   work items. If the record lacks concrete work-item detail, record the blocker and stop; do not
+   invent parallel criteria merely because a minimum record was created.
 3. **Independence verified**: Confirm selected items don't share files. Quick check: list the expected file paths for each item and look for overlaps.
 
 ## Workflow
 
 ### 1) Identify parallelizable work items
 
-**Wave detection (preferred)**: Check the task document for wave annotations (e.g., `— **Wave 1**`, `— **Wave 2**`). If present, group steps by wave number. Execute all same-wave steps in parallel, then advance to the next wave. This is the preferred path since wave annotations are assigned by `/ct` during planning when the author has full context.
+**Wave detection (preferred)**: Check the resolved task record for wave annotations (e.g., `— **Wave 1**`, `— **Wave 2**`). If present, group steps by wave number. Execute all same-wave steps in parallel, then advance to the next wave. Wave annotations are optional; do not require `/ct` formatting.
 
-**Fallback (no waves)**: Read the task document. List all acceptance criteria / work items. Select only those that pass the decision matrix above.
+**Fallback (no waves)**: Read the resolved task record. List all acceptance criteria / work items. Select only those that pass the decision matrix above.
 
 Announce the plan:
 
@@ -143,26 +150,26 @@ working directory from the task and repository scripts before running commands; 
 placeholder and keep each package invocation in its own explicit cwd. Do not claim validation from
 an unresolved root-level command.
 
-**Project verification:**
-```bash
-{{LINT_CMD}} && {{TYPECHECK_CMD}} && {{TEST_CMD}}
-```
+**Project verification:** Run the repository's resolved lint, type, and test commands from their
+declared working directories. Do not execute an unresolved placeholder or assume a root command.
 
 If validation fails, identify which worker's changes caused the issue and fix in the main working tree.
 
-### 5) Update task document
+### 5) Update task record
 
-After all workers' changes are applied and validated, update the task document **once**:
+After all workers' changes are applied and validated, update the selected task record **once**:
 - Check off completed criteria
-- Add changelog entries for each parallelized item
+- Add concise result links for each parallelized item
 - Note which items were parallelized (useful for reviewers)
 
-Workers must not edit shared task documents — this is the orchestrator's job, to avoid merge conflicts in docs.
+Workers must not edit shared task/review records — this is the orchestrator's job, to avoid merge
+conflicts in docs. Link each worker's returned summary and validation evidence in the selected task
+record; do not create a second ledger.
 
 ### Context note
 Worker results accumulate in this conversation. Context may be
 auto-compacted between waves. Before starting the next wave, re-read the
-task document to reconstruct scope, and only persist between waves what
+the resolved task record to reconstruct scope, and only persist between waves what
 you will actually need (diffs applied, validation status). Do not stop a
 multi-wave run because context feels full — compaction is handled for you.
 

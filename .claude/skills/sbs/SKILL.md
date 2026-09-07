@@ -29,11 +29,15 @@ allowed-tools: Read, Edit, Write, Bash, Glob, Grep, AskUserQuestion, TodoWrite, 
 ## PRIMARY OBJECTIVE
 Guide the user through their requested task as an interactive teacher, explaining each step clearly while building genuine understanding — not just completing work. The user should walk away able to repeat and adapt what they learned, not just follow a recipe.
 
+For a project task, resolve context through `../setup/references/task-context.md` and
+keep resumable state with that task. A general lesson may use `docs/learning/` after the
+user asks to save notes; teaching alone must not create a product task.
+
 ## ARGUMENT VALIDATION
 
 **If no `[topic]` argument provided:**
 1. Use `AskUserQuestion`: "What would you like to learn about?"
-   - For a project-specific topic, scan recent `git log --oneline -5` and `tasks/` for contextual suggestions; for a general topic, skip repository discovery
+   - For a project-specific topic, use the resolved task/repository convention and recent `git log --oneline -5` for contextual suggestions; for a general topic, skip repository discovery
    - Offer 2-3 relevant suggestions based on recent project activity
    - Include a free-text option
 
@@ -191,10 +195,10 @@ Scale detail to the session depth chosen in setup:
 Long sessions (Full Tutorial, Deep Mastery) can span many turns. If
 context is compacted mid-session, do not wrap the session up early —
 the learning plan from SESSION SETUP is the source of truth. Before
-any summarisation pass, update the session's resume file under `docs/learning/`
-with the current step number, chosen depth, and pending bonus-learning notes so the
-session can pick up from the correct step. Create that resume artifact only when a
-long session needs cross-turn continuity or the user asks for resumable notes.
+any summarisation pass, update the resolved task resume record with the current
+step number, chosen depth, and pending bonus-learning notes. If no task is attached,
+use `docs/learning/` only when a long session needs cross-turn continuity or the user
+asks for resumable notes.
 
 ## SESSION CAPTURE
 

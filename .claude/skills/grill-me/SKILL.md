@@ -7,6 +7,11 @@ description: Use when a plan, design, or discovery document needs stress-testing
 
 Pressure-test a plan or design until the remaining ambiguity is explicit, bounded, and easy to communicate.
 
+For task work, resolve the reviewed artifact with
+[`../setup/references/task-context.md`](../setup/references/task-context.md). Read the linked
+entrypoint and relevant sections only; return the compact decision summary to the caller, which
+owns any durable task update.
+
 ## Core Behavior
 
 - First, enumerate every candidate risk you can see across all categories

@@ -14,6 +14,11 @@ description: >-
 
 Extract and formalize domain terminology from the current conversation into a consistent glossary stored at `product-docs/UBIQUITOUS_LANGUAGE.md`. The same vocabulary is used by domain experts, the user, and the AI — both in planning docs (PRD, JTBD, discovery, tech-decomposition) and in code.
 
+When called from task work, resolve the repository and task with
+[`../setup/references/task-context.md`](../setup/references/task-context.md). Step-0 calls from
+`/nf`, `/product`, and `/ct` are load-only. Write the glossary only for an explicit update request
+or an authorized post-grill update, then link the result from the task record when relevant.
+
 Classify the invocation before writing. A caller's Step 0 request is read-only loading. An
 explicit request to build/update the project glossary or define its domain terms authorizes
 the glossary update; an authorized post-grill caller may do the same. An explanatory request

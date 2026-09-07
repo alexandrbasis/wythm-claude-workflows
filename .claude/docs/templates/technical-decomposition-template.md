@@ -1,4 +1,11 @@
-> **For agentic workers:** Use `/si` to implement this task. Follow TDD (RED -> GREEN -> REFACTOR). Each step must have a failing test before production code. Update step checkboxes and test evidence during implementation, then use the completion summary for final verification evidence. See `.claude/skills/si/SKILL.md` for the full workflow.
+> **For agentic workers:** Use `/si` to implement this task when authorized. Follow the repository's
+> test strategy; use TDD where the project requires it. Update step checkboxes and test evidence
+> during implementation, then use the completion summary for final verification evidence. See
+> `.claude/skills/si/SKILL.md` for the implementation workflow.
+
+> **Task context:** Resolve and update the linked task record using
+> `.claude/skills/setup/references/task-context.md`. Keep status, links, evidence and next action
+> in that record; this document owns the technical plan.
 
 # Technical Decomposition: [Task Name]
 **Status**: Technical Review | **Created**: YYYY-MM-DD
@@ -6,11 +13,14 @@
 > **Lifecycle:** `Technical Review` -> `In Progress` -> `Implementation Complete`
 
 ## Linked Inputs / Context
-- Discovery: `./discovery-[feature-name].md` (if exists)
-- JTBD: `./JTBD-[feature-name].md` (if exists)
-- PRD / requirements: `[path-to-doc]` (if exists)
-- Architecture / decision docs: `[path-to-doc]` (if relevant)
+- Task record: `[path-to-TASK.md or existing task entrypoint]`
+- Discovery: `[path to discovery document]` (if exists)
+- JTBD: `[path to JTBD document]` (if exists)
+- PRD / requirements: `[path to requirements document]` (if exists)
+- Architecture / decision docs: `[path to relevant document]` (if relevant)
 - Other inputs: [prototype, issue link, diagrams, notes]
+
+Resolve each relative link from the document that owns it and verify it exists before relying on it.
 
 ---
 

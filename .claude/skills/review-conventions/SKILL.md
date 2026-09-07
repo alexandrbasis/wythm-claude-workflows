@@ -7,25 +7,27 @@ description: "Internal reference skill — shared conventions for all code revie
 
 Shared knowledge preloaded into review agents. Apply these conventions when reviewing code.
 
-## Tech Stack
+## Project context
 
-- **Framework**: {{FRAMEWORK}}
-- **ORM**: {{ORM}}
-- **Auth**: {{AUTH}}
-- **Testing**: {{TEST_FRAMEWORK}} — `{{TEST_CMD}}`
-- **Language**: {{LANGUAGE}}
-- **Architecture**: {{ARCHITECTURE}}
-- **Docs reference**: `{{DOCS_DIR}}`
+This reference stays generic so it can run in any repository. Read an
+applicable `CLAUDOPS.md`, manifests, CI configuration, source layout, and
+existing code before applying project-specific review rules. Use the project's
+own language, framework, layers, test commands, and documentation locations;
+leave unknowns explicit. `{{...}}` markers are historical template notation,
+never runtime defaults or executable paths.
 
 ## Architecture Rules
 
-{{LAYER_RULES}}
+Review boundaries and dependencies as the target project defines them. Use its
+architecture vocabulary where it already has one; do not rename `service`,
+`API`, `module`, or similar identifiers merely to fit this reference.
 
 ## Code Standards
 
 - Prefer project-established type/interface conventions
-- No unnecessary underscores for unused variables
-- Proper type safety — avoid `any`
+- Preserve local naming and type conventions; apply language-specific rules such
+  as underscore prefixes or `any` only when the repository's tooling establishes
+  them.
 - Secrets never logged; environment vars flow only through config providers
 - Database queries use parameter binding — no dynamic SQL or string interpolation
 
@@ -81,7 +83,9 @@ and move on.
 
 ## Project File Locations
 
-- Architecture docs: `{{DOCS_DIR}}`
+- Architecture docs: resolve from the repository's documented location or
+  changed-file references; do not assume a `docs/` subdirectory.
 - Product docs (PRDs, JTBDs): `product-docs/`
-- Task documents: `tasks/<task-dir>/tech-decomposition*.md`
-- Test structure: `{{TEST_DIR}}`
+- Task documents: resolve through `../setup/references/task-context.md`; preserve
+  repository conventions such as `tasks/<task-dir>/tech-decomposition*.md`
+- Test structure: infer from the repository's existing test layout and CI.

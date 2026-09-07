@@ -280,7 +280,7 @@ def _pointer(source_dir: str, explicit_only: bool) -> str:
         POINTER_MARKER,
         f"> If `.claude/skills/{source_dir}/SKILL.md.disabled` exists, stop before reading a fallback.",
         f"> **Project configuration:** If the current project contains `.claude/skills/{source_dir}/SKILL.md`, read and apply it instead of this bundled default. The project copy is the capability source of truth.",
-        "> If the selected task needs missing project files or contains unresolved `{{PLACEHOLDER}}` values, route to the setup skill first; reference-only tasks can continue with the bundled body.",
+        "> **Repository context:** Read `../setup/references/task-context.md` when resolving a task, project commands, or legacy `.claude/` resource paths. Use repository evidence and optional `CLAUDOPS.md`; a missing local workflow copy does not require setup. Resolve bundled resources from the installed skill, never from the target cwd.",
     ]
     if explicit_only:
         lines.append("> **Invocation guard:** use this as a standalone skill only when explicitly requested by the user; automatic selection is not authorization. Portable clients may not enforce Claude Code host-level invocation restrictions.")
@@ -466,6 +466,11 @@ def _copy_agents(source_root: Path, output_root: Path, aliases: dict[str, str]) 
         if original_dependencies:
             dependencies[name] = original_dependencies
         path = destination_root / f"{name}.md"
+        body = (
+            "> Read `../skills/setup/references/task-context.md` for repository and bundled-resource "
+            "resolution. Reuse the task and write ownership passed by the orchestrator.\n\n"
+            + body
+        )
         path.write_text(_render_document(rewritten, _rewrite_aliases(body, aliases)), encoding="utf-8")
     return dependencies
 

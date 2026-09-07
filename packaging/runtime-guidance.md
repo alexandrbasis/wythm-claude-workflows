@@ -1,17 +1,22 @@
 # Runtime guidance
 
-The plugin is a read-only source of workflow defaults. The `setup` skill owns explicit
-project bootstrap and copies missing files from
-`skills/setup/assets/workflow/.claude`; it excludes settings, MCP configuration, logs,
-secrets, and other runtime state. Existing project files are preserved.
+The plugin is a read-only source of workflow defaults and resources. Skills operate
+in the selected repository without requiring a copied workflow. Read applicable project
+instructions, optional `CLAUDOPS.md`, and real command configuration. The shared task
+contract lives at `skills/setup/references/task-context.md` in either package.
 
-Skills prepend a project-configuration pointer. When a project contains the referenced
-`.claude/skills/<source-folder>/SKILL.md`, that configured file is the capability source
-of truth. A `.disabled` marker stops the skill. Unresolved placeholders route to setup.
-Portable Agent Plugins clients may not implement Claude Code's host-level invocation
-guards, so explicit-only behavior is repeated in the skill instructions and recorded as
-metadata rather than claimed as a portable enforcement guarantee.
+A project's `.claude/skills/<source-folder>/SKILL.md` is an explicit local override.
+A `.disabled` marker stops that capability. Preserve those choices. Missing local files
+use bundled defaults; unresolved command placeholders require repository evidence or a
+specific clarification, not installation of the whole workflow.
 
-Claude-only agents are flattened into the plugin's `agents/` directory and their skill
-dependencies are qualified as `claudops:<skill-name>`. Agent Plugins v1 standardizes
-skills and MCP only; agents and hooks remain client-specific.
+Relative resource links resolve from the active skill directory. Legacy `.claude/docs`,
+`.claude/scripts` and agent resources have a fallback in the setup skill's
+`assets/workflow/.claude` tree. The explicit copied-workflow bootstrap remains available
+for users who want repository-owned instructions; it preserves existing files and excludes
+settings, MCP configuration, logs, secrets and runtime state. Hook activation is separate.
+
+Portable clients may not implement Claude Code's host invocation guards. Explicit-only
+behavior remains in skill text and metadata, without a claim of portable enforcement.
+Claude agents are flattened into `agents/` with qualified skill dependencies. Agent Plugins
+v1 packages contain skills; each host must supply supported delegation/tool capabilities.

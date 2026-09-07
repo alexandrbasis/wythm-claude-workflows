@@ -13,6 +13,10 @@ disable-model-invocation: true
 
 > **Upstream**: Adapted from [mattpocock/skills/tdd](https://github.com/mattpocock/skills/tree/main/tdd). Vocabulary aligned with this repo's `architecture-language/LANGUAGE.md`. Used as the canonical TDD reference by `/si` and `/si-quick`.
 
+When invoked for task work, resolve the task with `../setup/references/task-context.md`. Use its
+approved requirements and decisions as the authority, and record only the resulting test evidence
+and next action there; this reference does not create a second planning or test ledger.
+
 ## Philosophy
 
 **Core principle**: Tests should verify behavior through public interfaces, not implementation details. Code can change entirely; tests shouldn't.
@@ -134,18 +138,6 @@ After all tests pass, look for [refactor candidates](refactoring.md):
   cannot prove that RED was observed. Report chronology as unverifiable when history is absent or
   when tests and implementation were intentionally coupled under repository policy; the behavioral
   RED-before-GREEN invariant still applies.
-
-## Common Rationalizations
-
-The excuses that quietly turn TDD back into test-after:
-
-| Rationalization | Reality |
-|---|---|
-| "I'll add tests after the code works" | That's test-after, not TDD. The test no longer drives the design and tends to encode whatever the code happens to do. RED comes before code. |
-| "Testing the implementation is fine, it's faster" | Tests bound to internals break on every refactor and stop being a safety net. Test behavior through the public interface. |
-| "This slice is small, I'll skip the failing-test step" | If you didn't watch it fail, you don't know the test tests anything. A test that never went RED can pass for the wrong reason. |
-| "I'll build the whole layer, then test the stack" | Horizontal slices defer integration risk to the end. Build thin vertical slices that prove the whole path early (see Anti-pattern above). |
-| "Tests are green-ish, I'll refactor now" | Never refactor while RED. Get fully GREEN first, then refactor with the net in place. |
 
 ## Red Flags
 

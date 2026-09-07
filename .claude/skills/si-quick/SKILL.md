@@ -1,10 +1,9 @@
 ---
 name: quick
 description: >-
-  Use when handling a small, untracked change with clear scope or a bugfix with a known root
-  cause, and there is no tech-decomposition or task directory to follow. Trigger on requests like
-  'quick fix', 'just do it', 'small change', or 'quick task'. NOT for new features, tracked task
-  work, or changes needing formal implementation/review flow (use /si).
+  Apply a small change with known scope or a diagnosed bug fix using a compact task record.
+  Use for quick fixes, configuration edits and bounded refactors; use /ct when the work
+  needs unresolved design or coordinated implementation planning.
 allowed-tools:
   - Read
   - Write
@@ -16,118 +15,21 @@ allowed-tools:
   - Skill
 ---
 
-# /quick — Lightweight Task Mode
+# Quick implementation
 
-> **Announcement**: Begin with: "I'm using the **quick** skill for a lightweight task."
+Use the [implementation contract](../si/SKILL.md) in compact mode. This entrypoint keeps
+its short invocation; task resolution, TDD, evidence and authorization have one owner.
 
-Fast-path implementation with quality checks but no ceremony.
+Resolve or create the task using [shared task context](../setup/references/task-context.md).
+An existing task folder is valid input. Keep the objective, scope, short plan, relevant
+checks and next action in its existing record; a new task needs only `TASK.md`.
 
-## When to Use
-- Bug fixes with known root cause
-- Config changes, env updates
-- Small refactors (rename, extract, inline)
-- Adding a validation rule, fixing a query
-- Anything that touches **<5 files**, has **clear scope**, and is **not already tracked by a task doc**
+Choose quick mode when the behavior and approach are known and the change is bounded.
+File count alone does not decide complexity. If a formal plan already describes the
+work, follow it. If new product decisions or coordinated dependencies appear, capture
+them and use `/nf` or `/ct` for the missing work before proceeding.
 
-## When NOT to Use (redirect)
-- A `tech-decomposition` or task directory already exists → `/si`
-- New feature or module → `/ct` + `/si`
-- Change needs Linear tracking → `/ct` + `/si`
-- Change touches >5 files → `/ct` + `/si`
-- Unclear scope or multiple approaches → `/brainstorm` or `/nf`
-
----
-
-## Workflow
-
-### STEP 1: Scope Gate
-Before starting, verify this is truly a quick task:
-- If a `tech-decomposition` or task directory already exists, use `/si` instead.
-- Count expected files to change. If >5, suggest `/ct` + `/si` instead.
-- If the change requires a new module/service/table, suggest `/ct` + `/si` instead.
-- If the user already wants a formal tracked implementation/review path, suggest `/si` instead.
-- If the user insists, proceed — but note the risk.
-
-### STEP 2: Quick Plan
-State in **3-5 bullet points** what will change:
-```
-Quick plan:
-- Fix: [what's wrong / what needs to change]
-- Files: [list of files to modify]
-- Test: [how to verify it works]
-```
-
-If the request already specifies the quick scope and expected files, treat that as confirmation and
-proceed. Otherwise get user confirmation before proceeding.
-
-### STEP 3: Implement
-- Stay inside the quick plan from STEP 2. Don't refactor adjacent code, rename unrelated symbols, or add defensive checks for cases the plan didn't identify. If you find something tempting, note it as a follow-up instead of doing it.
-- Apply the change to **every file listed** in the STEP 2 plan — not only the first. If implementation reveals a file that wasn't in the plan, confirm before expanding scope.
-- **Follow TDD for any logic changes** — canonical rules in `.claude/skills/tdd/SKILL.md`. Bright-line subset (same as `/si`):
-  - Write the test first, and confirm it fails for the right reason before writing code
-  - If production code landed before the failing test, revert it and restart from the test
-  - Implement the minimum change that turns the test green
-  - Vertical slices only — one RED→GREEN per behavior. Never horizontal (all tests first, then all code).
-  - Verify: `{{TEST_CMD}}`
-  - The test-first order matters because it lets the test specify the behavior, not just confirm the implementation the model already wrote.
-- For non-logic changes (config, docs, formatting): just make the change
-
-### STEP 4: Verify
-Run the smallest repo-appropriate verification that proves the changed behavior for the touched
-package(s). Resolve each command from the affected package's scripts and working directory first;
-never execute an unresolved placeholder or repeat a `cd` into the same package in one shell chain.
-
-Examples:
-
-**Logic change:**
-```bash
-{{LINT_CMD}} && {{TYPECHECK_CMD}} && {{TEST_CMD}}
-```
-
-**Config/docs change:**
-```bash
-{{LINT_CMD}}
-```
-
-**Type-only change:**
-```bash
-{{TYPECHECK_CMD}}
-```
-
-If the touched package uses different scripts or stronger verification is warranted, run those instead. If any check fails, fix it before proceeding.
-
-**Evidence requirement**: Before reporting completion, run the checks above and show their passing output. Project hooks (for example `stop-guard.sh`) enforce the same contract, so skipping them will block the run anyway.
-
-### STEP 4.5: De-Sloppify (if logic changes were made)
-If STEP 3 included logic changes (not just config/docs), run a quick de-sloppify pass:
-1. Identify changed files: `git diff --name-only`
-2. Run `/simplify` skill (`Skill tool → skill: "simplify"`) — it reviews changed files for slop: console.logs from debugging, commented-out code, redundant defensive checks, dead imports. Removes them without refactoring logic.
-3. If fixes applied, re-run STEP 4 verification checks.
-
-### STEP 5: Commit
-Ask user permission, then create a single conventional commit:
-```
-<type>(<scope>): <summary>
-```
-
-Types: `fix`, `refactor`, `chore`, `docs`, `test`
-
-### STEP 6: Optional Handoff
-- If the user only wants the quick fix applied, stop after STEP 5.
-- If the change now needs a formal tracked review path and a task doc already exists, hand off to `/sr`.
-- If the change needs formal review but no task doc exists, ask whether to promote the work into `/si` first.
-
----
-
-## What /quick Does NOT Do
-- Create task documents by default
-- Create Linear issues
-- Run review agents by default
-- Create PRs automatically
-- Update ROADMAP/STATE files
-
-## Guardrails
-
-Follow the shared reference: `.claude/docs/references/deviation-rules.md`
-
-This covers: auto-fix vs ask matrix, 3-attempt limit, scope boundaries, and paralysis guard rules.
+Implement with the tests/validation appropriate to the change and record the observed
+result in the same task. Preserve unrelated files and user edits. The requested fix can
+finish locally without a commit or PR; perform later actions only when authorized.
+Independent review remains available through `/sr` using the compact record.

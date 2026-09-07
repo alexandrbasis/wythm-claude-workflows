@@ -20,4 +20,7 @@ Step out of the current file. Go up one layer of abstraction. Produce a compact 
 
 Do not propose changes. Do not deep-dive into any one module. The point is to recover bearings, not to solve a problem.
 
+If this supports an active task, use [`../setup/references/task-context.md`](../setup/references/task-context.md)
+to read the selected task's relevant links. Do not create a task or artifact for a standalone map.
+
 If `product-docs/UBIQUITOUS_LANGUAGE.md` exists, name modules using its terms when possible.

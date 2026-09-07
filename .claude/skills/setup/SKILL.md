@@ -16,88 +16,71 @@ allowed-tools:
   - TodoWrite
 ---
 
-# Configure claudops for a project
+# Configure claudops for a repository
 
-Configure the requested repository's workflow using values evidenced in that repository
-and confirmed by the user. A plugin is a read-only template source; project configuration
-belongs in the target repository's `.claude/` directory.
+Make the workflow usable in the selected repository. The installed plugin supplies
+instructions and resources; repository configuration records only local choices.
+A task can start without setup when its context is already discoverable.
 
-## 1. Establish the target and existing configuration
+## Establish the project
 
-Resolve the requested repository and workspace in a monorepo. Inspect existing `.claude/`
-files before preparing changes. For a re-run, determine whether the request means specific
-values or a full reconfiguration; ask only when that scope is unclear. Preserve local
-content outside the selected configuration regions.
+Read [shared context](references/task-context.md) for repository/resource resolution.
+Resolve the target workspace and inspect project instructions, an existing `CLAUDOPS.md`,
+task directories and command configuration. On reconfiguration, compare current and
+requested values. Preserve unrelated local content and disabled skills.
 
-When loaded from a plugin and project templates are missing, use the script adjacent to
-this loaded skill, `scripts/bootstrap_project.py`. Resolve its absolute path from the
-skill location; keep the target repository as the working directory:
+Use [discovery categories](references/discovery.md) only for missing relevant context.
+Determine task-root conventions, command sources and unusual architecture or release
+constraints from evidence. Ask once for material unresolved choices; reuse decisions
+already supplied by the user. Do not make routine detected values into a new approval gate.
+
+## Configure the minimum
+
+Prefer the repository's existing configuration home. If none exists and durable choices
+are needed, write `CLAUDOPS.md` at the repository root. Keep it short:
+
+```markdown
+# Claudops project context
+Task root: tasks/  <!-- replace with the actual established convention -->
+Workspaces: <relevant package roots, when needed>
+Command sources: <package configuration / CI paths; non-obvious invocations if needed>
+Project constraints: <rules that cannot be discovered from the files above>
+```
+
+Record only actual values; omit irrelevant fields. Link existing instructions rather
+than duplicate them. Fill a task record using the shared contract when setup supports
+an active task. Setup itself does not require a product discovery document.
+
+Plugin mode does not copy all skills into the project. Read explicit local skill
+customizations if present; the installed defaults cover other capabilities. Resolve
+unfilled legacy command placeholders from actual project sources for the current task;
+unknown values block only dependent work. A missing `.claude/` directory is not a blocker.
+
+## Optional copied-workflow maintenance
+
+Use this branch only when the user requests a repository-owned copy of the workflow,
+or reconfiguration of an existing copied installation. The script adjacent to this
+skill, `scripts/bootstrap_project.py`, previews missing templates:
 
 ```bash
 python3 "/absolute/path/to/loaded/setup/scripts/bootstrap_project.py" --project "/absolute/project"
 ```
 
-Review its `add` and `preserved` lists. An authorized first setup includes copying these
-missing workflow templates; run the same command with `--apply` and read back the result.
-The script preserves existing files and excludes settings, secrets and runtime state.
-It does not configure or activate hooks. If existing files are older or customized,
-use `update-setup` for those changes rather than overwriting them during bootstrap.
+Inspect `add` and `preserved`, then apply with `--apply` within the authorized scope.
+It preserves existing files and disabled markers and excludes settings, secrets and
+runtime state. Use `update-setup` for existing customized files. Substitute only
+confirmed legacy `{{UPPERCASE_VARIABLE}}` values in the selected local files; retain
+unknowns and report the dependent capabilities. Plugin resources remain unchanged.
 
-With a copied `.claude/` installation, configure the existing local files directly.
-Completion: the target is explicit and the local files to configure are identified.
+For requested hooks, read [activation guidance](references/hooks.md). Show the exact
+settings diff and obtain approval before activating side effects, unless that exact
+scope is already approved. Validate changed scripts and preserve existing matchers.
+Disable skills only when the user selects that set; tool absence does not authorize it.
 
-## 2. Detect and confirm values
+## Verify and finish
 
-Read [discovery outputs](references/discovery.md) for the categories relevant to this
-setup: stack, paths, commands, architecture and any additional project-specific category.
-Use independent scouts when that improves coverage; a small repository can be inspected
-directly. Cite the source for each detected value and label unknowns. Obtain command
-values from project configuration instead of guessing a language's usual defaults.
-
-Present one reviewable set covering every detected category, including uncertainty and
-current-versus-proposed values on reconfiguration. Confirm the values together; request
-corrections for unresolved decisions. Values already approved for this scope remain
-approved. Do not invent values for unknown placeholders.
-
-Completion: each value to substitute has evidence and confirmation; unresolved values
-are recorded separately.
-
-## 3. Configure local workflow files
-
-Apply the confirmed values through the authorized set without repeated per-file or
-per-batch approval. Fill `coding-conventions/SKILL.md` and `review-conventions/SKILL.md`
-first, then relevant skill and agent Markdown. Before each file, give a compact path and
-substitution summary. Preserve user-authored text outside the selected regions.
-
-Search for actual `{{UPPERCASE_VARIABLE}}` occurrences rather than any double brace.
-Replace only confirmed variables. For multi-line layers and rules, use the confirmed
-architecture; if none exists, say that no project-specific architecture rule is configured.
-Keep unknown placeholders intact with a follow-up list. Documentation examples explaining
-placeholder syntax are not unresolved project settings.
-
-For hook configuration, read [hook values and activation](references/hooks.md). Configure
-only hooks applicable to the detected stack. Validate Python literals and shell quoting.
-Show the exact `.claude/settings.json` JSON diff, preserving every existing setting and
-matcher, and obtain approval before activation. A previously approved exact diff may be
-applied directly. Copying templates does not approve auto-commit or other hook side effects.
-
-When a concrete architecture is confirmed, update
-`code-analysis/references/project-checks.md` with checks for the detected source paths.
-For disabling skills, list candidate names and reasons, let the user select the exact set,
-then show the final set for confirmation. Rename only that set's `SKILL.md` files to
-`SKILL.md.disabled`; keep every other skill enabled. Absence of a tool alone does not
-approve disabling its skill.
-
-## 4. Verify the destination
-
-Read back changed local files and verify substitutions against the confirmed values.
-Check remaining project placeholders across skills, agents and hooks. Parse any modified
-JSON; syntax-check changed Python/shell hooks before activation. Confirm each configured
-hook path exists and each selected matcher references the intended file. Report hooks as
-active only when the settings read-back proves they are wired; runtime success needs an
-actual invocation.
-
-Finish with the configured repository, file counts, unresolved values, disabled skills,
-and verified hook state. Distinguish copied, configured, wired and exercised components.
-If a Claude session needs to reload newly materialized agents, say so; do not start an
-unrequested implementation or review workflow just to test setup.
+Read back configured files, verify referenced paths and commands against their sources,
+and report unresolved decisions. Parse modified configuration and syntax-check modified
+hook scripts. Distinguish configured, copied, wired and exercised components. Runtime
+success requires an actual relevant invocation; do not start another workflow solely to
+claim setup succeeded. The result is the configured project and any active task's next step.

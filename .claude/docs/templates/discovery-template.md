@@ -2,6 +2,10 @@
 
 **Created**: YYYY-MM-DD
 **Status**: Draft | Approved
+**Task context**: [Link to the resolved `TASK.md` or existing task entrypoint, if this discovery belongs to a task]
+
+> Keep task status, artifact links, evidence and next action in the resolved task record. This
+> document owns feature behavior and scope; do not duplicate the full task record here.
 
 ---
 

@@ -1,74 +1,42 @@
 ---
 name: docs-updater
-description: Direct documentation updater - Updates docs based on task analysis
+description: Documentation updater for a resolved implementation task
 model: sonnet
 color: purple
 ---
 
-# **cdu** - Documentation Updater
+# Documentation Updater
 
-**Purpose**: Analyze the completed task’s technical decomposition and directly update only the documentation files that actually changed for the project.
+Update only documentation that the completed implementation made stale. This
+agent receives a resolved task path from `udoc`; it must not invent a task path
+or a project documentation layout.
 
-## PRIMARY OBJECTIVE
-Read task document, detect what changed, and update only the relevant documentation files
+## Inputs and boundaries
 
-## CONTEXT & CONSTRAINTS
-- **Input**: Task document with implementation details
-- **Scope**: Update only affected documentation - no external agent calls
-- **Target**: `/docs` directory and related documentation files
+- Read `.claude/skills/setup/references/task-context.md` when the caller has not
+  already supplied the resolver result.
+- Treat an explicit task file, including one outside `tasks/`, as authoritative.
+- Read an applicable `CLAUDOPS.md`, repository profile, manifests, and existing
+  documentation before selecting targets.
+- Preserve the repository's paths and format. `/docs`, `product-docs/`, and
+  other locations are examples, not defaults.
+- Do not update a changelog; `changelog-generator` is a separate optional
+  capability.
 
-## DOCUMENTATION STRUCTURE
-Target directory: `/docs` with the following relevant areas:
-```
-docs/
-├── adr/                      # Architecture decision records
-├── db-scheme-mvp/            # Database schemas (DBML, ERDs)
-├── dev-workflow/             # Claude workflow docs, hooks, automation
-├── development/              # Process retros, dev workflow feedback
-├── onboarding/               # Onboarding plans/checklists
-├── product-docs/             # PRDs, research, features, templates, social posts
-└── README.md
-```
+## Workflow
 
-## SIMPLE WORKFLOW
+1. Read the supplied task record or legacy `tech-decomposition-*.md`.
+2. Identify documentation whose claims, links, schema, workflow, or onboarding
+   instructions changed. Verify each target exists or is explicitly configured.
+3. Read each target before editing and change only affected sections.
+4. Run the repository's documented validation for the edited docs when one is
+   available; otherwise record that validation was unavailable.
+5. Return exact changed paths, skipped candidates with reasons, and verification
+   output. Do not commit, push, or call another agent.
 
-### Step 1: Read Task Document
-- Input file: `tasks/task-YYYY-MM-DD-[feature]/tech-decomposition-[feature].md`
-- Analyze `Primary Objective`, `Implementation Steps`, and `Implementation Changelog` for references to docs, ADRs, DB schemas, or onboarding changes
+## Output
 
-### Step 2: Detect Required Updates
-- Cross-reference mentions in the task document with actual doc paths:
-  - **Architecture / ADRs** → `docs/adr/`, `docs/db-scheme-mvp/`
-  - **Product / PRDs / Research** → `docs/product-docs/PRD/`, `docs/product-docs/JTBD/`, `docs/product-docs/Research/`, `docs/product-docs/Features/`
-  - **Process / Workflow** → `docs/dev-workflow/`, `docs/development/`
-  - **Onboarding / Training** → `docs/onboarding/`
-- Only touch files explicitly impacted by the implementation or by changes called out in the task notes.
-
-### Step 3: Update Only Necessary Files
-- Read the existing document before editing to preserve tone and structure
-- Update the section(s) that became outdated or require new information (e.g., add an ADR link, update PRD acceptance criteria, record new DB tables)
-- Maintain existing formatting (headings, tables, bullet styles)
-
-### Step 4: Commit Documentation Updates
-- Stage only the modified documentation files
-- Use a descriptive message summarizing the documentation sections touched
-
-## EXECUTION APPROACH
-1. **Read** the relevant `tech-decomposition-*.md` file
-2. **Analyze** which documentation areas it references (PRDs, ADRs, onboarding, etc.)
-3. **Update** only those files/directories in `docs/`
-4. **Commit** the documentation updates together with a clear message
-
-## EXAMPLE OUTPUT
-```
-🔍 Task analysis: Added user authentication feature
-📂 Categories affected: technical, architecture  
-📝 Updated: docs/technical/bot-commands.md, docs/architecture/api-design.md
-✅ Documentation update complete - 2 files modified
-```
-
-## SUCCESS CRITERIA
-- Only documentation that was actually affected gets updated
-- Updates reflect the real changes made in the task
-- All changes committed together with descriptive message
-- No unnecessary file modifications
+Return a concise summary with `STATUS`, `TASK`, `UPDATED`, `SKIPPED`, and
+`VERIFICATION` fields. The caller persists this in the task evidence when the
+run is task-attached. A standalone documentation update returns the summary
+without creating a synthetic task.

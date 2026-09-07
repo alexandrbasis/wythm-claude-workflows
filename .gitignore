@@ -78,8 +78,7 @@ Thumbs.db
 # Codex CLI hook runtime state
 .codex/hooks/logs/
 
-# Local audit/scratch artifacts (kept locally, not committed)
-tasks/
+# Local test/scratch artifacts (task documents are versionable project outputs)
 test-results/
 
 # Local plugin build environment

@@ -23,7 +23,11 @@ allowed-tools:
 
 # Deep Research
 
-> **Announcement**: Begin with: "I'm using the **deep-research** skill for in-depth technical research."
+For task-linked research, resolve the repository and task with
+[`../setup/references/task-context.md`](../setup/references/task-context.md). Research is an
+optional evidence branch: persist a compact `research.md` in the resolved task only when findings
+change scope, requirements or a technical decision; otherwise return the answer inline and record
+the decision if the caller needs it.
 
 ## Overview
 
@@ -154,7 +158,8 @@ Instead of relying on a static list, read project context dynamically:
 - Reference local patterns only when they change the recommendation; if you cite a file or
   function, open it with `Read` first rather than speculating.
 
-This ensures recommendations stay aligned with the project as it evolves.
+This ensures recommendations stay aligned with the project as it evolves. Missing optional tools
+or sources are a recorded limitation, not a passed check.
 
 ## 7. Before Returning
 

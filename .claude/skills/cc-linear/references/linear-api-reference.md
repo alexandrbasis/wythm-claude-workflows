@@ -1,6 +1,8 @@
 # Linear GraphQL API Reference
 
-GraphQL queries and mutations used by `.claude/scripts/linear-api.sh`. Useful for debugging.
+GraphQL queries and mutations used by the configured `linear-api.sh` wrapper. Useful for
+debugging after the active project/provider path is resolved; examples below use
+placeholder identifiers and must not be treated as a workspace default.
 
 ## API Endpoint
 
@@ -50,7 +52,7 @@ query($tid: String!, $limit: Int!) {
   }
 }
 # Variables: { "tid": "<team-uuid>", "limit": 10 }
-# Note: Requires team UUID (resolved from team key from `LINEAR_TEAM_KEY`, default `TEAM`)
+# Note: Requires team UUID resolved from the explicitly configured `LINEAR_TEAM_KEY`
 ```
 
 ### My Issues (filtered by assignee)
@@ -78,8 +80,8 @@ query($key: String!) {
     nodes { id key name }
   }
 }
-# Variables: { "key": "TEAM" }
-# Cached in /tmp/linear-TEAM-team.json (24h TTL)
+# Variables: { "key": "<configured-team-key>" }
+# Cache must be namespaced by the resolved team key (24h TTL)
 ```
 
 ### List Workflow States
@@ -91,7 +93,7 @@ query($tid: ID!) {
   }
 }
 # Variables: { "tid": "<team-uuid>" }
-# Cached in /tmp/linear-TEAM-states.json (24h TTL)
+# Cache must be namespaced by the resolved team key (24h TTL)
 ```
 
 ### Semantic Search (AI)
@@ -116,7 +118,7 @@ query($term: String!, $limit: Int) {
 ```graphql
 { issueLabels { nodes { id name } } }
 { users { nodes { id name active } } }
-# Cached in /tmp/linear-TEAM-labels.json and -users.json (24h TTL)
+# Cache must be namespaced by the resolved team key (24h TTL)
 ```
 
 ### Get Current User (Viewer)
@@ -255,12 +257,12 @@ mutation($id: String!, $url: String!) {
 
 | Cache File | Contents | TTL |
 |------------|----------|-----|
-| `/tmp/linear-TEAM-team.json` | Team UUID for `LINEAR_TEAM_KEY` | 24h |
-| `/tmp/linear-TEAM-states.json` | State name → UUID mapping | 24h |
-| `/tmp/linear-TEAM-labels.json` | Label name → UUID mapping | 24h |
-| `/tmp/linear-TEAM-users.json` | User name → UUID mapping | 24h |
+| `/tmp/linear-<team-key>-team.json` | Team UUID for explicit `LINEAR_TEAM_KEY` | 24h |
+| `/tmp/linear-<team-key>-states.json` | State name → UUID mapping | 24h |
+| `/tmp/linear-<team-key>-labels.json` | Label name → UUID mapping | 24h |
+| `/tmp/linear-<team-key>-users.json` | User name → UUID mapping | 24h |
 
-Clear cache: `rm /tmp/linear-TEAM-*.json`
+Clear the cache for the resolved team key only; do not delete another team's cache.
 
 ## Rate Limits
 

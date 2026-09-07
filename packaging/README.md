@@ -20,8 +20,12 @@ For Claude Code, start Claude in the target project and point it at the extracte
 claude --plugin-dir /absolute/path/to/claudops
 ```
 
-Then run `/claudops:setup` once. The portable artifact is loaded by the compatible
-Agent Plugins client; its client determines the command and activation UI.
+Start the desired workflow directly; `/claudops:setup` is optional for project-specific
+choices or copied-workflow maintenance. Task stages share
+`skills/setup/references/task-context.md`: resolve the existing task, create a minimum
+record when needed, and persist each stage's result there. No local workflow copy is
+required. The portable artifact is loaded by the compatible Agent Plugins client;
+its client determines the command and activation UI.
 
 The portable root manifest and MCP schema follow Agent Plugins v1.0.0:
 

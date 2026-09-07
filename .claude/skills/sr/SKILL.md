@@ -26,6 +26,14 @@ allowed-tools:
 
 Universal review entrypoint for task paths, PRs, branches, explicit ranges, and local working-tree drafts. Resolve the review target first, then only run checks supported by the evidence you actually have.
 
+Before resolving the target, resolve one task context with `../setup/references/task-context.md`. Reuse
+the explicit task or linked active task; otherwise create the minimum record in the configured task
+root. A PR title/description is review context only and never becomes an invented specification.
+Link the review artifact, immutable snapshot, verification results, findings, and one next action
+from that record. Existing conversation authorization remains authoritative for writes. If this is a
+read-only review, return a proposed path rather than
+creating a task file.
+
 ## When to Use
 - Pre-merge code review
 - "review this PR"
@@ -41,6 +49,7 @@ Universal review entrypoint for task paths, PRs, branches, explicit ranges, and 
 
 ## STEP 1: Resolve Review Target
 
+- Resolve the task context and record the target reference before dispatching reviewers.
 - Task path -> `task`
 - PR URL or PR number -> `pr`
 - Explicit git range -> `range`
@@ -171,37 +180,44 @@ Verification is evidence, not a prerequisite for starting review.
 
 If verification is skipped or partial, record it. Missing verification is not passing verification.
 
-## STEP 7: Prepare CR File
+## STEP 7: Prepare review artifact
 
-There is always exactly **one** Code Review file per review target. Compute `cr_file_path`:
+There is one review artifact per target, independent of whether the target is a task, PR, branch,
+range, or working tree. Resolve the path in this order:
 
-- `task` -> `<task-directory>/code-review-[feature-name].md`
-  - Extract `[feature-name]` from the task directory name by stripping the `task-YYYY-MM-DD-` prefix (e.g., `task-2026-04-02-operations-center` → `operations-center`). If the directory does not match this prefix pattern, use the full directory name as the feature name.
-- `working-tree` -> `.claude/reviews/code-review-working-tree-[current-branch].md` (or `code-review-working-tree.md` if detached)
-- all other non-task modes -> `.claude/reviews/code-review-[target].md` (create `.claude/reviews/` if missing)
+1. Reuse an existing review path linked from the selected task record.
+2. Otherwise use `<resolved-task-root>/code-review-[target].md`, sanitizing `/` and spaces in the
+   target. This keeps non-task reviews with the same durable task context instead of creating a
+   competing `.claude/reviews` tree.
+3. If an existing legacy review file is found, preserve it in place and link that path; never rename
+   it merely to fit this convention.
 
-**Sanitization:** Replace any `/` or spaces in `[current-branch]` or `[target]` with hyphens before constructing the filename.
+For a read-only review, report the proposed or linked path and skip all artifact writes in this step
+and later steps. For a writable re-review, retain the prior revision and evidence; append a new
+revision block or update only the new revision after findings are ready. Do not clear the old review
+before a replacement exists, and do not create a second file for the same target.
 
-**If `cr_file_path` already exists** (re-review): reuse it. Clear all `<!-- SECTION:xxx -->` contents back to placeholder text so agents write fresh findings. Do NOT create a second file.
-
-**Legacy migration:** If `cr_file_path` does not exist, also check for a legacy `Code Review.md` (task mode) or `Code Review - *.md` (other modes) in the same directory. If found, rename it to the new `cr_file_path` convention before reusing.
-
-**If no file exists at all**: create it by writing the template from `.claude/docs/templates/code-review-template.md`.
+If no writable artifact exists, create it from `.claude/docs/templates/code-review-template.md` under
+the resolved task root.
 
 ## STEP 8: Dispatch Agents
 
-Pass `cr_file_path` to every agent so they use **File Mode**.
+Pass the common target context to every reviewer and request an inline structured finding/result.
 
-Dispatch **all agents selected in STEP 5 in a single turn** — issue every Agent tool call in the same assistant message. The agents write to disjoint `<!-- SECTION:xxx -->` markers in `cr_file_path`, so there are no ordering dependencies (in `deep` scope this batch also includes `structural-quality-reviewer`, writing to its own `structural-quality` markers). Each agent already receives the same `full_diff` / `changed_files` context computed once in STEP 3, so the tool calls are independent and safe to batch. Do not dispatch one, wait for it to finish, then dispatch the next; that serializes a parallel workload.
+Dispatch **all agents selected in STEP 5 in a single turn** when the host supports independent
+parallel calls; otherwise run the same selected passes sequentially without reducing coverage.
+Reviewers return findings; the single orchestrator writes the shared `cr_file_path` after all results
+arrive. Disjoint `<!-- SECTION:xxx -->` markers are layout, not a concurrency guarantee.
 
-Each agent reads → edits its own section markers only; no agent touches another agent's section.
-
-If an agent fails or times out, write a fallback note into its section:
+If an agent fails or times out, the orchestrator writes a fallback note into its section:
 `*Review skipped — [agent-name] did not complete.*`
 
 Once every dispatched agent has finished, proceed to STEP 9.
 
 ## STEP 9: Write Verdict
+
+If the request is read-only, return the inline findings, observed verification, and proposed or
+linked artifact path, then stop. Do not write the review file or task record.
 
 The orchestrator writes the remaining sections that agents do not own:
 
@@ -213,7 +229,13 @@ The orchestrator writes the remaining sections that agents do not own:
 - `verification` — record commands run and results
 - `metadata` — changed files, diff source, reviewers invoked
 
-Use the **Edit tool** to write each orchestrator section into its markers in `cr_file_path`. Do NOT overwrite the entire file — agents already wrote their sections.
+Use the **Edit tool** to append the new orchestrator revision or update its own markers in
+`cr_file_path`. Do NOT overwrite the entire file — prior revisions and reviewer results remain
+evidence.
+
+After writing the verdict, link the review artifact and observed result from the resolved task record,
+including the next action. One orchestrator owns the shared review file; reviewer agents return findings and never rely on
+parallel writes being safe merely because markers are disjoint.
 
 Verdicts:
 - `DRAFT REVIEW`: working-tree review or no immutable snapshot
@@ -235,21 +257,10 @@ This is a recommendation, not a blocker. It surfaces the gap between "code looks
 
 Three gates are worth re-stating because mis-handling them corrupts the review file:
 
-- One CR file per review target — reuse and clear existing markers instead of creating a second file (see STEP 7).
-- Pass `cr_file_path` to every dispatched agent so they write in File Mode (see STEP 8).
-- Use Edit, not Write, on `cr_file_path` after agents have populated their sections — a full overwrite destroys their work (see STEP 9).
-
-## Common Rationalizations
-
-The shortcuts that turn a review into a rubber stamp:
-
-| Rationalization | Reality |
-|---|---|
-| "The implementer says it's done and tested — I'll trust the summary" | Review reads the code, not the claim. Verify against the diff; never sign off on a self-report. |
-| "It looks fine, I'll approve" | "Looks fine" is not a finding. Either name what you verified, or read deeper — an empty review is worse than no review. |
-| "I'll only look at the changed lines" | Cross-phase and integration bugs live in files the diff touches indirectly. Use `--scope=feature` when a change integrates with prior work (STEP 4). |
-| "No spec artifact, so I'll claim it matches the spec anyway" | Never assert spec compliance without a spec artifact — emit `Skipped - no task/spec artifact available` (STEP 6). |
-| "Lots of nits — I'll mark them all CRITICAL to be safe" | Severity inflation trains the author to ignore you. Label honestly: Nit/Optional/FYI vs MAJOR/CRITICAL. |
+- One review artifact per target — reuse the linked/legacy path and retain prior revisions (see STEP 7).
+- Pass the same target context to every dispatched reviewer; only the orchestrator writes
+  `cr_file_path` after results arrive (see STEP 8).
+- Use Edit, not Write, on `cr_file_path` while preserving all reviewer results (see STEP 9).
 
 ## Red Flags
 

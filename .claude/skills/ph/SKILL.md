@@ -23,6 +23,11 @@ allowed-tools:
 
 Capture the current implementation state into a cold-start brief (`HANDOFF.md`) so a fresh Claude session can resume work without re-exploring the codebase. This is invoked when context windows run long or when work spans multiple sessions.
 
+Resolve the task with `../setup/references/task-context.md` before writing. Use the selected task
+root, preserve an existing plan or compact `TASK.md`, and record the handoff link, current state,
+evidence, blockers, and one next action in that task record. A read-only request may return the
+proposed path without creating it.
+
 ### Write-first discipline
 
 Context may compact while this skill runs. Create `HANDOFF.md` with section headers immediately after STEP 1, then fill each section as you complete STEPS 2–5. A partially-written handoff on disk is more useful than a fully-planned one that never gets saved. Produce every section through to the end — do not stop early due to token concerns.
@@ -39,9 +44,12 @@ Context may compact while this skill runs. Create `HANDOFF.md` with section head
 
 ### STEP 1: Resolve Task
 
-1. If `$ARGUMENTS` provided, locate the task directory
-2. Otherwise, detect from current branch or ask: "Which task to prepare handoff for?"
-3. Read the task document (tech-decomposition)
+1. Resolve `$ARGUMENTS`, the linked active task, or the configured task convention with
+  `../setup/references/task-context.md`.
+2. If several candidates remain plausible, ask which task; do not choose by recency alone.
+3. Read the task entrypoint and linked active plan when one exists. A compact task record is valid;
+   do not require a formal decomposition or exact headings when the required state and evidence are
+   present.
 4. If `HANDOFF.md` already exists, read and reconcile it with the task document before editing it;
    otherwise create it with the section headers from STEP 5 immediately after resolving the task.
    Never overwrite an existing handoff before reading it; fill the reconciled artifact as the
@@ -69,7 +77,8 @@ git stash list
 
 ### STEP 3: Capture Implementation State
 
-1. **Identify current step**: Read task doc checkmarks — find the last checked step and the first unchecked step
+1. **Identify current step**: Read available step/status markers. If a compact record has no checkboxes,
+   derive the current state from its evidence and next action instead of requiring the legacy format.
 2. **Reconcile with reality**: Compare task doc claims against actual code. Check every file in the diff, not only the files named in steps:
    - Do files mentioned in checked steps exist?
    - Do tests for checked steps pass?
@@ -95,7 +104,9 @@ The `git diff --name-only` call above can run in the same turn as the test comma
 
 ### STEP 5: Write HANDOFF.md
 
-Write to `tasks/task-[name]/HANDOFF.md`:
+Write to `<resolved-task-root>/HANDOFF.md` (preserve any legacy path already selected). Use the
+existing handoff schema when one exists; the template below is a default set of facts, not a required
+legacy heading layout:
 
 ```markdown
 # Session Handoff
@@ -164,13 +175,14 @@ Load these files to rebuild context (ordered by importance):
 ### STEP 6: Update Task Document
 
 1. Ensure all checked/unchecked steps accurately reflect code state
-2. Add a note in the task doc: `**Handoff prepared**: See HANDOFF.md for session context`
+2. Add a note in the task entrypoint: `**Handoff prepared**: See HANDOFF.md for session context`.
+   Link the handoff and the final evidence/next action from the task record before pausing.
 
 ---
 
 ## HOW `/si` CONTINUE MODE USES HANDOFF.md
 
-When `/si` detects Continue mode, it checks for `HANDOFF.md` in the task directory:
+When `/si` detects Continue mode, it checks for `HANDOFF.md` in the resolved task root:
 
 - **If HANDOFF.md exists**: Load it first, read the "Files to Read First" section, then reconcile with task doc. This is faster and more accurate than re-exploring.
 - **If HANDOFF.md is absent**: Fall back to the current behavior (scan task doc checkmarks, run tests, read recent commits).

@@ -16,6 +16,12 @@ allowed-tools: [Read, Grep, Glob, Bash, Task, Skill, AskUserQuestion]
 
 Investigate a reported problem, find the root cause, and create a tracker issue with a TDD fix plan. **This skill does NOT apply the fix** — it produces a durable, grabbable issue that `/si` or another agent can pick up later.
 
+Resolve the task with `../setup/references/task-context.md` before investigation. Reuse the linked
+task or create the minimum record in the configured root; for diagnosis/body-only mode, return the
+proposed path without writing. Link the issue/body, root-cause evidence, current state, and one next
+action from that record. The explicit triage request remains the authorization for the selected
+tracker write.
+
 The request to triage and file authorizes one issue write in the resolved tracker destination.
 If the user asks for diagnosis or a draft only, choose the "Skip — output the body only" path
 and do not create an issue. Resolve the tracker and repository/team before creating anything.
@@ -128,7 +134,8 @@ A numbered list of RED-GREEN cycles:
 Pick up with `/si <this issue>` to implement.
 ```
 
-After creating the issue, print the issue URL and a one-line summary of the root cause.
+After creating the issue, link its URL and the one-line root-cause summary from the selected task
+record, then print them.
 
 ## Completion
 

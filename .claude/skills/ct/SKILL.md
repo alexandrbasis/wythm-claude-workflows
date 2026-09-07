@@ -13,12 +13,17 @@ allowed-tools: Task, Skill, AskUserQuestion, Read, Glob, Grep, Edit, Write, Bash
 
 # Create Task Command
 
-> **Announcement**: Begin with: "I'm using the **ct** skill for technical task creation."
-
 ## Quick start
 `/ct streak-freeze` → confirm scope (GATE 0) → discover inputs & explore the codebase (GATE 1–2) →
-resolve ambiguity (GATE 3) → write `tech-decomposition-streak-freeze.md` (GATE 4) →
+resolve ambiguity (GATE 3) → update the active plan (GATE 4) →
 review + split evaluation (GATE 5–6) → next: `/si [task-dir]`.
+
+## Shared task context
+Resolve the repository, task and linked artifacts with
+[`../setup/references/task-context.md`](../setup/references/task-context.md) before the gates.
+Reuse an explicit plan or task entrypoint; create the minimum `TASK.md` only when no matching
+record exists. Update the record with the active plan, decisions, verification evidence and next
+action before handing off to `/si`.
 
 ## Objective
 Create implementation-ready technical documentation that a developer can execute with confidence.
@@ -36,10 +41,12 @@ first, then derive implementation steps. Keep the plan concrete, traceable, and 
   disk as you go; don't stop early over token concerns.
 
 ## Workflow
-Seven sequential gates. Each has an exit criterion — don't advance until it's met.
+Use the gates in order, but skip branches whose evidence is already present in the resolved task.
+Each active gate has an exit criterion.
 
 ### GATE 0 — Confirm the task is ready for technical planning
-- If no argument is provided, ask what task or feature to plan.
+- If no argument is provided, use the shared resolver to reuse the task established in the
+  conversation, issue or branch. Ask only when no candidate exists or more than one remains plausible.
 - Route away if not ready: still fuzzy/exploratory → `/nf` or `/brainstorm`; missing product framing
   (goals, business rules, success metrics) → `/product`; ready to build → continue.
 - Ask enough to name: objective, primary actor/system touchpoint, success criteria,
@@ -48,8 +55,8 @@ Seven sequential gates. Each has an exit criterion — don't advance until it's 
 - **Exit:** the task is one clear implementation objective with known boundaries.
 
 ### GATE 1 — Discover source material and prior art
-Search for inputs instead of assuming a repo layout; prefer existing doc conventions. Run these Glob
-calls in one turn (they're independent):
+Search the resolved task and its linked repository inputs instead of assuming a repo layout. Use
+the repository's configured conventions and run independent searches together when supported:
 - Discovery: `**/discovery-*.md`
 - Product: `**/JTBD-*.md`, `**/PRD*.md`, `**/*requirements*.md`
 - Architecture: `**/ADR*.md`, `**/*architecture*.md`, `**/*decision*.md`
@@ -60,10 +67,12 @@ constraints/blockers, open questions (`[NEEDS CLARIFICATION: ...]`), reusable pl
 - **Glossary**: if `product-docs/UBIQUITOUS_LANGUAGE.md` exists, read it and use its canonical terms
   verbatim (module names, behaviors, acceptance criteria). Flag conflicts rather than inheriting drift.
 - **Architecture vocab**: load `.claude/skills/architecture-language/LANGUAGE.md` before describing
-  module changes — use **module / interface / seam / adapter / depth** exactly; don't drift into
-  "component", "service", "API", or "boundary".
-- **Output location**: prefer the repo's task-doc convention; else default to
-  `tasks/task-YYYY-MM-DD-[feature-name]/tech-decomposition-[feature-name].md`.
+  module changes. Use its terms for architectural guarantees, while retaining established project
+  terms such as `service` or `API` when they name real project concepts; state the mapping when it
+  matters.
+- **Output location**: prefer the resolved task's existing plan entrypoint and repo convention;
+  otherwise use `tasks/task-YYYY-MM-DD-[feature-name]/tech-decomposition-[feature-name].md` beside
+  the minimum `TASK.md`.
 - **Exit:** you know which inputs are authoritative and where the output doc lives.
 
 ### GATE 1.5 — Requirements quality & scope check
@@ -73,15 +82,16 @@ only?), **Consistency** (docs/constraints don't contradict?), **Measurability** 
 verifiable?), **Coverage** (errors, boundaries, permissions, edge cases defined?), **Gap** (what
 behavior is still missing?).
 
-If important gaps exist: summarize as 3–7 tagged checklist items and present with `AskUserQuestion` —
+If important gaps exist: summarize the material tagged checklist items and present with `AskUserQuestion` —
 **Fix requirements first** (return to source docs) or **Proceed with explicit decisions/blockers**
 (resolve what's resolvable, capture anything still blocking). Don't hide requirement gaps inside
 implementation steps.
 - **Exit:** gaps are resolved or explicitly captured as decisions/blockers.
 
 ### GATE 2 — Explore the codebase
-Launch **2–3 scoped Explore workers in a single turn** (fan out in the same batch — don't sequence)
-when the host provides that worker role, each with a mandate:
+Run the smallest scoped codebase pass that can ground the plan. When the host provides workers and
+the mandates are independent, fan out in one batch; otherwise perform the same passes directly and
+record the fallback. Cover as needed:
 1. **Architecture & patterns** — closest similar feature/module/workflow, relevant data models or
    persisted state, reusable shared abstractions/utilities/base patterns.
 2. **Change surface** — files/dirs to modify; nearby API surfaces, contracts, background jobs, events,
@@ -103,8 +113,9 @@ Identify gray areas: multi-interpretation requirements, missing acceptance crite
 technical choices with multiple valid approaches, unclear current-vs-future boundaries. For each:
 resolve from docs/code, ask the user when product/implementation judgment is needed, or mark as
 blocker/prerequisite.
-- **Glossary updates**: if a new domain term appears or needs sharpening, invoke `/ubiquitous-language`
-  to update `product-docs/UBIQUITOUS_LANGUAGE.md` inline so `/si` and reviewers inherit it.
+- **Glossary updates**: if a new domain term appears or needs sharpening, load it through
+  `/ubiquitous-language`; write `product-docs/UBIQUITOUS_LANGUAGE.md` only when the caller authorized
+  the update, then link the result so `/si` and reviewers inherit it.
 - Record non-trivial choices in the decomposition as a decision table (`# | Question | Decision |
   Rationale`).
 - **Scope guardrail**: this gate clarifies HOW to implement what's already in scope — it does not
@@ -113,14 +124,14 @@ blocker/prerequisite.
   materially change implementation, the task is not ready for decomposition.
 
 ### GATE 4 — Write the technical decomposition
-1. Read `.claude/docs/templates/technical-decomposition-template.md` — treat it as the **output
-   contract** (defines structure & detail level; don't restate it inside the doc).
-2. Follow **`references/decomposition-guide.md`** for the required sections, planning rules
-   (Entity Lifecycle, Constraint-to-UI traceability, the `Must Haves` block) and the Given/When/Then
-   test-case format.
+1. If a separate technical plan is needed, read `.claude/docs/templates/technical-decomposition-template.md`
+   and follow **`references/decomposition-guide.md`** for its structure. If the resolved task is
+   small and its `TASK.md` already has an equivalent objective, acceptance/verification, decisions
+   and implementation steps, extend that record instead of creating boilerplate.
 
 Core rules to honor while writing:
-- Define the **Test Plan before implementation steps**.
+- Define verification before implementation steps. A separate decomposition uses the template's
+  **Test Plan**; a compact task may use equivalent acceptance and verification sections.
 - Concrete files/dirs/modules per step, stating what it changes and what it proves.
 - Assign `REQ-XXX` IDs when source requirements exist; otherwise write explicit plain-language
   requirements.
@@ -133,13 +144,13 @@ Core rules to honor while writing:
 Self-check: does every must-have map to tests and steps? any scope creep? are blockers/constraints
 explicit? does it follow repo patterns? is the test strategy sufficient for the change risk?
 
-Required review by complexity:
+Choose review depth from evidence and risk, not a numeric step count:
 
-| Complexity | Signal | Required review |
-|------------|--------|-----------------|
-| Simple | 1–2 focused steps | `plan-reviewer` agent |
-| Medium | 3–5 steps, multiple touchpoints | `plan-reviewer` + a plan-capable architecture review |
-| Complex | 6+ steps, architecture/cross-system risk | `plan-reviewer` + a plan-capable architecture review + cross-AI validation |
+| Risk signal | Evidence | Review |
+|------------|----------|--------|
+| Low | single bounded behavior, local change, clear tests | self-check or `plan-reviewer` when available |
+| Material | multiple modules, migrations, permissions, or unclear contracts | `plan-reviewer` + plan-capable architecture pass |
+| High | cross-system/irreversible change or unresolved critical risk | above + optional cross-AI validation |
 
 Use reviewers that accept a plan and its supporting context. The repository's
 `senior-architecture-reviewer` is defined for completed implementations and git-history checks;
@@ -151,15 +162,15 @@ record the fallback; do not fabricate implementation evidence.
 > then filter in a separate pass. Keep low-confidence items labeled until verification; do not
 > pre-filter during discovery.
 
-For **Complex** plans, cross-AI validation is part of the required path — follow
-`.claude/docs/templates/cross-ai-protocol.md` if present. Optional adjuncts: `/analyze` when source
-specs exist and traceability matters; sync a tracker issue if the project uses one. If review finds
-gaps, revise (preserve known risks/blockers) and re-run the relevant review path.
+For high-risk plans, use `.claude/docs/templates/cross-ai-protocol.md` if available. `/analyze` is
+the traceability pass for source specs; run it once after the plan exists when traceability matters.
+Use tracker sync only when requested and supported. If a review capability is unavailable, record
+the skipped check and continue only when the remaining evidence supports the risk decision.
 - **Exit:** the plan is specific, scoped, and reviewable enough to evaluate splitting.
 
 ### GATE 6 — Task splitting evaluation
-Invoke the `task-splitter` agent on the **finalized, reviewed** parent plan (provide the task-directory
-path + the `tech-decomposition-[feature-name].md` path). It either:
+Invoke the `task-splitter` agent only when the reviewed plan shows a safe functional or prerequisite
+split; provide the resolved task-directory path and active plan path. It either:
 - recommends **NO SPLIT** — keep the parent doc active and proceed to handoff, or
 - creates `splitting-decision.md` — present the recommendation with `AskUserQuestion`.
 
@@ -170,9 +181,10 @@ proceed.
 - **Exit:** the task is confirmed as a single implementation unit or decomposed into approved phases.
 
 ## Output
-Create `tech-decomposition-[feature-name].md` in the repo's existing task-doc convention, or in the
-fallback task directory if none exists. After GATE 6 the active output is either the parent
-`tech-decomposition-[feature-name].md` or the phase-specific docs created by `task-decomposer`.
+Create `tech-decomposition-[feature-name].md` only when the task's existing entrypoint cannot carry
+the required technical detail or an existing consumer requires that file. Otherwise update the
+resolved `TASK.md`/plan entrypoint. After GATE 6 the active output is the selected parent plan or
+phase-specific docs created by `task-decomposer`; link it from the task record.
 
 ## Handoff
 After the gates complete, present a concise summary:
@@ -191,7 +203,9 @@ Next steps:
 ```
 
 ## Flexibility notes
-- Small changes: keep the doc lean but still include `Must Haves`, `Test Plan`, and concrete steps.
+- Small changes: keep the resolved task record lean with objective, acceptance/verification,
+  decisions and concrete steps; create a separate decomposition only when its detail or consumer
+  requires it.
 - Large features: keep one parent objective and split only when execution would otherwise be unsafe or
   vague.
 - The decomposition core stays lightweight, but the required review path and the `task-splitter` /

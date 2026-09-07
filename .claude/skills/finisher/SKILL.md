@@ -38,6 +38,11 @@ Before merging:
 
 This skill is the close-out counterpart to `/si` (implement) and `/sr` (review). It assumes review has already happened and the user is ready to ship.
 
+Resolve one task context with `../setup/references/task-context.md` before the PR gates. Reuse the
+linked task or create the minimum record in the configured task root; a PR-only flow still records
+the PR, CI, merge state, and next action there. Existing conversation authorization remains
+authoritative, and merge remains a separate confirmation boundary.
+
 ## RELATED SKILLS
 
 - `/sr` — Code review before merge. Run **before** this skill.
@@ -62,23 +67,30 @@ If the PR is already merged, report that and stop — the work is already shippe
 
 If the PR is in **CLOSED** (not merged) state, stop and ask the user how to proceed.
 
-### Step 2: Resolve Task Directory (optional)
+### Step 2: Resolve Task Context and Directory
 
-This step is **best-effort and silent**. The skill works fine without a task directory — most invocations probably won't have one. Only enrich Gate 3 if a task is found cleanly.
+Resolve the task context using `../setup/references/task-context.md`. The skill works with or without
+a formal decomposition, but it must link the selected task record before continuing. Only enrich Gate
+3 when a phase is actually resolved; record “not applicable” for a PR-only task.
 
-1. If `$ARGUMENTS` includes a path, treat it as the task or phase directory and read its `tech-decomposition-*.md`. If the path doesn't exist or has no tech-decomposition file, surface that to the user — they pointed somewhere specific, so don't silently ignore it.
+1. If `$ARGUMENTS` includes a path, treat it as the task or phase directory and resolve its existing
+   task entrypoint (formal decomposition or compact `TASK.md`). If the path does not exist, surface
+   that to the user — they pointed somewhere specific, so do not silently ignore it. A compact task
+   record is valid for PR-only close-out; only the conditional phase handoff needs formal phase docs.
 2. Otherwise, look at the project root:
-   - If there's no `tasks/` directory at all → no task. Continue with PR-only flow. Do **not** prompt the user.
-   - If `tasks/` exists, do a quick scan for a `tech-decomposition-*.md` whose path or contents reference the current branch.
-     - **Exactly one match** → use it.
-     - **Zero matches** → no task. Continue with PR-only flow. Do **not** prompt the user.
-     - **Multiple matches** → ambiguous. Ask the user once: "Found N candidate task directories — which one is this PR closing out, or none?" Accept "none" as a valid answer.
+   - If there's no `tasks/` directory or no matching decomposition, use the minimum task record from
+     the resolver and continue with PR-only flow. Do **not** invent spec claims from PR metadata.
+   - Otherwise use the task-context resolver's linked active task or configured repository
+     convention. If no matching task record exists, use the minimum record for PR-only evidence.
+     Do not infer a specification from PR metadata. If several records remain plausible, ask once
+     which task is being closed out, or accept "none" for PR-only flow.
 3. If a task is resolved, capture:
    - Task name and goal
    - Whether it lives directly under `tasks/` (single task) or inside a `phase-N-*/` subfolder (one phase of a split task)
    - The parent task directory if this is a phase
 
-**Why this matters:** The phase-handoff step in Gate 3 only fires when the resolved task is inside a `phase-N-*/` folder. No task → no phase → Gate 3 skips silently. This keeps the skill universal: if the user just wants to ship a quick fix branch, no questions about tasks get asked.
+**Why this matters:** The phase-handoff step in Gate 3 only fires when the resolved task is inside a
+`phase-N-*/` folder. A minimum task record still indexes the PR-only evidence and next action.
 
 ### Step 3: Working Tree Snapshot
 
@@ -267,6 +279,7 @@ If checks are stuck "queued" or "in_progress" for an unreasonable time, surface 
 
 After a successful push and green checks, read back the remote head and PR status. The pushed commit
 and the checked PR head must match before continuing.
+Link the observed head and CI result from the selected task record before presenting merge confirmation.
 
 ---
 
@@ -318,6 +331,8 @@ gh pr view <PR#> --json state,merged,mergedAt
 ```
 
 Confirm `merged: true`. If not, surface the error from `gh` and stop.
+Record the observed merge state and local cleanup result in the selected task record. Do not report
+completion from a planned command or partial status.
 
 ### Step 4: Local Cleanup
 
@@ -370,18 +385,6 @@ Final summary:
 In any of these cases, report the actual state honestly and let the user decide next steps. Optimistic summaries that mask failures cost the user real debugging time later.
 
 ---
-
-## Common Rationalizations
-
-The shortcuts that land a broken main or lose someone else's work:
-
-| Rationalization | Reality |
-|---|---|
-| "CI is still running but it'll pass — I'll merge now" | Still-running counts as not-green (STOP CONDITIONS). Merging on a guess can land a broken main. Wait for green. |
-| "`git add -A` is faster than staging by name" | It silently commits `.env`, `tasks/` scratch, and debug artifacts. Stage by filename (Gate 2). |
-| "Push was rejected — I'll `--force` it" | A rejected push means the remote changed. Force overwrites someone else's work. Investigate, never force from this skill. |
-| "It's a phase task but the next-phase docs look close enough" | Stale next-phase assumptions cost the next implementer real time. Apply the Gate 3 handoff updates before merging. |
-| "The summary reads better if I just say all-green" | Optimistic summaries that mask a failed check or skipped handoff cost debugging time later. Report the actual state. |
 
 ## Red Flags
 

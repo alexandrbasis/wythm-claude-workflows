@@ -20,6 +20,11 @@ Sync local `.claude/` workflow files with upstream claudops. The skill is
 upstream-driven: local-only user files are ignored unless they are explicitly tracked in
 the update manifest.
 
+This workflow is for a legacy copied `.claude/` installation. A managed plugin remains
+authoritative; upgrade it through the host plugin manager instead of copying the plugin
+into the project. Read `../setup/references/task-context.md` when this update is
+attached to a task; a check-only or standalone update does not create a task.
+
 ## Scope and authority
 
 - Start with the deterministic script. Do not classify diffs manually.
@@ -149,6 +154,9 @@ python3 "$CLAUDOPS_UPDATE_SCRIPT" --local-root "$CLAUDOPS_TARGET" apply \
 The apply step updates selected files and refreshes the target repository's lock manifest.
 Use the source clone and local files from the reviewed scan. If either changes before
 application, rerun the scan and resolve any changed selection before writing.
+When a task is attached, link the scan, exact selection, apply result and verify
+read-back from the task directory. Preserve local customizations and disabled markers;
+never write the managed plugin cache.
 
 ### 5. Verify
 
