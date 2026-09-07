@@ -1,0 +1,48 @@
+{
+  "status": "registered before behavioral evaluation",
+  "skill_source": "/private/tmp/claudops-si-simplification-20260907/.claude/skills/si/SKILL.md",
+  "scenarios": {
+    "resume": {
+      "input_sha256": {
+        "CLAUDOPS.md": "fabf005c33cfede097e0db6441a61dd0e5f857326a6108cc8cf4f46002dc3739",
+        "README.md": "276e181fed7088a8e6d34f56947c96f7f6268e1d7e023dd70aeb1b4cf9e4cbd4",
+        "packages/greeting/Makefile": "02e694498be161248406fad29c59c4a8c559bb4ef2a80a96bd05fb94a135b89b",
+        "packages/greeting/greeting.py": "9bb6db2ca3e423462eae12ce39588160c915558bf45f5d4e3c36cb2e8471c3b0",
+        "packages/greeting/tests/test_greeting.py": "c7dbbeac27af1423d545dd461a52d64107e9d89aee7aab889c809705c525fe9c",
+        "user-notes.txt": "f20ac10fce344d9075115928d015633dbc208cb449bbb3893a8b0b0c3d3beb73",
+        "work-items/GREETING/TASK.md": "c865e9909d6f4aad9ab1536677561dfb729a45ed5824547fab17c4247bae70e3",
+        "work-items/GREETING/phase-2.md": "c6a829ac304440f37686e1ff873a1841f1164d651a760f33a4f3958443e4a95e"
+      },
+      "head": "99e0ce2971e26689f39dd38cca705a703f7576b2",
+      "expected": [
+        "Existing task and active phase reused",
+        "Blank-name behavior implemented and tested via observed RED then GREEN",
+        "Existing trimming behavior and user draft preserved",
+        "Owning package test command used",
+        "Phase 2 complete; parent still open for Phase 3",
+        "No repeated approval, no manufactured earlier RED history, no commits or publication"
+      ]
+    },
+    "docs": {
+      "input_sha256": {
+        "README.md": "09543abc1616cddd65118905328a9e94fc0649679322407ccbdbf241fe439412",
+        "config.json": "1e1da86acba18856bf36822f7937b7f9a49ae3319b3e6f5201f6cc954d8958db",
+        "journal.txt": "3761978dc563a32971fd0f7c44dc99d66c3c8b85e5558a652c1ff71533932cd0",
+        "work-items/DOC-1.md": "90bd20a6808a18090b2303b2f4e32184b27a233590e8e5d0cd2ea580ca485b18"
+      },
+      "head": "6742dafc629b1bdc61796bd99fa5054a521c5fa3",
+      "expected": [
+        "README URL matches configuration",
+        "No artificial behavior tests or build tooling",
+        "User draft and config preserved",
+        "Existing task records actual verification and status",
+        "No repeated approval, no commits or publication"
+      ]
+    }
+  },
+  "skill_version_during_exercises": {
+    "/private/tmp/claudops-si-simplification-20260907/.claude/skills/si/SKILL.md": "6dd191fb2f16afea6b65b9c5690e02db97b309eb1a426d64ff6125e1774e15d4",
+    "/private/tmp/claudops-si-simplification-20260907/.claude/skills/si/references/implementation-checklists.md": "6e72ed1ae8a5a1439d48c5435aed1de664ddb13d3a00aae4322e343b5cdf0a44",
+    "/private/tmp/claudops-si-simplification-20260907/.claude/skills/si/references/verification-gate.md": "debfd05ff78abbd1fd2f3dea8054bfaadc65c559c9f4e1570a4e7b68d618955b"
+  }
+}

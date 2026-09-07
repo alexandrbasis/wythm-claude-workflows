@@ -1,0 +1,9 @@
+Primary read-back, 2026-09-07
+Working directory: /private/tmp/claudops-si-exercises-20260907/resume/packages/greeting
+Command: PYTHONDONTWRITEBYTECODE=1 make test
+Observed exit code: 0
+python3 -m unittest discover -s tests -q
+----------------------------------------------------------------------
+Ran 3 tests in 0.000s
+
+OK

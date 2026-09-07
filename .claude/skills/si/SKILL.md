@@ -1,97 +1,81 @@
 ---
 name: si
 description: >-
-  Implement or resume a ready task, from a compact task record or a technical decomposition,
-  with behavior-first tests and durable verification. Use for requested implementation;
-  discovery belongs to /nf, planning to /ct, and independent review to /sr.
-argument-hint: [task-directory | tech-decomposition-path]
+  Implement or resume a task from its existing plan and acceptance criteria, with
+  behavior-first tests and recorded verification. Use for requested implementation;
+  unresolved discovery belongs to /nf, planning to /ct, and independent review to /sr.
+argument-hint: [task-path | technical-plan-path]
 allowed-tools: [Agent, AskUserQuestion, Edit, Read, Write, Bash, Glob, Grep, Skill, TodoWrite]
 ---
 
 # Implement a task
 
-Deliver the requested behavior and leave enough verified task state for review or the
-next session. A compact task and a formal decomposition use the same implementation
-contract; scale documentation and delegation to the work.
+Deliver the agreed outcome and leave verified progress that a person or fresh agent can
+resume. A short plan in the existing task record is sufficient when the work is clear.
 
-## 1. Resolve the task and readiness
+## 1. Read the active task and current state
 
-Read [shared task context](../setup/references/task-context.md). Reuse the explicit or
-established task and follow its active phase/plan pointers. If none exists, create the
-minimum record before starting. Preserve the repository's filenames and status vocabulary.
+Resolve the task with [shared task context](../setup/references/task-context.md), following
+its active plan or selected phase. Create the minimum record only when none exists.
+Read the agreed behavior, constraints, decisions, unfinished steps and relevant code/tests.
+Reuse findings that still match the code; inspect what is missing or changed.
 
-Read the objective, acceptance criteria, constraints, relevant decisions, planned changes
-and verification approach. Equivalent sections in any language satisfy this contract.
-Populate missing structural information from the authorized request and repository
-evidence; do not stop merely because a particular heading or `tech-decomposition-*.md`
-is absent. A known, bounded fix can keep its short plan in the existing task record.
+Fill structural gaps from the authorized request and repository evidence. Missing headings
+or a particular decomposition filename are not blockers. Resolve questions that materially
+change scope, behavior, contracts or safety before dependent implementation; continue
+independent work. Use /nf or /ct only when actual discovery or planning is needed.
 
-When behavior or scope is materially unresolved, save the question/blocker and resolve
-it before dependent implementation. Use `/nf` or `/ct` when actual discovery or planning
-is needed. A task status or a PR description alone does not invent an approved spec.
+Inspect the working tree and preserve unrelated changes. Keep the selected checkout unless
+isolation helps. Reuse authorization for the same operations and scope; implementation alone
+does not authorize publication or tracker writes. Record the task as in progress using its
+existing status vocabulary.
 
-## 2. Establish the change boundary
+## 2. Implement in verified slices
 
-Inspect the relevant code, tests, project instructions and working-tree state. Record
-which files/packages the work affects and how to verify the outcome. Preserve unrelated
-user changes. Use an isolated branch/worktree when warranted and authorized; an already
-selected working directory does not need another checkout by default.
+For behavior changes, follow [TDD](../tdd/SKILL.md): observe a test fail for the intended
+reason, implement that behavior, then refactor within scope. Use the agreed testing strategy
+and real repository commands. Documentation, formatting and other non-behavior changes use
+appropriate validation. On resume, check current code and evidence; preserve existing work
+and report missing test chronology instead of rewriting history to manufacture RED.
 
-Reuse authorization for the same operation and scope. Commit, push, PR, merge and
-tracker writes follow their actual authorization boundary; an implementation request
-alone does not authorize publication. Do not manufacture test/implementation commit
-history or reset shared work to recreate a test-first sequence.
+Implement the full agreed scope in dependency order. Resolve routine technical choices from
+repository patterns and domain terms. Record consequential deviations and their rationale
+once in the existing task; obtain a decision for changes to agreed scope or acceptance.
 
-## 3. Implement and retain evidence
+For behavior that mutates application data or involves async interactions, read
+[mutation and async checks](references/implementation-checklists.md). For enumerated,
+visual or cross-surface requirements, read [verification recipes](references/verification-gate.md).
+Read the references that apply, using their checks for the behavior the task requires.
 
-Follow [TDD](../tdd/SKILL.md) for behavior changes: one failing behavior test, verify the
-failure's cause, implement, then refactor within scope. Use the agreed test strategy;
-documentation, formatting and other non-behavior changes use appropriate validation
-without artificial tests. Existing project testing requirements remain in force.
+When independent work has disjoint ownership and delegation offers a useful benefit, use
+[parallelization](../parallelization/SKILL.md). Otherwise work directly. The orchestrator owns
+shared task updates and verifies the combined result.
 
-Keep one acceptance-to-evidence mapping in the task's existing checklist or test plan.
-Reuse requirement IDs and existing verification rows; do not generate parallel REQ,
-TEST and VC ledgers for the same facts. Each required behavior must have an observed
-test, check or artifact before it is marked complete.
+After each meaningful slice, update its existing acceptance/checklist entry with observed
+evidence and the next unfinished action. If no entry exists, add a compact note in the task's
+plan or progress section. Keep one mapping; existing IDs and plain-language
+acceptance are both valid. Save progress before a pause so resume starts from these facts.
 
-Read [verification recipes](references/verification-gate.md) for exact-count, enumerated,
-visual or other brittle requirements. Read [implementation checklists](references/implementation-checklists.md)
-when changes involve entity mutations, async interactions or material deviations from the
-plan. Preserve post-action visibility, error handling and data/state consistency checks
-where they apply. Use the repository's canonical domain terms.
+## 3. Verify the complete change
 
-Implement the full agreed scope. After a meaningful completed step, update its evidence,
-actual progress and next action. Record material deviations and their rationale once;
-new product scope requires a decision, not silent expansion. Save progress before a long
-pause and resume from those files after compaction.
+Remove residue introduced by this task and run applicable project checks from their owning
+packages. Record command, working directory, result and the relevant revision or artifact.
+Reuse evidence only while the affected code and inputs remain unchanged; rerun affected
+checks after edits, cleanup or integration. A skipped or blocked check is not a pass.
 
-For independently useful work with disjoint ownership, read [parallelization](../parallelization/SKILL.md).
-Use supported workers only when delegation helps; otherwise work directly. Pass the task,
-owned paths, constraints and expected result to each worker. One orchestrator consolidates
-shared documents and verifies the combined result.
+Compare every agreed acceptance item with observed evidence, including required integration
+or visible behavior. Code presence alone is insufficient proof of an outcome. Resolve failures
+and missing required checks before claiming implementation complete; a partial result may
+be handed over as a draft with its blockers named.
 
-## 4. Verify completion
+## 4. Save status and hand off
 
-Remove temporary instrumentation, dead imports and other residue introduced by this task.
-Run the checks required by the change and project policy from their owning package;
-resolve commands from configuration or CI. Record command, working directory, outcome
-and relevant revision/artifact. Reuse valid evidence for unchanged code; rerun affected
-checks after subsequent edits. A skipped or blocked check is not a pass.
+Update the existing current status and next action in place, with links to code, verification,
+material deviations and remaining work. Keep old states as history. A separate completion
+report is unnecessary when these facts already exist; a finished phase leaves its parent open
+until the remaining phases are complete. Preserve links to completed phases, distinguish
+pending work from the selected phase, and advance only within the authorized scope.
 
-Check every acceptance item against evidence, including enumerated fields/options and
-cross-surface behavior where specified. Missing required evidence prevents claiming
-implementation complete. A partial result may be reviewed as a draft with its gaps named.
-For non-trivial decisions, try to find a counterexample before handoff; unresolved
-substantive findings remain blockers or explicitly accepted limitations.
-
-## 5. Hand off the actual result
-
-Update the task's implementation status and link code/verification evidence, deviations
-and known follow-ups. A separate completion document is unnecessary when the task already
-contains these facts. Completing a phase does not complete its parent feature.
-
-When independent review is requested or required, hand `/sr` the active task and actual
-review target. A local diff is valid review input; a pushed branch or PR is not a
-prerequisite. Perform commits, push or PR creation only within their granted scope and
-read back any action you claim. End with the result and the next action, distinguishing
-implemented, reviewed, merged and deployed states.
+When review is requested or required, hand /sr the active task and actual diff/commit/PR target;
+a local diff is valid input. Continue already authorized review or delivery, read back actions
+you claim, and distinguish implementation, review, merge and deployment in the final result.

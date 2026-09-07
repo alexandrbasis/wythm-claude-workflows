@@ -56,13 +56,12 @@
 ## How to Apply This Document
 
 ### In /ct (Create Task)
-- Reference this document when writing the Verification Checklist
-- For each VC entry in a "brittle zone", add explicit mitigation
+- Use relevant verification recipes when planning brittle requirements.
+- Keep their checks in the task's existing plan; a separate VC checklist is optional.
 
 ### In /si (Start Implementation)
-- Before each step, re-read VC entries (Rule 2)
-- After each step, run verification commands
-- Never self-assess completeness — use task doc checkbox count
+- Verify the current slice against its acceptance and record observed evidence in the task.
+- Confirm every required outcome before completion; checkbox counts alone are not proof.
 
 ### In /sr (Start Review)
 - spec-compliance-reviewer reads this doc to know WHERE to be extra skeptical

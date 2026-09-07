@@ -262,6 +262,11 @@ ordered steps, verification and material risks. It reuses discovery decisions an
 code evidence. Detailed templates, independent plan review and phase splitting are used
 when the work's risk or an explicit request warrants them.
 
+`/si` implements or resumes that active plan, keeps progress and verification in the same
+task record, and uses TDD for behavior changes. Other changes use appropriate validation.
+Independent work can be delegated when it helps; the combined result is checked before
+completion. Existing authorization carries forward to review and delivery within its scope.
+
 ### Cross-AI
 - Gemini CLI — plan review, web-grounded research
 - Codex / Cursor CLI — second-opinion review (see `cross-ai-protocol` template)

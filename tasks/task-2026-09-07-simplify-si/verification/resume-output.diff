@@ -1,0 +1,50 @@
+diff --git a/packages/greeting/greeting.py b/packages/greeting/greeting.py
+index 25a98d4..1c5b838 100644
+--- a/packages/greeting/greeting.py
++++ b/packages/greeting/greeting.py
+@@ -2 +2,4 @@ def greet(name):
+-    return f"Hello, {name.strip()}!"
++    normalized_name = name.strip()
++    if not normalized_name:
++        normalized_name = "friend"
++    return f"Hello, {normalized_name}!"
+diff --git a/packages/greeting/tests/test_greeting.py b/packages/greeting/tests/test_greeting.py
+index acdfb63..a069f3c 100644
+--- a/packages/greeting/tests/test_greeting.py
++++ b/packages/greeting/tests/test_greeting.py
+@@ -9,0 +10,4 @@ class GreetingTests(unittest.TestCase):
++
++    def test_blank_name_falls_back_to_friend(self):
++        self.assertEqual(greet(""), "Hello, friend!")
++        self.assertEqual(greet("   "), "Hello, friend!")
+diff --git a/work-items/GREETING/TASK.md b/work-items/GREETING/TASK.md
+index 9ec9c15..f3c1cb5 100644
+--- a/work-items/GREETING/TASK.md
++++ b/work-items/GREETING/TASK.md
+@@ -7 +7,2 @@ Status: in progress.
+-- Active phase: [blank-name fallback](phase-2.md), ready for implementation.
++- Phase 2 (blank-name fallback): complete. Code and tests cover empty and whitespace-only names.
++- Active phase: Phase 3 (localization), future scope and not authorized for this request.
+@@ -11 +12,6 @@ Status: in progress.
+-Implement only the active phase.
++Phase 2 is verified. Leave Phase 3 unchanged until it is explicitly authorized and its phase record exists.
++
++## Verification
++- `make test` from `packages/greeting/`: passed, 3 tests ran.
++- Final `PYTHONDONTWRITEBYTECODE=1 make test` from `packages/greeting/`: passed, 3 tests ran; no Python cache artifacts remain.
++- The pre-existing dirty `user-notes.txt` was preserved unchanged.
+diff --git a/work-items/GREETING/phase-2.md b/work-items/GREETING/phase-2.md
+index 6d557e1..2129f3d 100644
+--- a/work-items/GREETING/phase-2.md
++++ b/work-items/GREETING/phase-2.md
+@@ -3 +3 @@ Parent: [greeting task](TASK.md).
+-Status: ready for implementation.
++Status: complete.
+@@ -14 +14,6 @@ Update `packages/greeting/greeting.py:greet` and extend `packages/greeting/tests
+-No phase-2 code has been implemented. Resume from the current files and run the relevant checks.
++- Added `test_blank_name_falls_back_to_friend` covering empty and whitespace-only names.
++- RED observed from `packages/greeting/`: `make test` failed with `Hello, !` for the empty name.
++- Implemented the fallback in `packages/greeting/greeting.py:greet` while preserving trimming and internal spaces.
++- GREEN observed from `packages/greeting/`: `make test` passed, 3 tests ran.
++- Final `PYTHONDONTWRITEBYTECODE=1 make test` passed, 3 tests ran, with no Python cache artifacts remaining.
++- Next: keep Phase 3 localization out of scope; no commit or publication requested.

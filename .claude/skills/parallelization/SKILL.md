@@ -1,11 +1,8 @@
 ---
 name: parallelization
 description: >-
-  Parallelize implementation across isolated git worktrees. Use when /si identifies
-  parallelizable work, the user says 'run in parallel', 'implement simultaneously',
-  'parallelize these steps', or when a task has 2+ independent acceptance criteria
-  touching different files/modules.
-  NOT for single-threaded implementation (use /si).
+  Parallelize genuinely independent implementation items when /si or the user asks for parallel
+  work. Use /si directly for one item, dependent work, shared files, or shared mutable state.
 allowed-tools:
   - Agent
   - AskUserQuestion
@@ -20,171 +17,76 @@ allowed-tools:
 
 # Parallel Implementation Orchestrator
 
-> **Announcement**: Begin with: "I'm using the **parallelization** skill for parallel implementation orchestration."
+Use this skill only after resolving the task with `../setup/references/task-context.md`. The
+orchestrator owns shared task/review records and the final combined verification.
 
-Spawn scoped `developer-agent` workers in isolated git worktrees to implement independent work items simultaneously, then merge results back into the working tree.
+## Decide
 
-Resolve the task first with `../setup/references/task-context.md`. Use the selected task root and
-record the parallelization decision, worker results, validation evidence, and next action there. The
-orchestrator is the sole writer of shared task/review records.
+Parallelize only when two or more work items are independent: they have disjoint owned paths, no
+ordering dependency, and no shared mutable fixtures or state. If there is one item, an overlap, or
+uncertain independence, continue directly through `/si` and state the reason once. Keep a wave to a
+small set, normally no more than four workers.
 
-## When to Parallelize
+Before dispatch, read `git status --short`, the task entrypoint, and the expected paths for each item.
+Record the dispatch base revision for every isolated worker and the pre-dispatch inventory for a
+shared checkout. If relevant inputs are already dirty, do not create workers from a clean `HEAD`; use
+a coordinated shared checkout or continue sequentially. Leave unrelated changes untouched.
 
-Parallelization helps when a task has multiple acceptance criteria that are genuinely independent — different modules, different files, no shared state. The time savings are significant (N items in ~1x time instead of Nx time), but the merge overhead adds complexity. Use this decision matrix:
+## Dispatch
 
-| Scenario | Parallelize? |
-|----------|-------------|
-| Steps touch different modules/directories | Yes |
-| Independent test suites for different services | Yes |
-| Steps modify the same files | No — sequential |
-| Step N depends on Step N-1's output | No — sequential |
-| Database migrations (order matters) | No — sequential |
-| Steps share test fixtures or DB state | No — sequential |
-| Only 1 parallelizable item | No — not worth the overhead |
+Use whatever worker and isolation capabilities the environment supports. Prefer isolated execution
+when available. A shared checkout is acceptable only when each worker has disjoint owned paths and
+the orchestrator coordinates all shared state. Give every worker one item, its task path, optional
+criterion/context paths, owned paths, and the exact git authority it inherits. Default to no commit.
+If no supported worker capability exists, continue directly through `/si`.
 
-Keep the worker set small enough to review and merge. Four simultaneous workers is a practical
-ceiling; combine tiny adjacent work items instead of dispatching one worker per checklist row.
+Dispatch independent workers up to the host's supported concurrency before waiting. With one
+worker slot, execute items sequentially or directly while preserving their coverage. Adapt to the
+available API and isolation mechanism. A worker returns `complete`, `failed`, or `blocked` using
+the developer-agent JSON contract.
 
-If a scenario is not covered by the matrix, default to sequential and state
-your reasoning in one sentence before proceeding. Parallelization is an
-optimization, not a requirement — when independence is uncertain,
-sequential is the safe choice.
+## Consolidate
 
-## Pre-flight Checks
+For each result:
 
-Before spawning any workers, verify:
+1. Inspect the reported files and the worker's status; do not trust a summary without reading the
+   changed tree.
+2. For an isolated worker, compare the full owned tree with its recorded dispatch base, including
+   committed, staged, and unstaged tracked changes. Use a binary diff from that base plus an explicit
+   untracked-file listing for added, deleted, binary, mode, and symlink changes. For a shared checkout,
+   inspect the changes in place against the pre-dispatch inventory; never replay them as a patch.
+3. For isolated workers, transfer every owned path from that manifest, then resolve conflicts before
+   reading the destination back. Preserve ownership, file content, modes, symlinks, and binary data.
+4. Read back the destination inventory and compare it with the complete manifest. After all transfers,
+   validate the combined tree from the commands and working directories resolved from project
+   configuration. Worker checks are evidence for the item, not combined verification.
 
-1. **Classify working-tree changes**: inspect `git status` before dispatch. If task files or required
-   inputs are dirty, do not send them to workers branched from `HEAD`; fall back to sequential
-   in-place execution or ask the user to preserve the changes. If only unrelated files are dirty,
-   leave them untouched and proceed with isolated workers. Never require an unrelated commit or
-   stash solely to use this optimization.
-2. **Task context exists**: the resolved record or linked plan must be readable and have identifiable
-   work items. If the record lacks concrete work-item detail, record the blocker and stop; do not
-   invent parallel criteria merely because a minimum record was created.
-3. **Independence verified**: Confirm selected items don't share files. Quick check: list the expected file paths for each item and look for overlaps.
+If a commit is authorized, stage only the assigned changes; whole-path staging is suitable only
+when that file's entire diff is in scope. Inspect the staged diff and name-status/stat so unrelated
+dirty changes remain outside the commit. Publication requires its own authority when not already granted.
 
-## Workflow
+## Verification and handoff
 
-### 1) Identify parallelizable work items
+Run the required lint, type, test, render, schema, or plugin checks for the combined tree. Apply TDD
+to behavior changes; validate docs, formatting, and metadata with fit-for-purpose checks without
+inventing tests. Treat configuration as behavior when it changes runtime behavior. Mark the combined
+work complete only when every required check passes; record `not_applicable` with a reason where a
+check does not apply, and never turn a skipped or unresolved check into `passed`.
 
-**Wave detection (preferred)**: Check the resolved task record for wave annotations (e.g., `— **Wave 1**`, `— **Wave 2**`). If present, group steps by wave number. Execute all same-wave steps in parallel, then advance to the next wave. Wave annotations are optional; do not require `/ct` formatting.
+Update the task record once after consolidation with the parallelization decision, worker evidence,
+combined verification, and next action. Workers do not edit shared task documents. Preserve the
+complete final file inventory and any real blocker for the next stage.
 
-**Fallback (no waves)**: Read the resolved task record. List all acceptance criteria / work items. Select only those that pass the decision matrix above.
+## Safety rules
 
-Announce the plan:
-
-> "Parallelizing items [2, 3, 5] (Wave 1) — they touch independent modules. Items [1, 4] (Wave 2) will run after Wave 1 completes."
-
-### 2) Spawn workers in worktrees
-
-Each worker runs in an **isolated git worktree** via the Agent tool's `isolation: "worktree"` parameter. This gives each worker its own copy of the repo — no file conflicts possible.
-
-Spawn every worker in **the same assistant message** — do not default to
-sequential Agent calls. True concurrency only happens when all Agent tool
-calls are in one turn; splitting them across turns serializes the work and
-defeats the purpose of this skill. When calls have no dependencies, batch
-them; never spawn one, wait, then spawn the next.
-
-```
-Agent tool call 1:
-  subagent_type: "developer-agent"
-  isolation: "worktree"
-  prompt: |
-    Implement acceptance criterion [N] for the task at [task_path].
-
-    Inputs:
-    - task_document_path: [task_document_path]
-    - criterion_number: [N]
-    - git_writes_approved: false
-
-    Constraints:
-    - Scope: criterion [N]. Make the edits needed to satisfy it (including
-      required supporting imports, types, fixtures). Do not expand scope into
-      other criteria, unrelated refactors, or drive-by cleanups.
-    - Follow TDD (RED → GREEN → REFACTOR) inside scope — canonical: `.claude/skills/tdd/SKILL.md`. Vertical slices only.
-    - Do NOT create git commits — just make the changes
-    - Do NOT edit shared task documents
-    - Return a summary with: status, files_changed, test_results, and any notes
-
-Agent tool call 2 (same message):
-  subagent_type: "developer-agent"
-  isolation: "worktree"
-  prompt: |
-    (same structure, different criterion)
-```
-
-Anti-pattern: do not call one Agent, wait for its result, then call the
-next. All N spawn calls go in one assistant message, period. If you find
-yourself about to issue a single Agent call when multiple items were
-selected, stop and batch them.
-
-**Why worktrees?** Without isolation, multiple agents editing files simultaneously in the same directory would create race conditions and corrupted files. Worktrees give each agent a complete, independent copy of the repo. When the agent finishes, its worktree path and branch are returned in the result — you use these to cherry-pick the changes back.
-
-### 3) Consolidate results
-
-As workers complete, collect their results. Each worktree agent returns:
-- The **worktree path** and **branch name** where changes were made
-- A summary of what was implemented
-
-For each completed worker:
-
-```bash
-# 1. Review what the worker changed
-git -C <worktree_path> diff HEAD
-
-# 2. If changes look correct, create a patch and apply it
-git -C <worktree_path> diff HEAD > /tmp/worker-crit-N.patch
-git apply /tmp/worker-crit-N.patch
-
-# 3. Or, if the worker committed (git_writes_approved=true):
-git merge <worktree_branch> --no-ff -m "feat(scope): implement criterion N"
-```
-
-**Conflict handling**: If `git apply` fails with conflicts, the items weren't truly independent. Apply the non-conflicting patches first, then handle the conflicting one manually in the main working tree.
-
-### 4) Run validation
-
-After all patches are applied, run the project's quality checks. Detect the project area and its
-working directory from the task and repository scripts before running commands; replace every
-placeholder and keep each package invocation in its own explicit cwd. Do not claim validation from
-an unresolved root-level command.
-
-**Project verification:** Run the repository's resolved lint, type, and test commands from their
-declared working directories. Do not execute an unresolved placeholder or assume a root command.
-
-If validation fails, identify which worker's changes caused the issue and fix in the main working tree.
-
-### 5) Update task record
-
-After all workers' changes are applied and validated, update the selected task record **once**:
-- Check off completed criteria
-- Add concise result links for each parallelized item
-- Note which items were parallelized (useful for reviewers)
-
-Workers must not edit shared task/review records — this is the orchestrator's job, to avoid merge
-conflicts in docs. Link each worker's returned summary and validation evidence in the selected task
-record; do not create a second ledger.
-
-### Context note
-Worker results accumulate in this conversation. Context may be
-auto-compacted between waves. Before starting the next wave, re-read the
-the resolved task record to reconstruct scope, and only persist between waves what
-you will actually need (diffs applied, validation status). Do not stop a
-multi-wave run because context feels full — compaction is handled for you.
-
-## Safety Rules
-
-- **Git writes require explicit user approval** — workers default to `git_writes_approved: false`
-- **Task docs are orchestrator-owned** — workers return notes, orchestrator updates docs
-- **No scope creep** — each worker implements exactly one criterion, nothing more
+- One worker owns one scoped item; no scope creep or shared task writes.
+- Reuse authorization already granted for the current task/request. Workers inherit explicit scoped
+  git authority from the orchestrator and do not re-ask for blanket approval.
+- Default: no worker branch and no worker commit. Publication is a separate gate when not granted.
+- If a worker fails or is blocked, record the cause and resolve it sequentially; do not claim the
+  combined task is complete from partial results.
 
 ## Output
 
-After consolidation, report:
-
-- Which criteria were parallelized
-- Worker summaries (status, files changed, test results)
-- Any conflicts discovered and how they were resolved
-- What remains to be done sequentially
-- Validation results (lint, types, tests)
+Report the items dispatched, each worker's status/files/evidence, transfer conflicts, combined
+verification, and the next sequential action. Keep the report concise and evidence-based.

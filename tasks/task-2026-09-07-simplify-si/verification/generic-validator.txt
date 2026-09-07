@@ -1,0 +1,6 @@
+Source skill check, 2026-09-07
+Command: PYTHONDONTWRITEBYTECODE=1 /private/tmp/claudops-venv/bin/python /Users/alexandrbasis/.codex/skills/.system/skill-creator/scripts/quick_validate.py .claude/skills/si
+Observed exit code: 1
+Unexpected key(s) in SKILL.md frontmatter: argument-hint. Allowed properties are: allowed-tools, description, license, metadata, name
+
+Interpretation: the generic Codex validator does not support the existing Claude source argument-hint metadata. It was preserved; the repository package validators check supported source/target contracts. This generic validator was not reported as passing.

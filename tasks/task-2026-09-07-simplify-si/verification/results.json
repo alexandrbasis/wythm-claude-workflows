@@ -1,0 +1,127 @@
+{
+  "date": "2026-09-07",
+  "baseline_commit": "d7285eb5efbd46daa7d6d41ec10be902788ca5e2",
+  "scope": "Critical audit and simplification of si, its two references and direct implementation consumers",
+  "line_counts": {
+    ".claude/agents/automation-agents/developer-agent.md": {
+      "before": 271,
+      "after": 139
+    },
+    ".claude/docs/references/llm-mental-model.md": {
+      "before": 74,
+      "after": 73
+    },
+    ".claude/skills/parallelization/SKILL.md": {
+      "before": 190,
+      "after": 92
+    },
+    ".claude/skills/si/SKILL.md": {
+      "before": 97,
+      "after": 81
+    },
+    ".claude/skills/si/references/implementation-checklists.md": {
+      "before": 68,
+      "after": 24
+    },
+    ".claude/skills/si/references/verification-gate.md": {
+      "before": 55,
+      "after": 22
+    },
+    ".claude/skills/tdd/SKILL.md": {
+      "before": 148,
+      "after": 148
+    },
+    "README.md": {
+      "before": 299,
+      "after": 304
+    }
+  },
+  "checks": {
+    "plugin_tests": {
+      "status": "pass",
+      "count": 25,
+      "evidence": "plugin-tests.txt"
+    },
+    "updater_tests": {
+      "status": "pass",
+      "count": 4,
+      "evidence": "updater-tests.txt"
+    },
+    "package_build": {
+      "status": "pass",
+      "skills": 40,
+      "agents": 18,
+      "source_fingerprint": "effcd3c8e1a860ba7bd3a4edd271872f58f8546e3a6be7e57f613a8bbdb90708",
+      "evidence": "build.json"
+    },
+    "package_validation": {
+      "status": "pass",
+      "formats": [
+        "claude",
+        "agent"
+      ],
+      "evidence": "validation.json"
+    },
+    "reproducibility": {
+      "status": "pass",
+      "evidence": "reproducibility.json"
+    },
+    "generic_skill_creator_validator": {
+      "status": "unsupported source metadata",
+      "exit_code": 1,
+      "reason": "The generic validator rejects the existing Claude source argument-hint field; repository validators verify the supported source and portable package formats.",
+      "evidence": "generic-validator.txt"
+    },
+    "diff_check": {
+      "status": "pass"
+    }
+  },
+  "review": {
+    "core_and_references": "independent final read-only review found no remaining semantic defects",
+    "direct_consumers": "Independent final read-only review found no remaining defects; single-worker-host fallback correction read back separately."
+  },
+  "exercises": {
+    "registration": "registered-scenarios.json",
+    "model": "gpt-5.6-luna / xhigh",
+    "resume": {
+      "status": "implemented behavior verified; task-link gap found",
+      "output": "resume-output.diff",
+      "primary_check": "resume-final-check.txt",
+      "observed": [
+        "Blank-name fallback implemented in selected Phase 2",
+        "Independent final run passed 3 tests from owning package",
+        "Other phases not implemented; parent still open",
+        "Pre-existing dirty user file preserved by SHA-256 comparison",
+        "No new commits and no residual Python caches"
+      ],
+      "agent_reported": [
+        "RED failed for intended blank-name behavior before implementation",
+        "GREEN passed after implementation"
+      ],
+      "gap": "Parent record dropped completed Phase 2 link and labeled unauthorized Phase 3 active. Final si now requires preserving phase links and distinguishing pending from selected work. This instruction correction was reviewed statically, without another full execution run."
+    },
+    "documentation": {
+      "status": "blocked before edits by automatic approval review",
+      "evidence": "docs-exercise-blocked.txt",
+      "input_integrity": "All final input hashes match the registered baseline.",
+      "limitation": "No successful docs-only execution is claimed. The evaluator attempted a shell retry after the initial rejection; that retry was also rejected and further attempts were stopped."
+    },
+    "limitations": [
+      "These are limited isolated exercises, not a benchmark or a guarantee across models or hosts",
+      "Behavioral exercises used the intermediate skill version hashed in the registration; final evidence-fallback, mutation-boundary and phase-link corrections received static review",
+      "Full parallel merge execution and installed-host plugin refresh were not exercised"
+    ]
+  },
+  "changed_source_sha256": {
+    ".claude/agents/automation-agents/developer-agent.md": "6af54b6e20fd44d6389611948061983393d982791b4fa4a3ff0c088619773a37",
+    ".claude/docs/references/llm-mental-model.md": "84c177d72f206f097c6bd3e9cf85a1a34523b0940f3285cd5f9e4d19a473749d",
+    ".claude/skills/parallelization/SKILL.md": "314df50fd9c95788cdb3512bd2dc1059bd8a86b00dd20fe9395eba742112daa3",
+    ".claude/skills/si/SKILL.md": "da27612a699cc94d50ac8d6458dda497e38614952cd7d1e5583142b08fe4c2bc",
+    ".claude/skills/si/references/implementation-checklists.md": "f405e85ec46e50478f642ee22a5ae5383454a5026a94efc52d59e4deabfd72aa",
+    ".claude/skills/si/references/verification-gate.md": "07b02ee376a35dde10bbefd74b6ccd3b01b27ad02adffd1e3215ab0bb5534b3f",
+    ".claude/skills/tdd/SKILL.md": "c0def653079dde221ddb50e37ae7e2dc2c63eb0340efbdf4b62ccf3c10f3c3e7",
+    "README.md": "9d85384325662cd4d2fd948ea2b861e61c5f01b7b4d98c3a71904363b9f2e03e"
+  },
+  "publication_target": "https://github.com/alexandrbasis/claudops/tree/main",
+  "delivery_evidence": "The remote commit and its GitHub Actions run are checked after publication; local validation is not remote publication proof."
+}
