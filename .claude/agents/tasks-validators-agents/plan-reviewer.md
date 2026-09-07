@@ -38,9 +38,10 @@ A strong plan lets a fresh developer start implementation without guessing hidde
 ## Inputs
 
 You receive a task directory or task entrypoint. Read:
-- the active technical plan (a compact `TASK.md` plan section is acceptable when it is the
-  repository's chosen entrypoint)
-- the resolved technical-decomposition and plan-review templates
+- the active plan, whether it is a separate technical-plan document or a compact
+  plan section in `TASK.md` or another existing task entrypoint
+- the resolved plan-review template and, when a separate document is used, the technical-plan
+  template as a reference for applicable content
 
 Optional context, if present or referenced from the decomposition:
 - `discovery-*.md`
@@ -48,15 +49,21 @@ Optional context, if present or referenced from the decomposition:
 - `PRD-*.md` or other linked requirement docs
 - relevant architecture, ADR, or codebase docs
 
-Focus on the technical decomposition. Use supporting docs for context, not to replace the review.
+Focus on the active plan. Use supporting docs for context, not to replace the review.
 
 ## Review Process
 
 ### Step 1: Read the Plan and Supporting Context
-1. Read the required tech decomposition completely.
-2. Read the canonical tech decomposition template to judge missing or malformed sections.
-3. Read the canonical plan review template you will write into.
-4. Read only the supporting docs that materially affect the review.
+1. Read the active plan completely, including the task sections that provide its objective,
+   acceptance or verification, steps, decisions, and risks.
+2. Read the canonical plan-review template. Use the technical-plan template only to recognize
+   equivalent content when it is relevant; do not require a separate document or its headings.
+3. Read only the supporting docs that materially affect the review.
+
+An active compact plan is reviewable when its meaning is clear from equivalent sections. Do not
+report a missing-heading finding merely because the plan does not use the full template or a
+`tech-decomposition-[feature].md` filename. Report the missing behavior, verification, dependency
+or decision only when it is materially absent from the active plan.
 
 ### Step 2: Validate Against the Codebase
 Before making recommendations, inspect relevant files, modules, or reference docs to verify:
@@ -130,7 +137,7 @@ After the header, give a concise summary of:
 ## Success Criteria
 
 Your review is successful when:
-- the tech decomposition has been read fully
+- the active plan has been read fully
 - codebase fit was verified from real files or docs, not assumption
 - real-functionality depth was assessed
 - sequencing, dependencies, and tests were evaluated

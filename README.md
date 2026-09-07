@@ -21,7 +21,7 @@ Works with any language, framework, and architecture — TypeScript, Python, Go,
 This is a **human-in-the-loop pipeline**, not a fully autonomous agent. You choose the work and review the required artifacts. Once a bounded stage is approved, the agent completes that scope without asking again for the same decision. Nothing ships without your explicit sign-off.
 
 - **You trigger** each stage — `/nf` for discovery, `/ct` for planning, `/si` for implementation, `/sr` for review
-- **You validate** between stages — review the discovery doc before planning, review the plan before coding
+- **You validate** material decisions and required artifacts; existing approvals carry forward between stages
 - **You control the gates** — quality checks run automatically, but merging is always your decision
 - **Agents assist, not replace** — 18 agents handle the grunt work (linting, testing, architecture checks), you make the calls
 
@@ -224,7 +224,7 @@ Pulls latest changes from the upstream claudops repo, shows what's new or modifi
 
 ### 4. Start using workflows
 ```
-/ct    — create a technical decomposition
+/ct    — create an implementation plan in the task record
 /si    — start implementation from a task
 /sr    — run multi-agent code review
 ```
@@ -256,6 +256,11 @@ code-quality + security + performance + test-coverage + documentation
 ```
 /nf → /vp (optional) → /ct (split when needed) → /si → /sr → /prc → authorized delivery
 ```
+
+`/ct` normally adds a concise implementation plan to the existing task record: changes,
+ordered steps, verification and material risks. It reuses discovery decisions and relevant
+code evidence. Detailed templates, independent plan review and phase splitting are used
+when the work's risk or an explicit request warrants them.
 
 ### Cross-AI
 - Gemini CLI — plan review, web-grounded research

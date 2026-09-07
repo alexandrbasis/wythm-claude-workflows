@@ -97,7 +97,9 @@ For each step, produce:
 [S / M / L] — [Brief justification]
 
 ### Suggested Task Command
-`/ct` with this step's scope to create a full technical decomposition.
+`/ct [resolved task path]` to refine this step in the active plan. Use the detailed planning
+guide only when this step has material migration, permission, integration, coverage or coordination
+risk and the compact plan cannot carry the needed detail.
 ```
 
 ### Phase 4: Review (adversarial check)
@@ -156,8 +158,11 @@ Step 1 ─── Step 2 ─── Step 4
 
 ## Integration
 
-- Each step can be turned into a `/ct` task document for detailed decomposition
-- Steps can reference existing task docs in `tasks/` if they already exist
+- Each step can be refined with `/ct [resolved task path]` in the existing task plan; a phase or
+  separate detailed plan is warranted only when the step's risk or handoff needs it.
+- Steps can reference existing task docs in `tasks/` if they already exist.
+- When detailed planning is warranted, point the `/ct` consumer to
+  `.claude/skills/ct/references/decomposition-guide.md` and preserve the active plan link.
 - After writing, update the resolved task record with the blueprint link, current stage and next
   action. Keep the blueprint as the source for its multi-session steps.
 

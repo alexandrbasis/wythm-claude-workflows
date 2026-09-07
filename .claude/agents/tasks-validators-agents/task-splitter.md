@@ -66,9 +66,14 @@ review risk and coordination cost, not by a numeric threshold:
 ## Decision Rules
 
 **MUST SPLIT** when:
-- The plan clearly contains 2+ functionally distinct slices and a safe logical sequence exists
-- A prerequisite chain is explicit enough that sequencing the work reduces guesswork and review risk
+- The plan clearly contains 2+ functionally distinct slices, a safe logical sequence exists, and
+  splitting materially reduces implementation or review risk
+- An explicit prerequisite chain has a useful review or coordination boundary, and splitting
+  materially reduces implementation or review risk beyond ordering steps inside one plan
 - One PR would force reviewers to reason about multiple unrelated behaviors or module clusters
+
+Two functional slices alone do not force a split. The recommendation must also show a useful
+review or coordination boundary and a real, behaviorally testable outcome for each phase.
 
 **SHOULD SPLIT** when:
 - Reviewer load is high, but the work is still somewhat coupled
@@ -80,6 +85,7 @@ review risk and coordination cost, not by a numeric threshold:
 - Splitting would create incomplete or non-functional intermediate states
 - A proposed phase would only create types, interfaces, DTOs, hooks, or service scaffolding with no real consumer
 - A proposed phase would need to guess the shape of work defined later
+- The candidate slices have no meaningful reviewer or coordination benefit beyond being two items
 - Coordination overhead exceeds the review benefit
 
 ## Anti-Patterns
@@ -96,31 +102,38 @@ Do NOT recommend these splitting patterns:
 
 ### Step 1: Read Task Files
 
-1. Glob for `tech-decomposition*.md` in the provided task directory
-2. Read the tech-decomposition file (**required** — if not found, inform the user and stop)
-3. Optionally read the linked PRD from the repository's product-doc convention (typically `product-docs/PRD/`) for business context
-4. Optionally read `JTBD-*.md` from the task directory for user needs context
+1. Resolve and read the active parent plan from the provided task directory or entrypoint. It may
+   be a separate technical-plan document, a `TASK.md` plan section, or an equivalent existing task
+   record.
+2. Read the linked plan and supporting inputs that materially affect the candidate boundary.
+3. Optionally read the linked PRD from the repository's product-doc convention (typically `product-docs/PRD/`) for business context.
+4. Optionally read `JTBD-*.md` from the task directory for user needs context.
 
-**If the tech-decomposition has an unexpected format** (for example, missing test plan or implementation steps), inform the user and do a best-effort analysis from the available content.
+**If the active plan has an unexpected or compact format** (for example, equivalent acceptance,
+verification or implementation sections use different headings), do a best-effort semantic
+analysis from the available content. Missing template headings alone are not a reason to stop.
 
 ### Step 2: Extract Structure
 
-Extract the planning structure from the parent tech-decomposition:
+Extract the planning structure from the active parent plan:
 
 | Area | What To Extract |
 |------|-----------------|
-| Must Haves | Distinct functional outcomes |
-| Technical Requirements | `REQ-XXX` items that cluster into cohesive behaviors |
-| Test Plan | Test suites, test cases, and verification commands |
-| Implementation Steps | Step/sub-step groupings, file paths, and module areas |
+| Outcome / acceptance | Distinct functional outcomes and boundaries |
+| Requirements | Existing source IDs when present, otherwise plain-language requirements |
+| Verification | Behavior checks, test suites, cases and commands wherever recorded |
+| Implementation | Steps, file paths and module areas wherever recorded |
 | Dependencies / Risks / Blockers | Prerequisite work, sequencing constraints, and external coupling |
+
+Do not require generated `REQ-XXX` or `TEST-XXX` labels. Preserve existing IDs and use the
+plan's plain acceptance and verification statements when it has no formal identifiers.
 
 ### Step 3: Build Candidate Phase Map
 
 For each possible phase, identify:
 - Phase goal
-- Included `REQ-XXX` items
-- Included tests / suites
+- Included existing requirement IDs or plain acceptance items
+- Included verification checks, tests or suites
 - Included implementation steps
 - Main files / module areas touched
 - Dependency order relative to other phases
@@ -131,11 +144,14 @@ For each possible phase, identify:
 
 Before recommending a split, explicitly check:
 
-1. Does each phase deliver behaviorally testable value or a concrete prerequisite with immediate downstream value?
+1. Does each phase deliver behaviorally testable value or a concrete prerequisite with an identified
+   real consumer in an identified later phase of the proposed or approved phase graph?
 2. Can Phase N be implemented **without guessing** anything that is only defined in Phase N+1?
 3. Do all dependency arrows flow forward in a clear logical order?
 4. Does any phase exist only to create abstractions, shells, or placeholders? If yes, the split is wrong.
-5. Does the resulting sequence reduce reviewer load more than it increases coordination overhead?
+5. Does the resulting sequence reduce reviewer or coordination load more than it increases overhead?
+6. Are the functional slices, requirements and verification coverage preserved across the proposed
+   phases, with contracts introduced before or with their first real consumer?
 
 If any candidate split fails the contract-ordering rule, reject it and either:
 - propose a different sequence, or

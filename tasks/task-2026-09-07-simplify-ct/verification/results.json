@@ -1,0 +1,138 @@
+{
+  "date": "2026-09-07",
+  "baseline_commit": "700b03f5475cf9dbb5712a13bc405352308410f2",
+  "scope": "Simplify ct and make its existing consumers accept semantically equivalent compact plans",
+  "automated": {
+    "plugin_tests": {
+      "status": "pass",
+      "count": 25,
+      "command": "PYTHONDONTWRITEBYTECODE=1 python -m unittest discover --start-directory tests --quiet",
+      "evidence": "plugin-tests.txt"
+    },
+    "updater_tests": {
+      "status": "pass",
+      "count": 4,
+      "command": "PYTHONDONTWRITEBYTECODE=1 python -m unittest discover --start-directory .claude/skills/update-setup/tests --quiet",
+      "evidence": "updater-tests.txt"
+    },
+    "build": {
+      "status": "pass",
+      "skills": 40,
+      "agents": 18,
+      "source_fingerprint": "d193a2c5dc366f6dc9119689a5dcf00d55703ede68055dd3561bfe9c85ec4af9",
+      "evidence": "build.json"
+    },
+    "validation": {
+      "status": "pass",
+      "formats": [
+        "claude",
+        "agent"
+      ],
+      "evidence": "validation.json"
+    },
+    "reproducibility": {
+      "status": "pass",
+      "evidence": "reproducibility.json"
+    }
+  },
+  "review": {
+    "status": "no remaining findings in checked scope",
+    "method": "bounded independent read-only review plus primary diff review",
+    "fixed_findings": [
+      "Material benefit is required before splitting a prerequisite chain",
+      "Prerequisite consumers may be in any identified later phase",
+      "Plain-language unresolved blockers are visible to analyze",
+      "Legacy ct gate and mandatory glossary invocation descriptions removed"
+    ]
+  },
+  "behavior_exercises": {
+    "method": "Synthetic repositories; planning-only agents on gpt-5.6-luna with xhigh reasoning; primary read-back of final outputs. No product implementation or fixture test execution.",
+    "small": {
+      "status": "compact output and ready status verified after resume",
+      "task": "scenarios/small/work-items/GREETING-1/README.md",
+      "observations": [
+        "Reused the existing README task without a separate decomposition",
+        "No new product questions",
+        "Implementation and tests remain unchanged by content inspection",
+        "No detailed guide read during resume"
+      ],
+      "corrections": [
+        "First pass loaded the detailed guide unnecessarily",
+        "First pass left an old current status at the top; ct now explicitly requires updating the existing current status in place, and a resume corrected it"
+      ],
+      "baseline_hashes": "Not captured before exercise; final hashes are observations only"
+    },
+    "blocker": {
+      "status": "expected blocked plan",
+      "task": "scenarios/blocker/tasks/RETENTION-1/TASK.md",
+      "observations": [
+        "Unspecified retention period remained a material decision",
+        "No default retention period was invented",
+        "Not ready for si; deletion was not implemented or executed"
+      ]
+    },
+    "complex": {
+      "status": "required migration risks and phase-approval boundary preserved",
+      "task": "scenarios/complex/tasks/CUSTOMER-2/TASK.md",
+      "observations": [
+        "Compatibility, backfill, rollback, tenant isolation and repository test command retained",
+        "Two phases proposed; no phase folders created",
+        "Product code and tests match captured baseline hashes"
+      ],
+      "corrections": [
+        "Initial output described a read-only lookup as a write seam; corrected to identify write normalization as new proposed work"
+      ]
+    },
+    "risk_exercise_harness_correction": "The agent initially treated TASK inputs as immutable and wrote root sidecars. Ownership was clarified: product inputs are immutable, task records are writable. Resume moved plans into their existing task folders and updated status/links.",
+    "limitations": [
+      "These are limited synthetic exercises with disclosed corrections, not a blind benchmark or a guarantee across models or hosts",
+      "No installed-host plugin refresh or real application migration was tested",
+      "Complex fixture has no concrete API consumer; no production-ready phase implementation is claimed"
+    ]
+  },
+  "immutable_risk_inputs": {
+    "baseline_provenance": "Captured by risk agent during first run before planning output; exact timestamp not recorded. Primary independently compared final file hashes.",
+    "sha256": {
+      "blocker/README.md": "e9e50b6c0b6790bcfd5cbe6d8e3b08929a16883e3e1e9356966db1d4affb14b3",
+      "blocker/cleanup.py": "0a6233afed6d01450b0a50b7829a1163383462754e3bbf08ca2b5640d7a712be",
+      "complex/README.md": "1230d942c6c9f497715fb9d9b0d1be4b044c93d6282bf0a9489ee7939f222dac",
+      "complex/Makefile": "02e694498be161248406fad29c59c4a8c559bb4ef2a80a96bd05fb94a135b89b",
+      "complex/service.py": "92f91e2a187a165038cc42087628a38c9dd4076ec85423b5bf9d23450caf1a65",
+      "complex/migrations/001_customers.sql": "f09d5bd69144c1a5eddedaff832c575baf369c01378ade2ac0fdd3d820166b14",
+      "complex/tests/test_service.py": "c1ee65404700740f73d9232789aea4f150aedcd246ed0eb42d63b95f1a1ef3e3"
+    }
+  },
+  "final_scenario_artifacts_sha256": {
+    "scenarios/blocker/README.md": "e9e50b6c0b6790bcfd5cbe6d8e3b08929a16883e3e1e9356966db1d4affb14b3",
+    "scenarios/blocker/cleanup.py": "0a6233afed6d01450b0a50b7829a1163383462754e3bbf08ca2b5640d7a712be",
+    "scenarios/blocker/tasks/RETENTION-1/TASK.md": "28f7dd361cb1abfda1283f42c81f6317bc98843772403b6760342e0b3e331a8a",
+    "scenarios/blocker/tasks/RETENTION-1/ct-plan.md": "1f8d86dafceb221ec2e9b2d349897aa36833018f663c3b9b8dc50a9c1dc93f30",
+    "scenarios/complex/Makefile": "02e694498be161248406fad29c59c4a8c559bb4ef2a80a96bd05fb94a135b89b",
+    "scenarios/complex/README.md": "1230d942c6c9f497715fb9d9b0d1be4b044c93d6282bf0a9489ee7939f222dac",
+    "scenarios/complex/migrations/001_customers.sql": "f09d5bd69144c1a5eddedaff832c575baf369c01378ade2ac0fdd3d820166b14",
+    "scenarios/complex/service.py": "92f91e2a187a165038cc42087628a38c9dd4076ec85423b5bf9d23450caf1a65",
+    "scenarios/complex/tasks/CUSTOMER-2/TASK.md": "21122c757227d5ce24b35805132cc98b33c945747659b3507777bff60b9b053a",
+    "scenarios/complex/tasks/CUSTOMER-2/ct-plan.md": "ab5a31429c0f8884a502df726fd892bf3eb70d04e219cd300ab88ba0dd803228",
+    "scenarios/complex/tests/test_service.py": "c1ee65404700740f73d9232789aea4f150aedcd246ed0eb42d63b95f1a1ef3e3",
+    "scenarios/small/README.md": "86333b3b9f17e0187d3497837ff282d5c389f7aaeb9c24dea99bbb8bf4cd749f",
+    "scenarios/small/greeting.py": "a55c14346b5c0e11da873793db175efd28d4840a330a5edba18d03d7d7310626",
+    "scenarios/small/tests/test_greeting.py": "4fc8c8a3c21a608b1040ea2ebf134255b0ce0ccd521fa6eb31feef9bc59dfb35",
+    "scenarios/small/work-items/GREETING-1/README.md": "86e713f2c0d6781197860e7a2c502f65066b4a4ae8b470b2f9edd4c2e3baf414"
+  },
+  "changed_source_sha256": {
+    ".claude/agents/tasks-validators-agents/plan-reviewer.md": "860f8a9179e8c5bba4571f8ade86b1eed2939465bc4d0e5721997e4bc2f53287",
+    ".claude/agents/tasks-validators-agents/task-decomposer.md": "0252d97659db84ff573543871f81161d5fe35938f4704c7d77bdefcc7f2895a2",
+    ".claude/agents/tasks-validators-agents/task-splitter.md": "6fa2ddc10e12880827247453f21b4fa63d018ed8b858d5302e8cc9a7518b8b27",
+    ".claude/docs/templates/plan-review-template.md": "845bdc77dc848786c8ed64cd256fe110518d66875be5aee091a498aa84091b41",
+    ".claude/docs/templates/splitting-decision-template.md": "52171e5a7ca8616d5934488666f356f44c799da7ea4c38cb8a76aabcfd9b239d",
+    ".claude/docs/templates/technical-decomposition-template.md": "a198fee0758c733c60424a93341aacd049310269acd56a2044d3cdfef1c21a84",
+    ".claude/skills/analyze/SKILL.md": "25ec7d9cc51552df6b2cf24dd71e37deb3054939bc32eb177e0081ef042e5e6d",
+    ".claude/skills/blueprint/SKILL.md": "698a3ceb43444d97868253694c6cb08ef5d76ace768975948b7b08dbde967ffa",
+    ".claude/skills/ct/SKILL.md": "1931be0c8dbf19b3ffb3768097ab5743ba31f4b249751e778c1f24218068d386",
+    ".claude/skills/ct/references/decomposition-guide.md": "bc6b2163648861055065544885185d16993c04b395ff09be5e6c5b11f7faab78",
+    ".claude/skills/ubiquitous-language/SKILL.md": "8158f6285ca2e7fe45473c3117b953e37928cdffb1703b1b6046d81a583fb87d",
+    "README.md": "8a1008496b164cb014dba48639ce0222ee131d5d5557c17da063cf72973f9d7e"
+  },
+  "publication_target": "https://github.com/alexandrbasis/claudops/tree/main",
+  "delivery_evidence": "Remote commit and GitHub Actions are checked after committing; local validation alone does not establish publication."
+}

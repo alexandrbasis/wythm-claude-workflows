@@ -2,15 +2,19 @@
 
 **Date**: YYYY-MM-DD | **Reviewer**: `plan-reviewer`
 **Task Directory**: [absolute path]
-**Reviewed Document**: `tech-decomposition-[feature].md`
+**Reviewed Document**: [active plan path or `TASK.md` section]
 **Status**: ✅ APPROVED / ⚠️ NEEDS UPDATES / ❌ BLOCKED
 
 ---
 
 ## Inputs Reviewed
-- Technical decomposition: `path/to/tech-decomposition-[feature].md`
+- Active plan: [path or `TASK.md` section]
 - Supporting docs: [paths reviewed, or `None reviewed`]
 - Code / architecture references: [paths reviewed, or `None reviewed`]
+
+Review the active plan by meaning. A compact task plan is valid; absent optional template
+headings are not findings unless the corresponding behavior, verification, dependency or decision
+is materially missing.
 
 ---
 

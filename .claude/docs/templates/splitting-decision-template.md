@@ -3,7 +3,7 @@
 **Date**: YYYY-MM-DD
 **Decision**: SPLIT RECOMMENDED
 **Task Context**: [resolved task directory and `TASK.md` or existing entrypoint]
-**Parent Tech Decomposition**: `tech-decomposition-[feature].md`
+**Parent Active Plan**: [path to the active plan or the relevant `TASK.md` section]
 
 ## Summary
 
@@ -13,14 +13,14 @@
 
 | Signal | Evidence From Parent Doc | Impact |
 |--------|---------------------------|--------|
-| Functional breadth | [REQ/use-case clusters] | [Why one PR is too broad] |
+| Functional breadth | [Existing requirement IDs, plain acceptance or use-case clusters] | [Why one PR is too broad] |
 | Verification breadth | [Test suites / cases] | [Why testing becomes hard to review] |
 | Module or domain spread | [Paths / bounded contexts] | [Why reviewer load is too high] |
 | Contract or prerequisite sequencing | [What must exist before what] | [Why ordering matters] |
 
 **Approach**: [Vertical functional slices / Prerequisite-then-consumer slices]
 **Decision Level**: [MUST SPLIT / SHOULD SPLIT]
-**Guardrail**: No phase may depend on a contract, interface, DTO, endpoint shape, schema, or module boundary first defined in a later phase.
+**Guardrail**: No phase may depend on a contract, interface, DTO, endpoint shape, schema, or module boundary first defined in a later phase. Each phase must retain its assigned functional acceptance and verification, with a real consumer for any prerequisite contract.
 
 ## Phase Plan
 
@@ -28,8 +28,8 @@
 
 **Goal**: [Functional outcome or concrete prerequisite outcome]
 **Delivers**: [What becomes possible or testable after this phase]
-**Includes Requirements**: `REQ-001`, `REQ-002`
-**Includes Tests**: [Test suite names, `TEST-XXX` items, or both]
+**Includes Requirements**: [Existing source IDs or plain-language acceptance items]
+**Includes Tests**: [Test suite names, existing test IDs, behavior checks, or both]
 **Includes Implementation Steps**: [Relevant parent step numbers / sub-steps]
 **Files / Modules**: `path/to/module`, `path/to/other-module`
 **Depends On**: [None / Phase N-1]

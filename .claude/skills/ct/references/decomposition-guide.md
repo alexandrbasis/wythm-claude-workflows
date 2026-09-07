@@ -1,76 +1,60 @@
-# `/ct` — Decomposition Writing Guide
+# Detailed planning
 
-Reference for **GATE 4** of the `ct` skill. Load this once you reach GATE 4 and are ready to write
-`tech-decomposition-[feature-name].md`. Drive the document toward the structure of
-`.claude/docs/templates/technical-decomposition-template.md` — that template is the **output
-contract**; this guide is the *how-to-fill-it* detail. Use the subsets that apply; skip what doesn't.
+Use this reference when a plan has material migration, permission, integration,
+coverage or coordination risk, or the user requests a detailed decomposition.
+Add only detail that resolves that risk; keep the existing task and accepted decisions.
 
-## Output shape
+## Detail that earns a place
 
-- Read `.claude/docs/templates/technical-decomposition-template.md` before drafting.
-- Treat it as the output contract: it defines the expected structure and level of detail; the
-  decomposition should contain exactly what's needed to fill it clearly.
-- Do **not** restate the template inside the document — use it as the source of truth for final shape.
+| Trigger | Add to the plan |
+|---------|-----------------|
+| Entity creation, update or deletion | Relevant defaults, persistence, immediate feedback and visibility on affected surfaces; handling of existing data when needed |
+| User-facing validation or asynchronous interaction | Applicable error/loading/empty/success behavior and how users recover; connect service constraints to the affected UI |
+| Migration, permissions or external contract | Compatibility, failure handling, access boundaries and a safe rollout/recovery approach |
+| Many interacting requirements | One requirement-to-verification mapping, reusing source IDs and linking implementation steps |
+| Independent delivery phases | Functional outcomes, dependency order and the contracts each phase introduces or consumes |
 
-## Required sections
+Resolve domain terminology from existing project sources. Read the architecture-language
+reference when the plan makes architectural guarantees that need its vocabulary.
+Ground decisions in inspected files; choose ordinary implementation details directly.
 
-- Linked Inputs / Context
-- Primary Objective
-- Must Haves
-- Test Plan
-- Technical Requirements
-- Implementation Decisions (if any)
-- Implementation Steps
-- Dependencies / Risks / Blockers
-- Tracking / Notes (optional)
+## Separate document, when useful
 
-## Planning rules
+Use the task's existing plan format. If no suitable format exists, start from
+`.claude/docs/templates/technical-decomposition-template.md`, resolved through the
+shared task context. The template is a scaffold: omit irrelevant sections and keep
+equivalent existing headings. Preserve legacy links and source requirement IDs.
 
-- **Entity Lifecycle** — when the task creates, updates, or deletes entities, add a
-  `## Entity Lifecycle` section covering:
-  - Creation entry points: where can the entity be created?
-  - Persistence defaults: which fields must be set, including semantic defaults (category, type,
-    order, visibility)?
-  - Immediate feedback: what confirms success to the user?
-  - Canonical visibility: where should the entity appear after creation?
-  - Cross-surface visibility: what other pages, lists, widgets, searches, or groupings must reflect it?
-  - Data normalization: should existing misclassified or orphaned entities be migrated?
-- **Constraint-to-UI traceability** — for every service-layer validation rule in the spec, require a
-  mapped UI element (error message, disabled/hidden option, input hint, or highlighted field). If a
-  validation rule has no corresponding UI affordance, flag it as a gap.
-- **`Must Haves` block** — add it immediately after the objective:
-  ```markdown
-  ## Must Haves
-  Non-negotiable truths when this task is complete:
-  - [ ] [Observable behavior 1]
-  - [ ] [Interface, file, endpoint, or workflow truth 2]
-  - [ ] [Constraint or invariant 3]
-  ```
-  These become the source of truth for goal-backward verification during implementation if that
-  workflow exists.
-- **Test Plan before implementation steps** — always.
-- **Don't restate discovery/product docs** — if discovery or product docs exist, do not restate
-  `Feature Overview`, `Why This Exists`, `How It Works`, or scope sections in full. Translate them
-  into `Must Haves`, `Technical Requirements`, `Implementation Decisions`, and `Implementation Steps`.
-- Include explicit **verification commands**.
-- Treat `Technical Requirements` as the implementation-facing version of the source requirements.
-- Use `Implementation Decisions` only for real technical choices, resolved gray areas, or explicit
-  trade-offs. If none were needed, write `No additional implementation decisions required.`
-- Break work into clear **steps and sub-steps** with concrete files, directories, or modules. State
-  what each step changes and what it proves.
-- If source requirements exist, assign `REQ-XXX` IDs and tag the relevant steps. If no formal
-  requirements doc exists, still write explicit requirement statements in plain language.
-- Add optional **wave annotations** only when steps are genuinely independent.
-- Reference constraints or architecture decisions that shaped the plan.
-- Leave `Issue ID`, `Branch / PR`, `Split status`, and `Completion Summary` blank or omitted unless
-  prior workflow steps produced real values — those fields are owned by later skills (`/si`, tracker
-  integration) and must reflect reality.
-- **Exclude time estimates** — this doc is a technical contract, not a schedule; estimates expire fast
-  and mislead consumers of the doc.
+Define observable completion and suitable verification before detailing implementation.
+Tests should describe required behavior; Given/When/Then helps when a scenario needs it.
+Use actual commands with their owning package. Keep each requirement in one authoritative
+place and link it from steps instead of maintaining duplicate acceptance ledgers.
+Task tracking and eventual execution evidence stay in the existing task record.
 
-## Test case format (Given/When/Then)
+## Independent review
 
-- **Given**: preconditions already in place
-- **When**: the action being exercised
-- **Then**: the observable outcome that proves the behavior
-- Prefer declarative behavior descriptions over click-by-click UI scripts.
+Use `plan-reviewer` when an independent pass can resolve a specific readiness risk,
+or when requested. Supply the active plan, relevant evidence and the review question.
+For architectural risk, use a reviewer that accepts plans, or assess that risk directly;
+an implementation-only reviewer is not a plan reviewer.
+
+Use `/analyze` for a material spec/plan coverage problem, not as another obligatory
+review of the same facts. Cross-AI validation is optional: use the resolved
+`.claude/docs/templates/cross-ai-protocol.md` when warranted and available. Incorporate
+findings once; record an unavailable required check as a limitation, never as passed.
+
+## Splitting
+
+Consider a split when distinct deliverable outcomes or prerequisites make execution
+and review safer. Keep tightly coupled work together. A phase introduces its contracts
+before or with its first consumer; no earlier phase may depend on a later guessed contract.
+
+Ask `task-splitter` to evaluate a concrete candidate boundary when helpful, passing the
+active plan even if it is a section of `TASK.md`. If that capability is unavailable,
+evaluate the same boundaries directly. A no-split decision fits in the existing plan.
+
+Present a proposed phase structure for the user's decision unless that exact split is
+already authorized. After approval, `task-decomposer` or the caller creates phase folders
+and plans. The parent links each phase and dependency; phases link the parent and their
+active inputs. Preserve requirement and verification coverage across phases. Hand `/si`
+the first active phase; completing it does not complete the parent feature.

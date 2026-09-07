@@ -3,7 +3,7 @@ name: ubiquitous-language
 description: >-
   Build or update a DDD-style ubiquitous language glossary when the user explicitly asks to
   define domain terms, build/update the project glossary, or harden terminology. For /nf,
-  /product, or /ct Step 0 calls, load and report the glossary; for authorized post-grill
+  /product, or /ct context-reading calls, load and report the glossary; for authorized post-grill
   updates, merge and write it. Do not write for a load-only or explanatory request. NOT for
   architectural vocabulary (use /architecture-language).
 ---
@@ -15,11 +15,11 @@ description: >-
 Extract and formalize domain terminology from the current conversation into a consistent glossary stored at `product-docs/UBIQUITOUS_LANGUAGE.md`. The same vocabulary is used by domain experts, the user, and the AI — both in planning docs (PRD, JTBD, discovery, tech-decomposition) and in code.
 
 When called from task work, resolve the repository and task with
-[`../setup/references/task-context.md`](../setup/references/task-context.md). Step-0 calls from
+[`../setup/references/task-context.md`](../setup/references/task-context.md). Context-reading calls from
 `/nf`, `/product`, and `/ct` are load-only. Write the glossary only for an explicit update request
 or an authorized post-grill update, then link the result from the task record when relevant.
 
-Classify the invocation before writing. A caller's Step 0 request is read-only loading. An
+Classify the invocation before writing. A caller's context-reading request is read-only loading. An
 explicit request to build/update the project glossary or define its domain terms authorizes
 the glossary update; an authorized post-grill caller may do the same. An explanatory request
 without that update intent returns proposed terms without writing.
@@ -29,14 +29,14 @@ without that update intent returns proposed terms without writing.
 - **`/nf` Step 0**: load existing glossary so discovery questions and the discovery doc use canonical terms.
 - **`/nf` Step 4 → Step 5 transition**: after the grill round, update glossary with new terms before writing the discovery doc.
 - **`/product` Step 0** and **after Step 4 grill**: same pattern — load before interview, update before writing PRD/JTBD.
-- **`/ct` GATE 1**: load alongside discovery/PRD docs so decomposition aligns with project terms.
+- **`/ct` context reading**: reuse established project terms from the task's relevant inputs.
 - **Manual update invocation**: when the user explicitly asks to harden terminology, define
   domain terms in the project glossary, or build/update the glossary. If the user only asks
   an explanatory terminology question, return a proposal without writing.
 
 ## Process
 
-### Load-only branch (Step 0)
+### Load-only branch (context reading)
 
 1. **Read existing glossary** at `product-docs/UBIQUITOUS_LANGUAGE.md` (if it exists) and
    report its current canonical terms. Stop here. Do not scan, merge, rewrite, or update the
@@ -70,7 +70,7 @@ without that update intent returns proposed terms without writing.
 ```md
 # Ubiquitous Language
 
-> Domain terms used across PRDs, JTBDs, discovery docs, tech-decompositions, and code. Update via the `/ubiquitous-language` skill — auto-invoked from `/nf`, `/product`, `/ct`.
+> Domain terms used across PRDs, JTBDs, discovery docs, technical plans, and code. Read during relevant context gathering; update via `/ubiquitous-language` when authorized.
 
 ## [Subdomain or lifecycle name]
 

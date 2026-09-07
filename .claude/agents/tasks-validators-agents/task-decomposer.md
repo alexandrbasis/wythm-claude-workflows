@@ -44,13 +44,13 @@ discovery/product docs, prototype approval, or plan review.
    document or invent empty headings.
 
 3. Read the canonical technical-decomposition template resolved through
-   `.claude/skills/setup/references/task-context.md`; an existing equivalent plan section satisfies
-   the structure when the task intentionally uses a compact `TASK.md`.
+   `.claude/skills/setup/references/task-context.md` as a reference; an existing equivalent plan
+   section satisfies the structure when the task intentionally uses a compact `TASK.md`.
 
 4. Validate that `splitting-decision.md` contains, for each phase:
    - a clear functional goal
-   - assigned `REQ-XXX` items
-   - assigned tests / suites
+   - the parent's requirements represented by existing source IDs or plain-language acceptance
+   - assigned verification checks, tests or suites where the parent has them
    - assigned implementation steps
    - dependency order
    - enough contract sequencing detail to avoid guesswork
@@ -96,50 +96,22 @@ do not create a second schema or add empty headings solely to match the template
 
 ### Fill Rules For Each Phase Document
 
-Populate each section as follows:
+Carry each fact once, using the parent's equivalent sections rather than adding a new
+schema. A phase plan contains:
 
-- **Title / Status**:
-  - Title becomes `Technical Decomposition: Phase N - [Phase Name]`
-  - Status should reflect readiness for implementation
+- **Outcome and context:** the approved phase goal, actual readiness, links to the parent
+  plan, splitting decision and relevant inputs; identify the phase within the whole feature.
+- **Acceptance and verification:** only the requirements and checks assigned to this phase.
+  Preserve existing source IDs, wording, test names and commands; plain-language acceptance
+  is sufficient when no IDs exist. Keep one coverage mapping.
+- **Implementation:** the assigned steps and affected files/modules, relevant decisions,
+  and existing requirement tags where present. Reorganize approved content without adding
+  new behavior or guessing contracts from later phases.
+- **Dependencies and risks:** prerequisite phases and contracts, applicable technical
+  dependencies, risks and unresolved blockers. Tracking fields are included only when known.
 
-- **Linked Inputs / Context**:
-  - Reference the parent tech-decomposition
-  - Reference `splitting-decision.md`
-  - Reference optional supporting docs when relevant
-
-- **Primary Objective**:
-  - State the phase-specific goal from the approved split
-
-- **Must Haves / acceptance**:
-  - Include only the observable truths this phase must deliver, using the parent format
-
-- **Verification / Test Plan**:
-  - Carry over only the suites, cases, and verification commands assigned to this phase; use the
-    parent heading when it has one
-  - Preserve existing test IDs and names from the parent document when present
-
-- **Technical Requirements**:
-  - Carry over only the `REQ-XXX` items assigned to this phase
-  - Preserve the original requirement IDs and wording
-
-- **Implementation Decisions**:
-  - Keep only the decisions relevant to this phase
-
-- **Implementation Steps**:
-  - Include only the steps/sub-steps assigned to this phase
-  - Preserve `[REQ-XXX]` tags
-  - Keep file/module references
-  - Do not invent new technical behavior; only reorganize existing content into the approved phase boundary
-
-- **Dependencies / Risks / Blockers**:
-  - State the phase dependency explicitly
-  - Include only the technical dependencies relevant to this phase
-  - Carry over relevant risks and blockers from the parent
-
-- **Tracking / Notes**:
-  - Keep issue/branch fields optional unless already known
-  - Set split context clearly, e.g. `Phase 1 of 3 from approved split`
-  - Note which earlier phase this one depends on, if any
+Preserve coverage across phases. Legacy `Must Haves`, `Technical Requirements` and `Test Plan`
+sections remain valid, but equivalent compact content does not need parallel copies of them.
 
 ### Step 5: Preserve The Parent Document
 
