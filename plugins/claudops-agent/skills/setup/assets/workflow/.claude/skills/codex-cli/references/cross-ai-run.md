@@ -24,6 +24,11 @@ Give the provider every path and requirement it needs: the task record when
 applicable, changed files or diff scope, repository root, and concrete review
 questions. The provider starts without conversation context.
 
+For Antigravity, read `../../antigravity-cli/SKILL.md` and
+`../../antigravity-cli/reference.md` for the provider runner's exact invocation,
+file-inlining, artifact, model-label, and bounded-input rules. Run its runner
+from the target repository root after resolving the loaded skill directory.
+
 ## Preflight and model
 
 Before the first call, verify the provider is available with `command -v` and
@@ -34,8 +39,12 @@ remote installer, self-update, or settings write implicitly.
 
 Use a model selected by the caller or configured by the provider. If no model
 was selected, omit the model override and let the installed provider use its
-configured default. Never pin a model because this reference was written at a
-particular date.
+configured default; the runner has no model default. For an explicit Gemini
+perspective through Antigravity, discover a current `gemini-*` slug with
+`agy models`, pass that exact slug, and record the provider plus actual model.
+If the default model is not reported, label its identity unverified and do not
+claim model-level independence. Never pin a model because this reference was
+written at a particular date, and never auto-fallback to another vendor.
 
 Use the least-privilege/read-only mode supported by the local help for review
 and research. Do not pass autonomous write, force, or permission-bypass flags
@@ -43,10 +52,22 @@ unless the caller explicitly requested that behavior.
 
 ## Run, capture, and verify
 
-Use the provider's one-shot mode and its documented output capture. Keep the
-prompt and result bounded; choose a timeout appropriate to the provider and
-record it. Read the captured result, check the exit status, and distinguish a
-provider opinion from independently verified repository evidence.
+Use the provider's one-shot mode and its documented output capture. For
+Antigravity, the tested shape is `agy -p --output-format json
+--print-timeout <duration>`; `--approval-mode` and `-o` are legacy forms and
+are rejected by the tested CLI. Keep the prompt and result bounded; choose a
+timeout appropriate to the provider and record it. Read the captured result,
+check exit status, and distinguish a provider opinion from independently
+verified repository evidence.
+
+For Antigravity JSON results, accept a completed result only when process exit
+is 0, the payload status is `SUCCESS`, `response` is non-empty, and
+`denied_actions` is absent or empty. Keep stderr even on exit 0. Empty,
+blocked, denied, malformed, timed-out, or visibly partial output is `PARTIAL`,
+including `SUCCESS` plus exit 0; it is not a no-findings result and cannot
+support a passed review. Other adapters use their native envelopes but must
+meet the same completed-output and evidence standard. Do not retry implicitly,
+change settings/auth, or bypass permissions.
 
 The wrapper should return a compact receipt containing provider, version,
 scope, prompt purpose, output location, exit status, and verification gaps.

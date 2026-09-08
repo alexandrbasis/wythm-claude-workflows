@@ -102,7 +102,7 @@ The result: AI speed with human judgment. Full context at every step, no black-b
 - **18 specialized agents** — TDD, code review, task validation, research
 - **40 skills** — full dev lifecycle, dev server monitoring, and cross-AI helpers (Antigravity, Codex CLI, Cursor CLI)
 - **Skills ↔ Agents composability** — agents preload shared convention skills via `skills:` frontmatter
-- **Cross-AI plan review** — optional Gemini verification of plans (see `review-plan-gemini.sh`)
+- **Cross-AI plan review** — optional Antigravity verification of plans (see `review-plan-gemini.sh`)
 - **Hooks** — lint on write, sync, validation, guards, metrics
 - **Linear integration** — project management from your terminal (`cc-linear` skill)
 
@@ -184,9 +184,11 @@ Plugin workflows read project instructions and command sources. For repository-o
 
 ### Cross-AI plan review
 
-Optional flow when Gemini CLI is configured — see `.claude/scripts/review-plan-gemini.sh` and hook wiring in `.claude/settings.json`.
+Use `/antigravity-cli` for a delegated or explicitly requested review through `agy`. The adapter captures JSON and diagnostics and rejects incomplete results, including permission-denied runs that exit successfully.
 
-**What Gemini can check:** security, architecture, performance, edge cases, testability.
+The legacy opt-in plan hook remains at `.claude/scripts/review-plan-gemini.sh`; it uses the same adapter. Plugin installation does not activate hooks.
+
+**Review scope:** security, architecture, performance, edge cases, testability.
 
 ---
 
@@ -306,6 +308,7 @@ Pulls latest changes from the upstream claudops repo, shows what's new or modifi
 ### Cherry-pick individual skills
 ```bash
 cp -r claudops/.claude/skills/si your-project/.claude/skills/
+cp -r claudops/.claude/skills/antigravity-cli your-project/.claude/skills/
 cp claudops/.claude/scripts/review-plan-gemini.sh your-project/.claude/scripts/
 ```
 
@@ -342,7 +345,7 @@ Independent work can be delegated when it helps; the combined result is checked 
 completion. Existing authorization carries forward to review and delivery within its scope.
 
 ### Cross-AI
-- Gemini CLI — plan review, web-grounded research
+- Antigravity CLI (`agy`) — plan review, web-grounded research
 - Codex / Cursor CLI — second-opinion review (see `cross-ai-protocol` template)
 
 ---
@@ -352,7 +355,7 @@ completion. Existing authorization carries forward to review and delivery within
 - [Claude Code](https://code.claude.com/docs/en/overview), Codex, or a compatible Agent Plugins client
 - Git for the GitHub marketplace source and repository workflows
 - GitHub CLI (`gh`) for GitHub pull request workflows
-- Optional: Gemini CLI (`npm i -g @google/gemini-cli`)
+- Optional: authenticated [Antigravity CLI (`agy`)](https://antigravity.google/docs/cli/install/) for cross-AI validation
 - Optional: Linear API access
 
 ---

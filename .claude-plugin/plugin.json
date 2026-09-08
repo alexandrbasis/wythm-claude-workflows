@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "claudops",
   "displayName": "Claudops",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Workflow skills and review agents for planning, implementation, review, and delivery.",
   "author": {
     "name": "Alex Basis"

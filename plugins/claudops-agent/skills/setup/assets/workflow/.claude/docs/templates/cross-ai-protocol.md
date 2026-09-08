@@ -6,8 +6,15 @@ Output format reference for skills that run cross-AI validation.
 
 Invoke the configured available validator skills (currently `/codex-cli`, `/antigravity-cli`, and
 `/cursor-cli`) with the calling skill's **FOCUS** and **FILE_REFS**. Do not invent a provider or
-block a task because an optional adapter is absent.
-Each skill handles its own CLI availability checks, flags, models, and output parsing.
+block a task because an optional adapter is absent. Each adapter handles its own binary flags and
+returns a receipt with provider, actual model when known, version, scope, exit status, result path,
+and retained stderr.
+
+For an explicit Gemini perspective, `/antigravity-cli` must discover a current `gemini-*` slug
+from `agy models`, pass that exact slug, and label the source `Gemini <slug> via Antigravity (agy)`.
+When the model is omitted, label the source `Antigravity (agy; model unverified)` until the receipt
+reports the actual model; never infer Gemini or claim model-level independence from the provider
+name alone.
 
 - **All configured validators available** → invoke in parallel, then produce comparison table + validation (sections 2-4)
 - **Two or more available** → invoke those in parallel, produce comparison table + validation
@@ -16,13 +23,14 @@ Each skill handles its own CLI availability checks, flags, models, and output pa
 
 ## 2. Comparison Table (multi-agent mode only)
 
-| # | Finding | Codex | Antigravity | Cursor | Agreement |
+| # | Finding | Codex | Antigravity (agy) | Cursor | Agreement |
 |---|---------|-------|--------|--------|-----------|
 | 1 | [description] | [severity or —] | [severity or —] | [severity or —] | YES / NO |
 
 De-duplicate by semantic equivalence. "—" means that AI didn't flag it.
 If severity differs, use the higher one.
-When fewer than three adapters ran, omit absent columns.
+When fewer than three adapters ran, omit absent columns. Use the provider/model labels from the
+receipts in source cells and findings; do not relabel an unverified default as Gemini.
 
 ## 3. Validation
 
@@ -36,7 +44,12 @@ For each finding, verify against actual code:
 - **INVALID**: Factually wrong (wrong file, misread logic, non-existent pattern). Dropped with reason.
 - **DISPUTED**: Some AIs found it, others didn't. Orchestrator checks code and decides.
 
-Only VALID findings propagate to the consolidated verdict.
+Only VALID findings propagate to the consolidated verdict. A provider is available for comparison
+only when it returned valid completed output. Missing binaries/capabilities are unavailable;
+non-zero exits, timeouts, malformed JSON, blocked reads, empty responses, visibly partial responses,
+or any `denied_actions` are `PARTIAL` results. They are not a no-findings source and cannot produce
+a `PASSED` review. A payload with `status: SUCCESS` and process exit 0 still fails this completeness
+check when its answer is empty or denied.
 
 ## 4. Consolidated Verdict
 
@@ -47,12 +60,12 @@ Only VALID findings propagate to the consolidated verdict.
 ```
 
 Status definitions:
-- **PASSED** — 0 Critical, 0 Major valid findings
+- **PASSED** — every selected adapter returned valid completed output, with 0 Critical and 0 Major valid findings
 - **FAILED** — 1+ Critical or 3+ Major valid findings
-- **PARTIAL** — One or more configured adapters unavailable/timed out; fewer than full coverage
+- **PARTIAL** — one or more selected adapters returned incomplete output or were unavailable/timed out; do not present as passed
 
 Final findings table (VALID only):
 
 | Severity | Finding | Source | Assessment |
 |----------|---------|--------|------------|
-| CRITICAL / MAJOR / MINOR / INFO | [description] | codex / antigravity / cursor / codex+antigravity / all / etc. | [brief note] |
+| CRITICAL / MAJOR / MINOR / INFO | [description] | codex / Antigravity (agy) / Gemini <slug> via Antigravity (agy) / cursor / all / etc. | [brief note] |

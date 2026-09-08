@@ -46,7 +46,7 @@ These hooks are wired in `settings.json` and work in any project without configu
 | Pre-commit validation | PreToolUse (Bash) | `validation/pre-commit-validation.py` | Blocks commits with syntax errors or merge conflicts |
 | Command logger | PreToolUse (Bash) | `logging/command-logger.py` | Logs every shell command to `.claude/hooks/logs/commands.jsonl` |
 | Sensitive file guard | PreToolUse (Write\|Edit) | `guards/sensitive-file-guard.py` | Blocks writes to `.env`, `.pem`, `.key`, lock files, `.git/` |
-| Gemini plan review | PostToolUse (ExitPlanMode) | `scripts/review-plan-gemini.sh` | Auto-reviews plans with Gemini when exiting plan mode |
+| Antigravity plan review | PostToolUse (ExitPlanMode) | `scripts/review-plan-gemini.sh` | Reviews plans through `agy`; requires the bundled `antigravity-cli/scripts/review.py` runner and appends only complete results |
 | Paralysis guard | PostToolUse | `paralysis/read-counter.py` | Warns after 5+ consecutive reads without writing |
 | Cost tracker | Stop | `metrics/cost-tracker.py` | Logs session token costs to `~/.claude/metrics/costs.jsonl` |
 

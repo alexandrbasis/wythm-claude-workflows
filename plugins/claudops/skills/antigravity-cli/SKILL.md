@@ -24,19 +24,56 @@ needs its provider-specific grounding. Read the shared lifecycle in
 ## Provider adapter
 
 1. Check `command -v agy`, then `agy --version`. Read `agy --help` before using
-   print mode, timeout, path injection, web, or output flags.
-2. Use the locally supported non-interactive mode and output capture. Do not
-   pass a model override unless local help and the caller explicitly require
-   one; configured provider routing is the default.
-3. Use `@path` or the provider's equivalent only after confirming each path
-   exists. Use the least-privilege mode available for review/research; never
-   pass permission-bypass or write flags unless explicitly requested.
-4. Read the captured result, check exit status, and return the shared receipt.
-   The result does not authorize edits, shell work, or publication.
+   print mode, output, timeout, model, or effort flags. If the binary or a
+   required capability is absent, report the prerequisite and stop.
+2. For an explicit Gemini run, inspect `agy models`, choose an exact currently
+   listed `gemini-*` slug, and pass it as `--model`. Record the selected
+   provider and model. If no model was requested, omit `--model` and retain the
+   provider's configured default; an unreported default model is unverified and
+   does not establish model-level independence.
+3. For review or research, resolve the loaded skill directory, run from the
+   target repository root, and use the runner with a fresh output directory:
 
-If `agy` is absent or lacks a needed mode, report the prerequisite and stop.
-Installation, update, sign-in, and settings changes are separate user actions;
-this skill never runs a remote installer or mutates provider settings.
+   ```bash
+   ANTIGRAVITY_SKILL_DIR="/absolute/path/to/loaded/antigravity-cli"
+   python3 "$ANTIGRAVITY_SKILL_DIR/scripts/review.py" \
+     --prompt-file /tmp/agy-prompt.md \
+     --file path/to/file.py \
+     --file path/to/requirements.md \
+     --model '<exact slug from agy models>' \
+     --effort high \
+     --timeout 120 \
+     --output-dir /tmp/agy-review-unique
+   ```
+
+   `ANTIGRAVITY_SKILL_DIR` must be the actual directory containing this loaded
+   skill; do not resolve it from the target repository's current directory.
+   `--file` is repeatable. `--effort` is optional and accepts `low`, `medium`,
+   or `high`. The runner verifies and pre-reads those files, then
+   inlines their contents so a denied provider file read cannot look like a
+   successful review. `--model` is optional and has no runner default; omit the
+   line when the configured provider default is intended. Use a new output
+   directory for every attempt and do not retry implicitly.
+4. Read `receipt.json`, `stdout.json`, `version.stderr.log`, `response.txt` on
+   success, and `stderr.log` from the output directory. A valid completed
+   review requires process exit 0, payload
+   `status: SUCCESS`, a non-empty `response`, and no `denied_actions`. A
+   `SUCCESS` result with an
+   empty or visibly partial answer, or with any denied action, is `PARTIAL` and
+   must never be reported as a passed review. Inspect and retain stderr even on
+   exit 0. Return the shared receipt; the result never authorizes edits, shell
+   work, or publication.
+
+The runner invokes the supported headless shape: `agy -p --output-format json
+--print-timeout <duration>`, with an explicit `--model <slug>` only when chosen
+by the caller. The old `--approval-mode` and `-o` forms are incompatible with
+the tested Antigravity CLI. Do not use permission-bypass flags, settings/auth
+edits, or automatic model fallback.
+
+For upstream behavior, use the official [headless CLI docs](https://antigravity.google/docs/cli/headless/),
+[migration guide](https://antigravity.google/docs/cli/gcli-migration/), and
+[installation guide](https://antigravity.google/docs/cli/install/). Verify local
+behavior first because flags, models, and output fields can change.
 
 ## Prompt requirements
 
@@ -44,7 +81,8 @@ Include the repository root, task/requirements path when task-attached, files or
 diff scope, and concrete questions. For web research, ask for source URLs and
 separate sourced claims from repository observations. Resolve task evidence
 through `../setup/references/task-context.md`; standalone calls do not create a
-task.
+task. Do not put unverified `@path` references in review prompts; pass verified
+files through the runner's repeatable `--file` option.
 
 ## When not to use
 
@@ -54,6 +92,6 @@ task.
 
 ## References
 
-- `../codex-cli/references/cross-ai-run.md` — shared lifecycle
-- `reference.md` — local-help-first provider lookup and historical notes
-- `templates.md` — prompt shapes; resolve placeholders before execution
+- `../codex-cli/references/cross-ai-run.md` — shared lifecycle and receipt
+- `reference.md` — local-help-first flags, models, output, and migration notes
+- `templates.md` — prompt shapes and runner examples
