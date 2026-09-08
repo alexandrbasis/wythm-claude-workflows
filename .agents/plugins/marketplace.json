@@ -1,0 +1,20 @@
+{
+  "name": "claudops",
+  "interface": {
+    "displayName": "Claudops"
+  },
+  "plugins": [
+    {
+      "name": "claudops",
+      "source": {
+        "source": "local",
+        "path": "./plugins/claudops-agent"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

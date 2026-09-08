@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Refresh or check the generated Claude package used by the local marketplace."""
+"""Refresh or check the generated Claude and portable marketplace packages."""
 
 import argparse
 import json
@@ -11,7 +11,7 @@ import tempfile
 REPOSITORY = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPOSITORY / "scripts"))
 
-from build_plugins import _artifact_snapshot, build, check
+from build_plugins import _artifact_snapshot, build, check, source_version
 from validate_plugins import validate_artifact, validate_outputs
 
 
@@ -26,13 +26,7 @@ def _read_object(path: Path) -> dict:
 
 
 def _source_version(repository: Path) -> str:
-    versions = [_read_object(repository / path).get("version") for path in
-                (".claude-plugin/plugin.json", "plugin.json")]
-    if any(not isinstance(version, str) or not version.strip() for version in versions):
-        raise ValueError("Both source manifests must declare a nonempty version.")
-    if versions[0] != versions[1]:
-        raise ValueError(f"Source manifest versions differ: {versions!r}.")
-    return versions[0]
+    return source_version(repository / ".claude")
 
 
 def _validate_catalog(repository: Path, target: Path, version: str) -> None:
@@ -54,48 +48,83 @@ def _validate_catalog(repository: Path, target: Path, version: str) -> None:
         raise ValueError("Marketplace entry version must match the source manifests.")
 
 
-def _replace_snapshot(generated: Path, target: Path, source: Path) -> None:
-    target.parent.mkdir(parents=True, exist_ok=True)
-    staging = Path(tempfile.mkdtemp(prefix=".claudops-snapshot-", dir=target.parent))
-    replacement, previous = staging / "new", staging / "previous"
-    promoted = False
+def _validate_codex_catalog(repository: Path, target: Path) -> None:
+    catalog = _read_object(repository / ".agents" / "plugins" / "marketplace.json")
+    if catalog.get("name") != "claudops":
+        raise ValueError("Codex marketplace name must be claudops.")
+    entries = catalog.get("plugins")
+    if not isinstance(entries, list) or len(entries) != 1 or not isinstance(entries[0], dict):
+        raise ValueError("Codex marketplace must contain exactly one Claudops plugin entry.")
+    entry = entries[0]
+    expected_source = {"source": "local", "path": "./plugins/claudops-agent"}
+    if entry.get("name") != "claudops" or entry.get("source") != expected_source:
+        raise ValueError("Codex marketplace entry must name claudops with local source ./plugins/claudops-agent.")
+    if (repository / entry["source"]["path"]).resolve() != target:
+        raise ValueError("Codex marketplace source must resolve to plugins/claudops-agent.")
+    if entry.get("policy") != {"installation": "AVAILABLE", "authentication": "ON_INSTALL"}:
+        raise ValueError("Codex marketplace must make the plugin AVAILABLE with ON_INSTALL authentication.")
+    if entry.get("category") != "Productivity":
+        raise ValueError("Codex marketplace category must be Productivity.")
+
+
+def _replace_snapshots(generated: dict[str, Path], targets: dict[str, Path], source: Path) -> None:
+    parent = next(iter(targets.values())).parent
+    parent.mkdir(parents=True, exist_ok=True)
+    staging = Path(tempfile.mkdtemp(prefix=".claudops-snapshot-", dir=parent))
+    promoted = []
+    rollback_errors = []
     try:
-        shutil.copytree(generated, replacement)
-        errors = validate_artifact(replacement, "claude", source)
-        if errors or _artifact_snapshot(replacement) != _artifact_snapshot(generated):
-            raise ValueError(f"Staged snapshot validation failed: {errors!r}.")
-        if target.exists():
-            target.rename(previous)
-        try:
-            replacement.rename(target)
-            promoted = True
-        except BaseException:
-            if previous.exists():
-                try:
+        # Finish every copy and validation before changing either published tree.
+        for kind, artifact in generated.items():
+            replacement = staging / kind / "new"
+            replacement.parent.mkdir()
+            shutil.copytree(artifact, replacement)
+            errors = validate_artifact(replacement, kind, source)
+            if errors or _artifact_snapshot(replacement) != _artifact_snapshot(artifact):
+                raise ValueError(f"Staged {kind} snapshot validation failed: {errors!r}.")
+        for kind, target in targets.items():
+            previous = staging / kind / "previous"
+            if target.exists():
+                target.rename(previous)
+            (staging / kind / "new").rename(target)
+            promoted.append(kind)
+    except BaseException:
+        for kind, target in reversed(list(targets.items())):
+            previous = staging / kind / "previous"
+            try:
+                if kind in promoted:
+                    shutil.rmtree(target)
+                if previous.exists():
                     previous.rename(target)
-                except OSError as error:
-                    raise ValueError(f"Snapshot replacement failed; previous package preserved at {previous}.") from error
-            raise
+            except OSError as error:
+                rollback_errors.append(f"{target}: {error}")
+        if rollback_errors:
+            raise ValueError(f"Snapshot rollback failed; backups preserved at {staging}: {rollback_errors!r}.")
+        raise
     finally:
-        if promoted or not previous.exists():
+        if not rollback_errors:
             shutil.rmtree(staging)
 
 
 def update_snapshot(repository: Path, *, check_only: bool = False) -> dict:
     repository = repository.resolve()
     source = repository / ".claude"
-    target = repository / "plugins" / "claudops"
-    if target.parent.is_symlink() or target.is_symlink():
-        raise ValueError("Refusing a symlink at the snapshot destination.")
+    targets = {"claude": repository / "plugins" / "claudops",
+               "agent": repository / "plugins" / "claudops-agent"}
+    for target in targets.values():
+        if target.parent.is_symlink() or target.is_symlink():
+            raise ValueError("Refusing a symlink at the snapshot destination.")
     version = _source_version(repository)
-    _validate_catalog(repository, target, version)
-    if target.exists():
-        marker = target / ".build-manifest.json"
-        if marker.is_symlink() or not marker.is_file():
-            raise ValueError("Refusing to replace a directory without a regular build manifest.")
-        identity = _read_object(marker)
-        if identity.get("plugin") != "claudops" or identity.get("artifact") != "claude":
-            raise ValueError("Refusing to replace a different package.")
+    _validate_catalog(repository, targets["claude"], version)
+    _validate_codex_catalog(repository, targets["agent"])
+    for kind, target in targets.items():
+        if target.exists():
+            marker = target / ".build-manifest.json"
+            if marker.is_symlink() or not marker.is_file():
+                raise ValueError("Refusing to replace a directory without a regular build manifest.")
+            identity = _read_object(marker)
+            if identity.get("plugin") != "claudops" or identity.get("artifact") != kind:
+                raise ValueError("Refusing to replace a different package.")
 
     with tempfile.TemporaryDirectory(prefix="claudops-snapshot-") as temporary:
         output = Path(temporary) / "dist"
@@ -104,16 +133,21 @@ def update_snapshot(repository: Path, *, check_only: bool = False) -> dict:
         if any(failures.values()):
             raise ValueError(json.dumps(failures, indent=2))
         check(source, output, version=version)
-        generated = output / "claude" / "claudops"
-        if check_only:
-            if not target.is_dir() or _artifact_snapshot(target) != _artifact_snapshot(generated):
-                raise ValueError("Snapshot is missing or stale; run packaging/update_snapshot.py.")
-        else:
-            _replace_snapshot(generated, target, source)
-        errors = validate_artifact(target, "claude", source)
-        if errors:
-            raise ValueError("\n".join(errors))
-        return {"snapshot": "plugins/claudops", "status": "current" if check_only else "updated",
+        generated = {kind: output / kind / "claudops" for kind in targets}
+        stale = [kind for kind, target in targets.items()
+                 if not target.is_dir() or _artifact_snapshot(target) != _artifact_snapshot(generated[kind])]
+        if check_only and stale:
+            paths = ", ".join(str(targets[kind].relative_to(repository)) for kind in stale)
+            raise ValueError(f"Snapshot {paths} is missing or stale; run packaging/update_snapshot.py.")
+        if not check_only and stale:
+            _replace_snapshots({kind: generated[kind] for kind in stale},
+                               {kind: targets[kind] for kind in stale}, source)
+        for kind, target in targets.items():
+            errors = validate_artifact(target, kind, source)
+            if errors:
+                raise ValueError("\n".join(errors))
+        return {"snapshots": [str(target.relative_to(repository)) for target in targets.values()],
+                "status": "current" if check_only else "updated",
                 "version": version, "skills": len(report.skill_names), "agents": len(report.agent_names)}
 
 

@@ -9,8 +9,8 @@ result in that task.
 ## Resolve the repository and resources
 
 The target repository/workspace and the installed skill directory are different roots.
-Read applicable project instructions and existing conventions. If present, `CLAUDOPS.md`
-records project-specific task locations and command sources; it is optional. In a
+Read applicable project instructions and existing conventions, including task locations
+and command sources recorded in the project's `CLAUDE.md` or `AGENTS.md`. In a
 monorepo, keep the selected workspace explicit and run commands in their owning package.
 Obtain commands from real configuration or CI; placeholders are lookup requests, never
 executable defaults. Ask only for values that cannot be established and block the work.
@@ -29,6 +29,33 @@ record the specific blocked check. Never claim a skipped check passed.
 
 A plugin can operate without copying its workflows into a project. Respect explicit
 local overrides and disabled markers; do not rewrite plugin files during a task.
+
+## Resolve agent roles in the current host
+
+Use a named role directly only when the current host registers that agent type. Otherwise,
+find its exact `name` in the applicable `.claude/agents` resource tree resolved above and
+read the role's Markdown instructions. Resolve each `skills:` dependency to the active
+local override or installed sibling skill and read it explicitly; portable hosts do not
+preload Claude agent dependencies. Treat the role's Claude `model` and `tools` fields as
+reference metadata, not host API arguments. Pass the role instructions, dependencies, bounded task
+and write ownership to a supported generic worker. Role filenames are instructions, not
+Codex `agent_type` values. A reviewer uses read-only ownership unless changes are requested.
+Preserve any inline-only return contract; one orchestrator owns shared task/review files.
+
+If the host cannot delegate, apply the same role and convention checks in the current
+agent and report that the result lacks an independent worker. Preserve evidence and
+required verification; a missing named agent does not justify skipping its review lens.
+This rule applies to role names requested by individual workflows, including discovery,
+planning and review.
+
+Use the current host's equivalent for named tools in workflow examples, including file
+editing and user input. If structured input is unavailable, ask the same question in
+ordinary conversation. Tool naming differences alone do not create a product blocker.
+Workflow references such as `/ct` mean the corresponding installed skill. If the host
+has no matching slash-command or Skill tool, read and apply the sibling `SKILL.md`,
+using the alias mapping above. In skill instructions, `$ARGUMENTS` means the text supplied
+with that invocation; pass the actual user/task text explicitly when the host does not
+substitute it.
 
 ## Find or start one task
 

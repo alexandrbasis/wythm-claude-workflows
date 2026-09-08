@@ -327,10 +327,11 @@ gh pr merge <PR#> --rebase --delete-branch
 ### Step 3: Verify Merge Succeeded
 
 ```bash
-gh pr view <PR#> --json state,merged,mergedAt
+gh pr view <PR#> --json state,mergedAt,mergeCommit,headRefOid
 ```
 
-Confirm `merged: true`. If not, surface the error from `gh` and stop.
+Confirm `state` is `MERGED` and `mergedAt` is non-null. If not, surface the observed
+state or error from `gh` and stop.
 Record the observed merge state and local cleanup result in the selected task record. Do not report
 completion from a planned command or partial status.
 

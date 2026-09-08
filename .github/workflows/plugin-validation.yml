@@ -29,5 +29,5 @@ jobs:
         run: python scripts/validate_plugins.py --source .claude --out "$RUNNER_TEMP/claudops-dist"
       - name: Check generated artifacts are reproducible
         run: python scripts/build_plugins.py --check --source .claude --out "$RUNNER_TEMP/claudops-dist"
-      - name: Check the tracked marketplace package is current
+      - name: Check both marketplace catalogs and tracked packages are current
         run: python packaging/update_snapshot.py --check

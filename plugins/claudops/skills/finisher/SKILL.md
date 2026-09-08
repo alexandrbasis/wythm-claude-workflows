@@ -20,7 +20,7 @@ allowed-tools:
 <!-- claudops-build: project-config-pointer -->
 > If `.claude/skills/finisher/SKILL.md.disabled` exists, stop before reading a fallback.
 > **Project configuration:** If the current project contains `.claude/skills/finisher/SKILL.md`, read and apply it instead of this bundled default. The project copy is the capability source of truth.
-> **Repository context:** Read `../setup/references/task-context.md` when resolving a task, project commands, or legacy `.claude/` resource paths. Use repository evidence and optional `CLAUDOPS.md`; a missing local workflow copy does not require setup. Resolve bundled resources from the installed skill, never from the target cwd.
+> **Repository context:** Read `../setup/references/task-context.md` when resolving a task, project commands, named agent roles, or legacy `.claude/` resource paths. Use repository evidence and applicable project instructions; a missing local workflow copy does not require setup. Resolve bundled resources from the installed skill, never from the target cwd.
 
 # Finisher
 
@@ -328,10 +328,11 @@ gh pr merge <PR#> --rebase --delete-branch
 ### Step 3: Verify Merge Succeeded
 
 ```bash
-gh pr view <PR#> --json state,merged,mergedAt
+gh pr view <PR#> --json state,mergedAt,mergeCommit,headRefOid
 ```
 
-Confirm `merged: true`. If not, surface the error from `gh` and stop.
+Confirm `state` is `MERGED` and `mergedAt` is non-null. If not, surface the observed
+state or error from `gh` and stop.
 Record the observed merge state and local cleanup result in the selected task record. Do not report
 completion from a planned command or partial status.
 

@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "claudops",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Portable workflow skills for planning, implementation, review, and delivery.",
   "author": {
     "name": "Alex Basis"

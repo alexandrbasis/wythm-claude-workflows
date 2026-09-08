@@ -1,5 +1,10 @@
 # Configure and activate project hooks
 
+This guide's settings, events and matchers target Claude Code. Apply them only in that
+host. For Codex or another client, establish its documented native hook mechanism and
+event mapping first. Without that evidence, report unsupported hook activation, leave
+settings unchanged and run relevant checks normally.
+
 Read when the user selects hook configuration. Configure only matching language/architecture hooks, then show the exact settings JSON diff before activation. Preserve existing matchers and settings. Existing approval for that exact diff remains valid.
 
 **Hook placeholder mapping** — derive each value from Phase 1 detection results:

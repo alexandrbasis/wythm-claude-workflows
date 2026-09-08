@@ -30,7 +30,6 @@ import yaml
 
 BUILD_FORMAT = 1
 PLUGIN_NAME = "claudops"
-DEFAULT_VERSION = "1.0.0"
 SKILL_FIELDS = {"name", "description", "license", "compatibility", "metadata", "allowed-tools"}
 TEXT_SUFFIXES = {
     ".md",
@@ -280,7 +279,7 @@ def _pointer(source_dir: str, explicit_only: bool) -> str:
         POINTER_MARKER,
         f"> If `.claude/skills/{source_dir}/SKILL.md.disabled` exists, stop before reading a fallback.",
         f"> **Project configuration:** If the current project contains `.claude/skills/{source_dir}/SKILL.md`, read and apply it instead of this bundled default. The project copy is the capability source of truth.",
-        "> **Repository context:** Read `../setup/references/task-context.md` when resolving a task, project commands, or legacy `.claude/` resource paths. Use repository evidence and optional `CLAUDOPS.md`; a missing local workflow copy does not require setup. Resolve bundled resources from the installed skill, never from the target cwd.",
+        "> **Repository context:** Read `../setup/references/task-context.md` when resolving a task, project commands, named agent roles, or legacy `.claude/` resource paths. Use repository evidence and applicable project instructions; a missing local workflow copy does not require setup. Resolve bundled resources from the installed skill, never from the target cwd.",
     ]
     if explicit_only:
         lines.append("> **Invocation guard:** use this as a standalone skill only when explicitly requested by the user; automatic selection is not authorization. Portable clients may not enforce Claude Code host-level invocation restrictions.")
@@ -591,6 +590,23 @@ def _build_one(source_root: Path, output_root: Path, artifact: str, version: str
     return [skill.output_name for skill in skills], dependencies
 
 
+def source_version(source_root: Path) -> str:
+    versions = []
+    for relative in (".claude-plugin/plugin.json", "plugin.json"):
+        path = source_root.parent / relative
+        try:
+            manifest = json.loads(path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as error:
+            raise ValueError(f"Invalid JSON in {path}: {error}") from error
+        version = manifest.get("version") if isinstance(manifest, dict) else None
+        if not isinstance(version, str) or not version.strip():
+            raise ValueError("Both source manifests must declare a nonempty version.")
+        versions.append(version)
+    if versions[0] != versions[1]:
+        raise ValueError(f"Source manifest versions differ: {versions!r}.")
+    return versions[0]
+
+
 def build(source_root: Path | str, output_root: Path | str, version: str | None = None) -> BuildReport:
     source_input = Path(source_root).expanduser().absolute()
     output_input = Path(output_root).expanduser().absolute()
@@ -600,7 +616,7 @@ def build(source_root: Path | str, output_root: Path | str, version: str | None 
     _assert_output_tree_safe(output_input)
     source_root = source_input.resolve()
     output_root = output_input.resolve()
-    version = version or DEFAULT_VERSION
+    version = version if version is not None else source_version(source_root)
     if output_root == source_root or output_root.is_relative_to(source_root) or source_root.is_relative_to(output_root):
         raise ValueError("source and output trees must not overlap")
     skills = _read_skills(source_root)

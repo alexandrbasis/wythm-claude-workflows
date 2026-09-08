@@ -11,6 +11,13 @@ Both artifacts contain the `setup` skill's pristine workflow templates under
 `skills/setup/assets/workflow/.claude`. Templates are copied only when the explicit
 setup bootstrap is run; package roots do not enable hooks, settings, or MCP servers.
 
+Ready copies of both artifacts are published in the repository for managed installation.
+Follow the [Claude Code and Codex quick start](https://github.com/alexandrbasis/claudops#quick-start).
+The portable package registers skills only; bundled role instructions are applied through
+supported host workers, with a direct review fallback when delegation is unavailable.
+Its shared task context defines tool and role adaptation. Bundled hook settings target
+Claude Code and require a verified native mapping before activation in another host.
+
 ## Load an extracted artifact
 
 For Claude Code, start Claude in the target project and point it at the extracted
@@ -48,3 +55,7 @@ python3 scripts/build_plugins.py --out dist
 python3 scripts/validate_plugins.py --out dist
 python3 scripts/build_plugins.py --check --out dist
 ```
+
+Builds use the matching version in the two source manifests by default and reject a
+mismatch. An explicit `--version` is available for development builds. Marketplace
+snapshots always use the source version.

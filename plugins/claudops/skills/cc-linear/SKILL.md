@@ -15,7 +15,7 @@ description: 'Execute Linear operations via direct GraphQL API — create issues
 <!-- claudops-build: project-config-pointer -->
 > If `.claude/skills/cc-linear/SKILL.md.disabled` exists, stop before reading a fallback.
 > **Project configuration:** If the current project contains `.claude/skills/cc-linear/SKILL.md`, read and apply it instead of this bundled default. The project copy is the capability source of truth.
-> **Repository context:** Read `../setup/references/task-context.md` when resolving a task, project commands, or legacy `.claude/` resource paths. Use repository evidence and optional `CLAUDOPS.md`; a missing local workflow copy does not require setup. Resolve bundled resources from the installed skill, never from the target cwd.
+> **Repository context:** Read `../setup/references/task-context.md` when resolving a task, project commands, named agent roles, or legacy `.claude/` resource paths. Use repository evidence and applicable project instructions; a missing local workflow copy does not require setup. Resolve bundled resources from the installed skill, never from the target cwd.
 
 # CC Linear
 

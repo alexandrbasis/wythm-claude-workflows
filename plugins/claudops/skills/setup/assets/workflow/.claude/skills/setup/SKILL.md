@@ -25,8 +25,8 @@ A task can start without setup when its context is already discoverable.
 ## Establish the project
 
 Read [shared context](references/task-context.md) for repository/resource resolution.
-Resolve the target workspace and inspect project instructions, an existing `CLAUDOPS.md`,
-task directories and command configuration. On reconfiguration, compare current and
+Resolve the target workspace and inspect project instructions, task directories and
+command configuration. On reconfiguration, compare current and
 requested values. Preserve unrelated local content and disabled skills.
 
 Use [discovery categories](references/discovery.md) only for missing relevant context.
@@ -36,8 +36,10 @@ already supplied by the user. Do not make routine detected values into a new app
 
 ## Configure the minimum
 
-Prefer the repository's existing configuration home. If none exists and durable choices
-are needed, write `CLAUDOPS.md` at the repository root. Keep it short:
+Update the repository's existing project instructions when durable choices are needed.
+If no instruction file exists, use `CLAUDE.md` for Claude Code or `AGENTS.md` for Codex;
+for another client, use its documented instruction file. Create a file only when the
+choices cannot be discovered from existing project configuration. Keep the addition short:
 
 ```markdown
 # Claudops project context
@@ -72,7 +74,11 @@ runtime state. Use `update-setup` for existing customized files. Substitute only
 confirmed legacy `{{UPPERCASE_VARIABLE}}` values in the selected local files; retain
 unknowns and report the dependent capabilities. Plugin resources remain unchanged.
 
-For requested hooks, read [activation guidance](references/hooks.md). Show the exact
+For requested hooks, first identify the host. The bundled hooks and
+[activation guidance](references/hooks.md) target Claude Code. On Codex or another host,
+verify a supported native hook mechanism and event mapping before configuring it.
+If none is established, report that hook activation is unsupported and continue ordinary
+workflow checks; do not copy Claude settings as a substitute. Show the exact
 settings diff and obtain approval before activating side effects, unless that exact
 scope is already approved. Validate changed scripts and preserve existing matchers.
 Disable skills only when the user selects that set; tool absence does not authorize it.

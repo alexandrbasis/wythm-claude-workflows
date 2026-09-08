@@ -1,6 +1,6 @@
 # claudops
 
-> Development workflows for Claude Code, also packaged as Agent Plugins v1 skills.
+> Development workflows for Claude Code and Codex, with a portable Agent Plugins v1 package.
 
 **Author:** [@alexandrbasis](https://x.com/alexandrbasis) | [@MishkaKey](https://x.com/MishkaKey)
 
@@ -17,6 +17,8 @@ Workflow skills for feature discovery, planning, implementation and review, avai
 Works with any language, framework, and architecture — TypeScript, Python, Go, Ruby, Java, and more.
 
 ## Quick start
+
+### Claude Code
 
 Open Claude Code in the project you want to work on. Inside Claude Code, add the
 marketplace and install the plugin:
@@ -41,7 +43,48 @@ project needs additional configuration. Check `/plugin` → **Installed** for th
 plugin and its components, or **Errors** for a loading problem. See
 [Claude Code installation](https://code.claude.com/docs/en/discover-plugins#install-plugins).
 
+### Codex
+
+Run these commands in your terminal with a current Codex CLI:
+
+```sh
+codex plugin marketplace add alexandrbasis/claudops
+codex plugin add claudops@claudops
+codex plugin list --marketplace claudops --json
+```
+
+Check that `claudops@claudops` is installed and enabled. Open a new Codex task in the
+project you want to work on, then invoke a skill explicitly:
+
+```text
+Use $claudops:nf to explore adding CSV export to the invoices page.
+```
+
+Codex loads the ready Agent Plugins package with all 40 skills. The small-change and
+documentation skills are `$claudops:quick` and `$claudops:udoc`. Setup is optional;
+`$claudops:setup` uses the project's existing instructions or `AGENTS.md` when new
+durable choices are needed. No Python or local build is required for installation.
+See [Codex plugin commands](https://learn.chatgpt.com/docs/developer-commands#codex-plugin).
+
+### Other Agent Plugins clients
+
+The ready portable package is [`plugins/claudops-agent`](plugins/claudops-agent/README.md),
+with its manifest at the package root. Load that directory through the compatible
+client's installation mechanism. Agent Plugins is a package format; installation UI,
+tools and runtime behavior depend on the client.
+
+The Claude package also registers 18 agents. The portable package contains their
+reference instructions as resources and adapts their roles to supported host workers;
+it registers no Claude agents. Neither package enables hooks, MCP or LSP servers.
+Optional cross-AI and tracker workflows need their own tools and access.
+
 ## Philosophy
+
+The command examples and agent inventory below describe Claude Code. In Codex, invoke
+the same skills as `$claudops:<skill>`; use `quick` and `udoc` for the two aliases.
+Codex applies the bundled role instructions through the
+[host adapter](plugins/claudops-agent/skills/setup/references/task-context.md#resolve-agent-roles-in-the-current-host),
+rather than registering the 18 Claude agent types.
 
 This is a **human-in-the-loop pipeline**, not a fully autonomous agent. You choose the work and review the required artifacts. Once a bounded stage is approved, the agent completes that scope without asking again for the same decision. Nothing ships without your explicit sign-off.
 
@@ -55,7 +98,7 @@ The result: AI speed with human judgment. Full context at every step, no black-b
 ## Highlights
 
 - **`/claudops:setup`** — records necessary project choices; plugin workflows discover repository commands without copying all instructions
-- **`/update-setup` for copied workflows** — pulls upstream changes, shows a diff, and lets you select updates while preserving local customizations. Managed plugins update through Claude Code.
+- **`/update-setup` for copied workflows** — pulls upstream changes, shows a diff, and lets you select updates while preserving local customizations. Managed plugins update through the client's plugin manager.
 - **18 specialized agents** — TDD, code review, task validation, research
 - **40 skills** — full dev lifecycle, dev server monitoring, and cross-AI helpers (Antigravity, Codex CLI, Cursor CLI)
 - **Skills ↔ Agents composability** — agents preload shared convention skills via `skills:` frontmatter
@@ -135,7 +178,7 @@ skills:
   - coding-conventions   # preloaded into developer-agent
 ```
 
-Plugin workflows read project instructions, command sources and optional `CLAUDOPS.md`. For repository-owned installations, `/setup` can configure the local convention skills; existing customizations remain authoritative.
+Plugin workflows read project instructions and command sources. For repository-owned installations, `/setup` can configure the local convention skills; existing customizations remain authoritative.
 
 ---
 
@@ -159,7 +202,9 @@ Python/shell hooks under `.claude/hooks/` — lint on write, agent sync, pre-com
 plugin.json                  # Agent Plugins manifest source
 .claude-plugin/plugin.json   # Claude manifest source
 .claude-plugin/marketplace.json # Claude Code marketplace catalog
+.agents/plugins/marketplace.json # Codex marketplace catalog
 plugins/claudops/            # Tracked ready-to-install Claude package
+plugins/claudops-agent/      # Tracked portable package used by Codex
 scripts/                    # Reproducible build and validation
 packaging/marketplace.md     # Snapshot maintenance and release checks
 dist/                       # Generated packages (not source)
@@ -180,8 +225,9 @@ workflow-visualization.html   # Interactive workflow map (open in browser)
 
 ## Plugin setup and updates
 
-Start `/claudops:nf`, `/claudops:ct`, `/claudops:si` or `/claudops:sr` in the target
-repository. The package contains all 40 skills and 18 agents. Setup is optional: use
+Start the `nf`, `ct`, `si` or `sr` skill in the target repository. Claude Code uses
+`/claudops:<skill>`; Codex uses `$claudops:<skill>`. Both packages contain all 40 skills;
+Claude Code also registers 18 agents. Setup is optional: use
 it for durable project choices or to maintain an explicitly requested local workflow
 copy. Shared plugin files stay unchanged, and hook activation requires its own
 authorized settings change.
@@ -192,7 +238,7 @@ requirements, plan and verification in that one file. Discovery, prototypes, pha
 plans and reviews become separate linked artifacts when needed. See the
 [shared task contract](.claude/skills/setup/references/task-context.md).
 
-To update a user-scope installation, run these commands in your terminal:
+To update a Claude Code user-scope installation, run these commands in your terminal:
 
 ```sh
 claude plugin marketplace update claudops
@@ -204,6 +250,17 @@ Use `--scope project` or `--scope local` if that is where you installed it.
 session or start a new session to load the updated files.
 [`/update-setup`](.claude/skills/update-setup/SKILL.md) is only for a copied `.claude/`
 workflow. See [Claude Code updates](https://code.claude.com/docs/en/plugins-reference#plugin-update).
+
+For Codex, refresh the Git marketplace and install its current package:
+
+```sh
+codex plugin marketplace upgrade claudops
+codex plugin add claudops@claudops
+codex plugin list --marketplace claudops --json
+```
+
+Start a new Codex task to load the updated skills. See
+[Codex marketplace commands](https://learn.chatgpt.com/docs/developer-commands#codex-plugin-marketplace).
 
 For source builds and publication, see the [marketplace maintainer guide](packaging/marketplace.md).
 The [package guide](packaging/README.md) covers local development loading and the
@@ -292,7 +349,7 @@ completion. Existing authorization carries forward to review and delivery within
 
 ## Prerequisites
 
-- [Claude Code](https://code.claude.com/docs/en/overview) installed
+- [Claude Code](https://code.claude.com/docs/en/overview), Codex, or a compatible Agent Plugins client
 - Git for the GitHub marketplace source and repository workflows
 - GitHub CLI (`gh`) for GitHub pull request workflows
 - Optional: Gemini CLI (`npm i -g @google/gemini-cli`)
