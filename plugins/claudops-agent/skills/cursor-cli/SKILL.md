@@ -21,21 +21,46 @@ shared lifecycle in `../codex-cli/references/cross-ai-run.md` first.
 
 ## Provider adapter
 
-1. Check `command -v agent`, then `agent --version`. Read `agent --help` when
-   syntax, output, trust, mode, or model behavior is unclear. The binary name
-   is provider-specific; do not substitute an unrelated `cursor` executable.
-2. Use the locally supported print/one-shot mode. Select a model only when the
-   caller or provider configuration supplies one; otherwise omit the override.
-   This skill does not pin `composer-2` or any other model.
-3. Select a read-only/ask or plan mode only if local help confirms its spelling.
-   Do not use force, yolo, cloud-write, or MCP-approval bypass flags for a
-   review unless the caller explicitly requests that behavior.
-4. Capture and read the provider's documented output, then return the shared
-   receipt. The result is evidence and does not authorize edits or publication.
+1. Check `command -v agent`, `agent --version`, and `agent --help`. Verify the
+   binary is Cursor Agent and supports `--print`, `--mode ask`, and
+   `--output-format json`. `cursor-agent` may be an installation alias; do not
+   substitute the Cursor editor executable.
+2. When the caller requests a particular model or an independent model family,
+   inspect `agent models` and select an exact listed slug. Otherwise omit the
+   model override. Cursor supports multiple providers; `auto` and an unreported
+   default do not establish model-level independence. Record the requested slug
+   separately from any model identity actually reported by the provider.
+3. Resolve the loaded skill directory and run the adapter from the target
+   repository root with Python 3.10+:
 
-If `agent` is missing or outdated for the requested capability, report the
-prerequisite and stop. Installation or update is a separate user action; never
-run a remote installer or modify Cursor settings implicitly.
+   ```bash
+   CURSOR_SKILL_DIR="/absolute/path/to/loaded/cursor-cli"
+   python3 "$CURSOR_SKILL_DIR/scripts/review.py" \
+     --prompt-file /tmp/cursor-prompt.md \
+     --file path/to/file.py \
+     --timeout 120 \
+     --output-dir /tmp/cursor-review-unique
+   ```
+
+   Set `CURSOR_SKILL_DIR` to the directory containing this loaded skill, not a
+   path relative to the reviewed repository. `--file` is repeatable and pre-reads
+   verified UTF-8 files into the prompt. The combined input limit is 96 KiB;
+   narrow larger reviews explicitly. Add `--model '<exact listed slug>'` only
+   when selected. Each invocation requires a fresh output directory.
+4. Inspect `receipt.json`, `stdout.json`, `stderr.log`, `version.stderr.log`, and
+   `response.txt` on success. A completed JSON result requires exit 0,
+   `type: result`, `subtype: success`, `is_error: false`, and a non-empty string
+   `result`. An error envelope, timeout, malformed output, trust rejection, or
+   empty answer is incomplete. Also read the answer for blocked reads, omitted
+   scope, or other visible limitations: a valid envelope alone does not prove
+   the review was completed. Return the shared receipt and evidence gaps.
+
+The adapter always uses `agent -p --mode ask --output-format json`. Print mode
+alone can use write and shell tools; keep the explicit read-only mode. Workspace
+trust is a separate prerequisite: the adapter preserves a trust rejection and
+stops. It does not pass `--trust`, force/yolo, automatic MCP approval, or sandbox
+bypass flags, retry, authenticate, update the CLI, or modify settings. Resolve
+missing capabilities or trust through a separate user-authorized action.
 
 ## Prompt requirements
 
@@ -53,5 +78,5 @@ conversation's context. Resolve task evidence through
 ## References
 
 - `../codex-cli/references/cross-ai-run.md` — shared lifecycle
-- `reference.md` — local-help-first provider lookup and historical notes
+- `reference.md` — native output contract, trust boundary, and official sources
 - `templates.md` — prompt shapes; resolve placeholders before execution

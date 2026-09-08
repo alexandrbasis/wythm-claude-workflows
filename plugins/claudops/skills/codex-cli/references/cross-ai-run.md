@@ -29,6 +29,10 @@ For Antigravity, read `../../antigravity-cli/SKILL.md` and
 file-inlining, artifact, model-label, and bounded-input rules. Run its runner
 from the target repository root after resolving the loaded skill directory.
 
+For Cursor, read `../../cursor-cli/SKILL.md` and
+`../../cursor-cli/reference.md` for its bounded runner and native result
+contract. It uses explicit ask mode and stops on missing workspace trust.
+
 ## Preflight and model
 
 Before the first call, verify the provider is available with `command -v` and
@@ -68,6 +72,12 @@ including `SUCCESS` plus exit 0; it is not a no-findings result and cannot
 support a passed review. Other adapters use their native envelopes but must
 meet the same completed-output and evidence standard. Do not retry implicitly,
 change settings/auth, or bypass permissions.
+
+For Cursor JSON, require exit 0, `type: result`, `subtype: success`,
+`is_error: false`, and a non-empty string `result`. Treat workspace-trust
+rejection as incomplete, and inspect otherwise valid answers for missing scope
+or blocked reads. Cursor's `auto` routing or an unreported model default does
+not establish independence from the main model.
 
 The wrapper should return a compact receipt containing provider, version,
 scope, prompt purpose, output location, exit status, and verification gaps.

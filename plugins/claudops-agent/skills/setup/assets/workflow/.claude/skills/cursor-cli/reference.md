@@ -1,30 +1,71 @@
 # Cursor CLI reference
 
-The installed `agent` binary is authoritative. Verify before composing a
-command:
+## Native invocation and model selection
 
-```bash
-command -v agent
-agent --version
-agent --help
+Verify `agent --version`, `agent --help`, and `agent models` on the current host.
+The runner uses the documented one-shot shape:
+
+```text
+agent -p --mode ask --output-format json [--model <selected-slug>] <prompt>
 ```
 
-Use the locally supported print/one-shot command, output format, model option,
-workspace/trust option, and read-only mode. Do not assume a model name, flag,
-default, or output stream from this file. Omit a model override when the
-caller/configuration should choose it.
+`--print` alone is not a read-only boundary: local help explicitly grants write
+and shell tools. Keep `--mode ask` for a review. Workspace trust is checked
+separately even in ask mode. A trust error must remain incomplete; the adapter
+never enables trust or permission bypass implicitly.
 
-The prompt must carry repository root, task/requirements path, changed files or
-diff scope, and concrete review questions. Capture the result and record the
-provider version, scope, exit status, and verification gaps. A result is a
-second opinion, not authorization to edit files.
+Select a slug from the current model listing when a particular perspective is
+required. `auto` is routing, not a verified model identity. A requested model is
+not independently confirmed merely because the command accepted its slug.
+Do not reuse historical `composer-2` examples or infer a model's lineage from
+Cursor's provider name.
 
-## Historical compatibility note
+## JSON completion contract
 
-Earlier workflow copies used `composer-2`, `--mode=ask`, `--trust`, and a
-specific `v2026.03.20` version. Treat those as historical values. Verify each
-flag with the installed `agent --help` before using it for a legacy task.
+Accept only an object with all of these fields, after process exit 0:
 
-If `agent` is absent or cannot provide the requested mode, report the missing
-capability and stop. Installing/updating Cursor is a separate user-authorized
-action; do not run a remote installer or write settings from this reference.
+```json
+{"type":"result","subtype":"success","is_error":false,"result":"Review text"}
+```
+
+The `result` must be a non-empty string. Preserve raw output and stderr even on
+success. Error or incomplete envelopes, malformed JSON, non-zero exits,
+timeouts, and empty answers cannot become a passed review. Inspect the answer
+for limitations that the envelope does not encode; a successful transport may
+still report an unavailable file or an unfinished analysis. This adapter does
+not consume `stream-json` or partial deltas as a final answer.
+
+## Runner artifacts and bounds
+
+The adjacent `scripts/review.py` requires a verified prompt file, positive finite
+`--timeout` in seconds, and a new `--output-dir`. Optional `--file` arguments are
+pre-read and inlined; optional `--model` has no runner default. Python 3.10+ is
+required. Combined UTF-8 input is capped at 96 KiB to keep one-shot argv bounded.
+
+The process has a hard timeout and its process group is terminated on expiry.
+Artifacts include `stdout.json`, `stderr.log`, `version.stderr.log`, and
+`receipt.json`; only completed output produces `response.txt`. A failed version
+preflight produces a receipt and version stderr without starting the review.
+The receipt records scope, requested model/default uncertainty, version, purpose,
+output paths, exit status, and verification gaps. It does not grant permission
+to edit or publish the reviewed project.
+
+## Verified local compatibility
+
+On 2026-09-08, Cursor Agent `2026.09.02-c22c1a3` accepted the shape above and
+returned the illustrated completion envelope. The account listed `auto` as its
+default and `composer-2.5` among available models. These are dated observations,
+not pinned defaults. A new temporary workspace rejected the same call without
+trust; an explicitly trusted synthetic fixture completed in ask mode.
+
+## Official sources
+
+- [CLI parameters](https://cursor.com/docs/cli/reference/parameters) — supported
+  flags and the separate workspace-trust prompt.
+- [Output format](https://cursor.com/docs/cli/reference/output-format) — JSON
+  result envelope, error output, and stream events. JSON does not report the
+  resolved model; preserve the requested slug without claiming confirmation.
+- [Permissions](https://cursor.com/docs/cli/reference/permissions) — configured
+  tool permissions. The runner leaves these settings unchanged.
+- [CLI usage](https://cursor.com/docs/cli/using) — ask and plan modes. Read-only
+  mode is provider behavior, not proof of OS-level sandbox isolation.

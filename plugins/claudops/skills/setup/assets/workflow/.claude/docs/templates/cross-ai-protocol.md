@@ -16,6 +16,13 @@ When the model is omitted, label the source `Antigravity (agy; model unverified)
 reports the actual model; never infer Gemini or claim model-level independence from the provider
 name alone.
 
+For Cursor, select a current model slug when the requested independence requires
+it. Label `auto` or an unreported default model as unverified; the Cursor brand
+does not establish a separate model family. Native completed output requires
+`type: result`, `subtype: success`, `is_error: false`, and a non-empty `result`,
+in addition to exit 0. Retain workspace-trust failures and visibly incomplete
+answers as `PARTIAL`.
+
 - **All configured validators available** → invoke in parallel, then produce comparison table + validation (sections 2-4)
 - **Two or more available** → invoke those in parallel, produce comparison table + validation
 - **One available** → invoke solo, skip comparison table, produce single-source verdict (section 4)
