@@ -16,11 +16,36 @@ Workflow skills for feature discovery, planning, implementation and review, avai
 
 Works with any language, framework, and architecture — TypeScript, Python, Go, Ruby, Java, and more.
 
+## Quick start
+
+Open Claude Code in the project you want to work on. Inside Claude Code, add the
+marketplace and install the plugin:
+
+```text
+/plugin marketplace add alexandrbasis/claudops
+/plugin install claudops@claudops
+```
+
+Choose the installation scope when prompted. Claude Code installs the ready package;
+you do not need Python or a local build. If the installation asks you to activate the
+plugin, run `/reload-plugins` or start a new session.
+
+Start a workflow with a concrete request:
+
+```text
+/claudops:nf Add CSV export to the invoices page.
+```
+
+Plugin commands use the `/claudops:` prefix. `/claudops:setup` is optional when the
+project needs additional configuration. Check `/plugin` → **Installed** for the
+plugin and its components, or **Errors** for a loading problem. See
+[Claude Code installation](https://code.claude.com/docs/en/discover-plugins#install-plugins).
+
 ## Philosophy
 
 This is a **human-in-the-loop pipeline**, not a fully autonomous agent. You choose the work and review the required artifacts. Once a bounded stage is approved, the agent completes that scope without asking again for the same decision. Nothing ships without your explicit sign-off.
 
-- **You trigger** each stage — `/nf` for discovery, `/ct` for planning, `/si` for implementation, `/sr` for review
+- **You trigger** each stage — `/claudops:nf` for discovery, `/claudops:ct` for planning, `/claudops:si` for implementation, `/claudops:sr` for review
 - **You validate** material decisions and required artifacts; existing approvals carry forward between stages
 - **You control the gates** — quality checks run automatically, but merging is always your decision
 - **Agents assist, not replace** — 18 agents handle the grunt work (linting, testing, architecture checks), you make the calls
@@ -29,8 +54,8 @@ The result: AI speed with human judgment. Full context at every step, no black-b
 
 ## Highlights
 
-- **`/setup` wizard** — records necessary project choices; plugin workflows discover repository commands without copying all instructions
-- **`/update-setup`** — pulls upstream changes from claudops, shows a diff, lets you cherry-pick updates while preserving your local customizations
+- **`/claudops:setup`** — records necessary project choices; plugin workflows discover repository commands without copying all instructions
+- **`/update-setup` for copied workflows** — pulls upstream changes, shows a diff, and lets you select updates while preserving local customizations. Managed plugins update through Claude Code.
 - **18 specialized agents** — TDD, code review, task validation, research
 - **40 skills** — full dev lifecycle, dev server monitoring, and cross-AI helpers (Antigravity, Codex CLI, Cursor CLI)
 - **Skills ↔ Agents composability** — agents preload shared convention skills via `skills:` frontmatter
@@ -133,7 +158,10 @@ Python/shell hooks under `.claude/hooks/` — lint on write, agent sync, pre-com
 ```
 plugin.json                  # Agent Plugins manifest source
 .claude-plugin/plugin.json   # Claude manifest source
+.claude-plugin/marketplace.json # Claude Code marketplace catalog
+plugins/claudops/            # Tracked ready-to-install Claude package
 scripts/                    # Reproducible build and validation
+packaging/marketplace.md     # Snapshot maintenance and release checks
 dist/                       # Generated packages (not source)
 .claude/
 ├── agents/           # Specialized subagents
@@ -150,22 +178,7 @@ workflow-visualization.html   # Interactive workflow map (open in browser)
 
 ---
 
-## Use as a plugin
-
-Build both packages from the maintained `.claude/` source:
-
-```bash
-python3 -m venv .venv
-.venv/bin/pip install -r requirements-dev.txt
-.venv/bin/python scripts/build_plugins.py
-.venv/bin/python scripts/validate_plugins.py
-```
-
-For **Claude Code**, launch it in your target project with the built directory:
-
-```bash
-claude --plugin-dir /absolute/path/to/claudops/dist/claude/claudops
-```
+## Plugin setup and updates
 
 Start `/claudops:nf`, `/claudops:ct`, `/claudops:si` or `/claudops:sr` in the target
 repository. The package contains all 40 skills and 18 agents. Setup is optional: use
@@ -179,18 +192,22 @@ requirements, plan and verification in that one file. Discovery, prototypes, pha
 plans and reviews become separate linked artifacts when needed. See the
 [shared task contract](.claude/skills/setup/references/task-context.md).
 
-For **Agent Plugins v1**, use `dist/agent/claudops` with a compatible client.
-The portable package has `plugin.json` and all 40 skills; its format does not provide
-Claude's agent execution or invocation controls. Clients must supply the capabilities
-a selected workflow needs. Explicit-only policies are retained as metadata and text;
-portable clients must enforce those policies for equivalent discovery behavior.
-See [package architecture and validation](packaging/README.md) for the precise limits.
+To update a user-scope installation, run these commands in your terminal:
 
-These are generated packages, ready for local loading or distribution after review.
-Building does not install, publish, enable hooks, or change account settings.
-Agent Plugins is a [package format](https://agent-plugins.org/specification);
-installation and publication belong to each client. Claude's local loader is documented
-in its [plugin reference](https://code.claude.com/docs/en/plugins-reference).
+```sh
+claude plugin marketplace update claudops
+claude plugin update claudops@claudops --scope user
+```
+
+Use `--scope project` or `--scope local` if that is where you installed it.
+`claude plugin list` shows the installed scope. Run `/reload-plugins` inside an open
+session or start a new session to load the updated files.
+[`/update-setup`](.claude/skills/update-setup/SKILL.md) is only for a copied `.claude/`
+workflow. See [Claude Code updates](https://code.claude.com/docs/en/plugins-reference#plugin-update).
+
+For source builds and publication, see the [marketplace maintainer guide](packaging/marketplace.md).
+The [package guide](packaging/README.md) covers local development loading and the
+Agent Plugins v1 artifact for compatible clients.
 
 ## Use the copied workflow
 
@@ -275,8 +292,9 @@ completion. Existing authorization carries forward to review and delivery within
 
 ## Prerequisites
 
-- [Claude Code](https://docs.anthropic.com/en/docs/claude-code) installed
-- Git + GitHub CLI (`gh`)
+- [Claude Code](https://code.claude.com/docs/en/overview) installed
+- Git for the GitHub marketplace source and repository workflows
+- GitHub CLI (`gh`) for GitHub pull request workflows
 - Optional: Gemini CLI (`npm i -g @google/gemini-cli`)
 - Optional: Linear API access
 

@@ -1,0 +1,16 @@
+{
+  "name": "claudops",
+  "owner": {
+    "name": "Alex Basis"
+  },
+  "metadata": {
+    "description": "Claudops workflow skills and review agents for Claude Code."
+  },
+  "plugins": [
+    {
+      "name": "claudops",
+      "source": "./plugins/claudops",
+      "description": "Workflow skills and review agents for planning, implementation, review, and delivery."
+    }
+  ]
+}

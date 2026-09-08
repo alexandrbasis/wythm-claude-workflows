@@ -1,0 +1,37 @@
+{
+  "agent_skill_dependencies": {
+    "code-quality-reviewer": [
+      "review-conventions"
+    ],
+    "developer-agent": [
+      "coding-conventions"
+    ],
+    "documentation-accuracy-reviewer": [
+      "review-conventions"
+    ],
+    "performance-reviewer": [
+      "review-conventions"
+    ],
+    "security-code-reviewer": [
+      "review-conventions"
+    ],
+    "senior-architecture-reviewer": [
+      "review-conventions",
+      "architecture-language"
+    ],
+    "spec-compliance-reviewer": [
+      "review-conventions"
+    ],
+    "structural-quality-reviewer": [
+      "review-conventions",
+      "architecture-language"
+    ],
+    "test-coverage-reviewer": [
+      "review-conventions"
+    ]
+  },
+  "artifact": "claude",
+  "format": 1,
+  "plugin": "claudops",
+  "source_fingerprint": "effcd3c8e1a860ba7bd3a4edd271872f58f8546e3a6be7e57f613a8bbdb90708"
+}
